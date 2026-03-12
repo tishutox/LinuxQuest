@@ -33,8 +33,9 @@ const upload = multer({
 });
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
-const THA_REGEX    = /^[^\s@]+@tha\.de$/i;
-const SALT_ROUNDS  = 12;
+const THA_REGEX      = /^[^\s@]+@tha\.de$/i;
+const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;  // Only letters, numbers, underscore, hyphen
+const SALT_ROUNDS    = 12;
 
 // ─── REGISTER ─────────────────────────────────────────────────────────────────
 router.post('/register', upload.single('avatar'), async (req, res) => {
@@ -44,6 +45,10 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     // ── Validation ────────────────────────────────────────────────────────────
     if (!username || !full_name || !email || !password || !confirm_password) {
       return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    if (!USERNAME_REGEX.test(username)) {
+      return res.status(400).json({ error: 'Username can only contain letters, numbers, underscores, and hyphens.' });
     }
 
     if (!THA_REGEX.test(email)) {
@@ -148,7 +153,43 @@ router.get('/me', (req, res) => {
 
   if (!user) return res.status(401).json({ error: 'User not found.' });
 
-  return res.json({ user });
+  // Check if username is valid; if not, frontend should show change modal
+  const isValidUsername = USERNAME_REGEX.test(user.username);
+
+  return res.json({ user, needsUsernameUpdate: !isValidUsername });
+});
+
+// ─── UPDATE USERNAME ──────────────────────────────────────────────────────────
+router.post('/update-username', (req, res) => {
+  try {
+    const { newUsername } = req.body;
+
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Not authenticated.' });
+    }
+
+    if (!newUsername || !USERNAME_REGEX.test(newUsername)) {
+      return res.status(400).json({ error: 'Username can only contain letters, numbers, underscores, and hyphens.' });
+    }
+
+    // Check if username is already taken
+    const existing = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?')
+                       .get(newUsername, req.session.userId);
+    if (existing) {
+      return res.status(409).json({ error: 'This username is already taken.' });
+    }
+
+    db.prepare('UPDATE users SET username = ? WHERE id = ?')
+      .run(newUsername, req.session.userId);
+
+    const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
+                   .get(req.session.userId);
+
+    return res.json({ message: 'Username updated!', user });
+  } catch (err) {
+    console.error('[UPDATE USERNAME ERROR]', err);
+    return res.status(500).json({ error: 'Server error.' });
+  }
 });
 
 module.exports = router;

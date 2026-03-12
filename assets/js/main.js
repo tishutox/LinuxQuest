@@ -15,17 +15,18 @@ searchBtn.addEventListener('click',   () => search.classList.add('show-search'))
 searchClose.addEventListener('click', () => search.classList.remove('show-search'))
 
 /*=============== LOGIN / REGISTER TOGGLE ===============*/
-const loginPanel    = document.getElementById('login'),
-      registerPanel = document.getElementById('register'),
-      loginBtn      = document.getElementById('login-btn'),
-      loginClose    = document.getElementById('login-close'),
-      registerClose = document.getElementById('register-close'),
-      signupLink    = document.getElementById('signup-link'),
-      loginLink     = document.getElementById('login-link')
+const loginPanel      = document.getElementById('login'),
+      registerPanel   = document.getElementById('register'),
+      changeUsernamePanel = document.getElementById('change-username'),
+      loginBtn        = document.getElementById('login-btn'),
+      loginClose      = document.getElementById('login-close'),
+      registerClose   = document.getElementById('register-close'),
+      signupLink      = document.getElementById('signup-link'),
+      loginLink       = document.getElementById('login-link')
 
-const showLogin    = () => { loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register') }
-const showRegister = () => { registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register') }
+const showLogin    = () => { loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login') }
+const showRegister = () => { registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login') }
 
 loginBtn.addEventListener('click', showLogin)
 loginClose.addEventListener('click', hideAll)
@@ -92,8 +93,10 @@ async function checkSession() {
       const res  = await fetch('/api/auth/me', { credentials: 'include' })
       if (res.ok) {
          const data = await res.json()
-         setLoggedIn(data.user)
-      }
+         setLoggedIn(data.user)         if (data.needsUsernameUpdate) {
+            hideAll()
+            changeUsernamePanel.classList.add('show-login')
+         }      }
    } catch (_) { /* not logged in */ }
 }
 checkSession()
@@ -195,6 +198,41 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
    } finally {
       btn.disabled = false
       btn.textContent = 'Sign Up'
+   }
+})
+
+/*=============== CHANGE USERNAME ===============*/
+document.getElementById('change-username-form').addEventListener('submit', async (e) => {
+   e.preventDefault()
+   clearMsg('change-username-message')
+
+   const newUsername = document.getElementById('new-username').value.trim()
+
+   const btn = document.getElementById('change-username-submit')
+   btn.disabled = true
+   btn.textContent = 'Updating…'
+
+   try {
+      const res  = await fetch('/api/auth/update-username', {
+         method:      'POST',
+         credentials: 'include',
+         headers:     { 'Content-Type': 'application/json' },
+         body:        JSON.stringify({ newUsername })
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+         showMsg('change-username-message', data.error, 'error')
+      } else {
+         showMsg('change-username-message', data.message, 'success')
+         setLoggedIn(data.user)
+         setTimeout(() => { hideAll(); clearMsg('change-username-message') }, 1000)
+      }
+   } catch (_) {
+      showMsg('change-username-message', 'Cannot reach server.', 'error')
+   } finally {
+      btn.disabled = false
+      btn.textContent = 'Update Username'
    }
 })
 
