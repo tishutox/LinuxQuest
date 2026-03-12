@@ -192,4 +192,42 @@ router.post('/update-username', (req, res) => {
   }
 });
 
+// ─── RESET PASSWORD ───────────────────────────────────────────────────────────
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { identifier, newPassword, confirmPassword } = req.body;
+
+    if (!identifier || !newPassword || !confirmPassword) {
+      return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: 'Passwords do not match.' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+    }
+
+    // Find user by email or username
+    const user = db.prepare(
+      'SELECT id FROM users WHERE email = ? OR username = ?'
+    ).get(identifier.toLowerCase().trim(), identifier.trim());
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    // Hash and update password
+    const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    db.prepare('UPDATE users SET password = ? WHERE id = ?')
+      .run(hashed, user.id);
+
+    return res.json({ message: 'Password reset successfully! You can now log in with your new password.' });
+  } catch (err) {
+    console.error('[RESET PASSWORD ERROR]', err);
+    return res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 module.exports = router;

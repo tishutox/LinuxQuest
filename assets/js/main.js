@@ -18,21 +18,29 @@ searchClose.addEventListener('click', () => search.classList.remove('show-search
 const loginPanel      = document.getElementById('login'),
       registerPanel   = document.getElementById('register'),
       changeUsernamePanel = document.getElementById('change-username'),
+      resetPasswordPanel = document.getElementById('reset-password'),
       loginBtn        = document.getElementById('login-btn'),
       loginClose      = document.getElementById('login-close'),
       registerClose   = document.getElementById('register-close'),
       signupLink      = document.getElementById('signup-link'),
-      loginLink       = document.getElementById('login-link')
+      loginLink       = document.getElementById('login-link'),
+      forgotPasswordLink = document.getElementById('forgot-password-link'),
+      resetPasswordClose = document.getElementById('reset-password-close'),
+      backToLoginLink = document.getElementById('back-to-login-link')
 
-const showLogin    = () => { loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login') }
-const showRegister = () => { registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login') }
+const showLogin    = () => { loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login') }
+const showRegister = () => { registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login') }
+const showResetPassword = () => { resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login') }
 
 loginBtn.addEventListener('click', showLogin)
 loginClose.addEventListener('click', hideAll)
 registerClose.addEventListener('click', hideAll)
 signupLink.addEventListener('click', (e) => { e.preventDefault(); showRegister() })
 loginLink.addEventListener('click',  (e) => { e.preventDefault(); showLogin() })
+forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showResetPassword() })
+resetPasswordClose.addEventListener('click', hideAll)
+backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLogin() })
 
 /*=============== AVATAR PREVIEW ===============*/
 const avatarInput       = document.getElementById('avatar-input')
@@ -233,6 +241,51 @@ document.getElementById('change-username-form').addEventListener('submit', async
    } finally {
       btn.disabled = false
       btn.textContent = 'Update Username'
+   }
+})
+
+/*=============== RESET PASSWORD ===============*/
+document.getElementById('reset-password-form').addEventListener('submit', async (e) => {
+   e.preventDefault()
+   clearMsg('reset-password-message')
+
+   const identifier       = document.getElementById('reset-identifier').value.trim()
+   const newPassword      = document.getElementById('reset-new-password').value
+   const confirmPassword  = document.getElementById('reset-confirm-password').value
+
+   // Client-side validation
+   if (!identifier || !newPassword || !confirmPassword) {
+      return showMsg('reset-password-message', 'All fields are required.', 'error')
+   }
+
+   if (newPassword !== confirmPassword) {
+      return showMsg('reset-password-message', 'Passwords do not match.', 'error')
+   }
+
+   const btn = document.getElementById('reset-password-submit')
+   btn.disabled = true
+   btn.textContent = 'Resetting…'
+
+   try {
+      const res  = await fetch('/api/auth/reset-password', {
+         method:      'POST',
+         credentials: 'include',
+         headers:     { 'Content-Type': 'application/json' },
+         body:        JSON.stringify({ identifier, newPassword, confirmPassword })
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+         showMsg('reset-password-message', data.error, 'error')
+      } else {
+         showMsg('reset-password-message', data.message, 'success')
+         setTimeout(() => { hideAll(); clearMsg('reset-password-message') }, 1500)
+      }
+   } catch (_) {
+      showMsg('reset-password-message', 'Cannot reach server.', 'error')
+   } finally {
+      btn.disabled = false
+      btn.textContent = 'Reset Password'
    }
 })
 

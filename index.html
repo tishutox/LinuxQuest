@@ -107,7 +107,7 @@
                   You do not have an account? <a href="#" id="signup-link">Sign up</a>
                </p>
 
-               <a href="#" class="login__forgot">You forgot your password</a>
+               <a href="#" class="login__forgot" id="forgot-password-link">You forgot your password</a>
 
                <button type="submit" class="login__button" id="login-submit">Log In</button>
             </div>
@@ -194,6 +194,42 @@
 
             <button type="submit" class="login__button" id="change-username-submit">Update Username</button>
          </form>
+      </div>
+
+      <!--==================== RESET PASSWORD ====================-->
+      <div class="login" id="reset-password">
+         <form id="reset-password-form" class="login__form">
+            <h2 class="login__title">Reset Password</h2>
+
+            <div class="login__message" id="reset-password-message"></div>
+
+            <div class="login__group">
+               <div>
+                  <label for="reset-identifier" class="login__label">Email or Username</label>
+                  <input type="text" placeholder="Enter your email or username" id="reset-identifier" class="login__input" autocomplete="off">
+               </div>
+
+               <div>
+                  <label for="reset-new-password" class="login__label">New Password</label>
+                  <input type="password" placeholder="Enter new password" id="reset-new-password" class="login__input" autocomplete="new-password">
+               </div>
+
+               <div>
+                  <label for="reset-confirm-password" class="login__label">Confirm Password</label>
+                  <input type="password" placeholder="Confirm new password" id="reset-confirm-password" class="login__input" autocomplete="new-password">
+               </div>
+            </div>
+
+            <div>
+               <p class="login__signup">
+                  <a href="#" id="back-to-login-link">Back to login</a>
+               </p>
+
+               <button type="submit" class="login__button" id="reset-password-submit">Reset Password</button>
+            </div>
+         </form>
+
+         <i class="ri-close-line login__close" id="reset-password-close"></i>
       </div>
 
       <!--==================== MAIN ====================-->
