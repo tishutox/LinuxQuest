@@ -1,9 +1,11 @@
-const express = require('express');
-const session = require('express-session');
-const cors    = require('cors');
-const path    = require('path');
+const express  = require('express');
+const session  = require('express-session');
+const cors     = require('cors');
+const path     = require('path');
+const createSqliteStore = require('./database/sessionStore');
 
-const authRoutes = require('./routes/auth');
+const SqliteStore = createSqliteStore(session);
+const authRoutes  = require('./routes/auth');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // ─── Session ──────────────────────────────────────────────────────────────────
 app.use(session({
+  store:             new SqliteStore(),
   secret:            process.env.SESSION_SECRET || 'tha-secret-key-change-in-production',
   resave:            false,
   saveUninitialized: false,
