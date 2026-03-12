@@ -155,6 +155,12 @@ img {
   transition: color .4s;
 }
 
+.nav__logo-img {
+  height: 2rem;
+  width: auto;
+  display: block;
+}
+
 .nav__actions {
   display: flex;
   align-items: center;
