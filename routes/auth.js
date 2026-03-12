@@ -1,0 +1,154 @@
+const express = require('express');
+const bcrypt  = require('bcryptjs');
+const multer  = require('multer');
+const path    = require('path');
+const fs      = require('fs');
+const db      = require('../database/db');
+
+const router = express.Router();
+
+// ─── Multer – Profile picture storage ────────────────────────────────────────
+const uploadsDir = process.env.DATA_DIR
+  ? path.join(process.env.DATA_DIR, 'uploads')
+  : path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadsDir),
+  filename:    (_req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, unique + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
+  fileFilter: (_req, file, cb) => {
+    const allowed = /jpeg|jpg|png|gif|webp/;
+    const ok = allowed.test(path.extname(file.originalname).toLowerCase())
+            && allowed.test(file.mimetype);
+    ok ? cb(null, true) : cb(new Error('Only image files are allowed'));
+  }
+});
+
+// ─── Helper ───────────────────────────────────────────────────────────────────
+const THA_REGEX    = /^[^\s@]+@tha\.de$/i;
+const SALT_ROUNDS  = 12;
+
+// ─── REGISTER ─────────────────────────────────────────────────────────────────
+router.post('/register', upload.single('avatar'), async (req, res) => {
+  try {
+    const { username, full_name, email, password, confirm_password } = req.body;
+
+    // ── Validation ────────────────────────────────────────────────────────────
+    if (!username || !full_name || !email || !password || !confirm_password) {
+      return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    if (!THA_REGEX.test(email)) {
+      return res.status(400).json({ error: 'Only @tha.de email addresses are allowed.' });
+    }
+
+    if (password !== confirm_password) {
+      return res.status(400).json({ error: 'Passwords do not match.' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+    }
+
+    // ── Uniqueness checks ─────────────────────────────────────────────────────
+    const existingEmail    = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    const existingUsername = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+
+    if (existingEmail)    return res.status(409).json({ error: 'This email is already registered.' });
+    if (existingUsername) return res.status(409).json({ error: 'This username is already taken.' });
+
+    // ── Store avatar path (relative) or null ──────────────────────────────────
+    const avatarPath = req.file ? 'uploads/' + req.file.filename : null;
+
+    // ── Hash & insert ─────────────────────────────────────────────────────────
+    const hashed = await bcrypt.hash(password, SALT_ROUNDS);
+
+    const info = db.prepare(`
+      INSERT INTO users (username, full_name, email, password, avatar)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(username.trim(), full_name.trim(), email.toLowerCase().trim(), hashed, avatarPath);
+
+    // ── Start session ─────────────────────────────────────────────────────────
+    req.session.userId = info.lastInsertRowid;
+
+    const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
+                   .get(info.lastInsertRowid);
+
+    return res.status(201).json({ message: 'Account created successfully!', user });
+
+  } catch (err) {
+    console.error('[REGISTER ERROR]', err);
+    return res.status(500).json({ error: 'Server error. Please try again.' });
+  }
+});
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
+router.post('/login', async (req, res) => {
+  try {
+    const { identifier, password } = req.body;   // identifier = email OR username
+
+    if (!identifier || !password) {
+      return res.status(400).json({ error: 'Please fill in all fields.' });
+    }
+
+    // Try to find by email first, then by username
+    const user = db.prepare(
+      'SELECT * FROM users WHERE email = ? OR username = ?'
+    ).get(identifier.trim(), identifier.trim());
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials.' });
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ error: 'Invalid credentials.' });
+    }
+
+    req.session.userId = user.id;
+
+    return res.json({
+      message: 'Logged in successfully!',
+      user: {
+        id:         user.id,
+        username:   user.username,
+        full_name:  user.full_name,
+        email:      user.email,
+        avatar:     user.avatar,
+        created_at: user.created_at
+      }
+    });
+
+  } catch (err) {
+    console.error('[LOGIN ERROR]', err);
+    return res.status(500).json({ error: 'Server error. Please try again.' });
+  }
+});
+
+// ─── LOGOUT ───────────────────────────────────────────────────────────────────
+router.post('/logout', (req, res) => {
+  req.session.destroy(() => res.json({ message: 'Logged out.' }));
+});
+
+// ─── SESSION CHECK ────────────────────────────────────────────────────────────
+router.get('/me', (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ error: 'Not authenticated.' });
+
+  const user = db.prepare(
+    'SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?'
+  ).get(req.session.userId);
+
+  if (!user) return res.status(401).json({ error: 'User not found.' });
+
+  return res.json({ user });
+});
+
+module.exports = router;
