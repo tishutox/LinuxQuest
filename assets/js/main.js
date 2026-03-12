@@ -101,10 +101,12 @@ async function checkSession() {
       const res  = await fetch('/api/auth/me', { credentials: 'include' })
       if (res.ok) {
          const data = await res.json()
-         setLoggedIn(data.user)         if (data.needsUsernameUpdate) {
+         setLoggedIn(data.user)
+         if (data.needsUsernameUpdate) {
             hideAll()
             changeUsernamePanel.classList.add('show-login')
-         }      }
+         }
+      }
    } catch (_) { /* not logged in */ }
 }
 checkSession()
