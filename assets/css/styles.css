@@ -1,5 +1,5 @@
 /*=============== GOOGLE FONTS ===============*/
-@import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600&family=MedievalSharp&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Russo+One&display=swap");
 
 /*=============== VARIABLES CSS ===============*/
 :root {
@@ -16,7 +16,7 @@
 
   /*========== Font and typography ==========*/
   /*.5rem = 8px | 1rem = 16px ...*/
-  --body-font: "League Spartan", sans-serif;
+  --body-font: "Russo One", sans-serif;
   --h2-font-size: 1.25rem;
   --normal-font-size: .938rem;
 
@@ -147,7 +147,7 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: "MedievalSharp", cursive;
+  font-family: "Russo One", sans-serif;
 }
 
 .nav__logo {
