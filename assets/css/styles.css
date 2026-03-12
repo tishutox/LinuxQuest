@@ -151,6 +151,8 @@ img {
 }
 
 .nav__logo {
+  display: inline-flex;
+  align-items: center;
   color: var(--title-color);
   font-weight: var(--font-semi-bold);
   transition: color .4s;
@@ -172,7 +174,11 @@ img {
 .nav__login, 
 .nav__toggle, 
 .nav__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.25rem;
+  line-height: 1;
   color: var(--title-color);
   cursor: pointer;
   transition: color .4s;
@@ -204,6 +210,9 @@ img {
 }
 
 .nav__link {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
   color: var(--title-color);
   font-weight: var(--font-semi-bold);
   transition: color .4s;
@@ -361,6 +370,7 @@ img {
   display: flex;
   align-items: center;
   column-gap: .5rem;
+  line-height: 1;
 }
 
 .nav__avatar {
@@ -372,12 +382,18 @@ img {
 }
 
 .nav__username {
+  display: inline-flex;
+  align-items: center;
   font-weight: var(--font-semi-bold);
   color: var(--title-color);
   font-size: var(--normal-font-size);
+  line-height: 1;
 }
 
 .nav__logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   font-size: 1.2rem;
   color: var(--text-color);
