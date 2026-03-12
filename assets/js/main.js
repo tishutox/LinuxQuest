@@ -9,10 +9,27 @@ navClose.addEventListener('click',  () => navMenu.classList.remove('show-menu'))
 /*=============== SEARCH ===============*/
 const search      = document.getElementById('search'),
       searchBtn   = document.getElementById('search-btn'),
-      searchClose = document.getElementById('search-close')
+      searchClose = document.getElementById('search-close'),
+      searchForm  = document.getElementById('search-form'),
+      searchInput = document.getElementById('search-input')
 
 searchBtn.addEventListener('click',   () => search.classList.add('show-search'))
 searchClose.addEventListener('click', () => search.classList.remove('show-search'))
+
+searchForm.addEventListener('submit', (event) => {
+   event.preventDefault()
+
+   const query = searchInput.value.trim()
+   const targetUrl = new URL(window.location.href)
+
+   if (query) {
+      targetUrl.searchParams.set('q', query)
+   } else {
+      targetUrl.searchParams.delete('q')
+   }
+
+   window.location.href = targetUrl.toString()
+})
 
 /*=============== LOGIN / REGISTER TOGGLE ===============*/
 const loginPanel      = document.getElementById('login'),
