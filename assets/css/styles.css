@@ -1,5 +1,5 @@
 /*=============== GOOGLE FONTS ===============*/
-@import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600&family=MedievalSharp&display=swap");
 
 /*=============== VARIABLES CSS ===============*/
 :root {
@@ -147,6 +147,7 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: "MedievalSharp", cursive;
 }
 
 .nav__logo {
