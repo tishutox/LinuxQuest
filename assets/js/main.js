@@ -235,7 +235,7 @@ function updateProfileView(user) {
 
    if (profileDeleteNote) {
       profileDeleteNote.textContent = protectedUser
-         ? 'Dieses Projektkonto ist dauerhaft vor Loeschung geschuetzt.'
+         ? 'Dieses Projektkonto ist dauerhaft vor Löschung geschützt.'
          : 'Zum Löschen des Kontos ist dein Passwort erforderlich.'
    }
 }
