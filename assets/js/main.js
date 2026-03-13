@@ -347,6 +347,13 @@ const emailCodeWrap = document.getElementById('email-code-wrap')
 const regVerifyCode = document.getElementById('reg-verify-code')
 let   sendCodeTimer = null
 
+function getFriendlyRegisterError(errorMessage) {
+   if (!errorMessage) return 'Something went wrong. Please try again.'
+   if (errorMessage.includes('already registered')) return 'This email already has an account. Please log in or reset your password.'
+   if (errorMessage.includes('Invalid or expired verification code')) return 'Your code is invalid or expired. Please click “Send Code” again.'
+   return errorMessage
+}
+
 sendCodeBtn.addEventListener('click', async () => {
    const email = document.getElementById('reg-email').value.trim()
    if (!email) {
@@ -370,7 +377,7 @@ sendCodeBtn.addEventListener('click', async () => {
       const data = await res.json()
 
       if (!res.ok) {
-         showMsg('register-message', data.error, 'error')
+         showMsg('register-message', getFriendlyRegisterError(data.error), 'error')
          sendCodeBtn.disabled = false
          sendCodeBtn.textContent = 'Send Code'
       } else {
@@ -446,7 +453,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
       const data = await res.json()
 
       if (!res.ok) {
-         showMsg('register-message', data.error, 'error')
+         showMsg('register-message', getFriendlyRegisterError(data.error), 'error')
       } else {
          showMsg('register-message', data.message, 'success')
          setLoggedIn(data.user)

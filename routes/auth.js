@@ -37,6 +37,9 @@ const upload = multer({
 const THA_REGEX      = /^[^\s@]+@tha\.de$/i;
 const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;  // Only letters, numbers, underscore, hyphen
 const SALT_ROUNDS    = 12;
+const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
+const VERIFY_IP_MAX_REQUESTS = 6;
+const verificationIpRequests = new Map();
 
 function deleteOldAvatar(avatarPath) {
   if (!avatarPath || !avatarPath.startsWith('uploads/')) return;
@@ -62,6 +65,29 @@ function touchUserActivity(userId) {
   } catch (err) {
     console.error('[TOUCH ACTIVITY ERROR]', err);
   }
+}
+
+function getClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string' && forwarded.length) {
+    return forwarded.split(',')[0].trim();
+  }
+  return req.ip || req.socket?.remoteAddress || 'unknown';
+}
+
+function checkIpVerificationRateLimit(req) {
+  const now = Date.now();
+  const ip = getClientIp(req);
+  const recent = (verificationIpRequests.get(ip) || []).filter((timestamp) => now - timestamp < VERIFY_IP_WINDOW_MS);
+
+  if (recent.length >= VERIFY_IP_MAX_REQUESTS) {
+    const retryAfterSeconds = Math.ceil((VERIFY_IP_WINDOW_MS - (now - recent[0])) / 1000);
+    return { limited: true, retryAfterSeconds };
+  }
+
+  recent.push(now);
+  verificationIpRequests.set(ip, recent);
+  return { limited: false, retryAfterSeconds: 0 };
 }
 
 // ─── MAIL TRANSPORT ───────────────────────────────────────────────────────────
@@ -94,6 +120,13 @@ router.post('/send-verification', async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+
+    const ipLimit = checkIpVerificationRateLimit(req);
+    if (ipLimit.limited) {
+      return res.status(429).json({
+        error: `Too many verification requests from your network. Try again in about ${ipLimit.retryAfterSeconds} seconds.`
+      });
+    }
 
     const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(normalizedEmail);
     if (existing) {
