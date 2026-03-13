@@ -64,7 +64,6 @@ const projectContactElements = {
       name: document.getElementById('armand-modal-name'),
       username: document.getElementById('armand-modal-username'),
       email: document.getElementById('armand-modal-email'),
-      status: document.getElementById('armand-modal-status'),
       imprintLink: imprintArmandLink
    },
    jost: {
@@ -77,7 +76,6 @@ const projectContactElements = {
       name: document.getElementById('jost-modal-name'),
       username: document.getElementById('jost-modal-username'),
       email: document.getElementById('jost-modal-email'),
-      status: document.getElementById('jost-modal-status'),
       imprintLink: imprintJostLink
    }
 }
@@ -189,16 +187,12 @@ function updateProjectContactModal(contactKey, contact) {
    if (!elements) return
 
    const displayUser = getDisplayUser(contact, elements.fallback)
-   const exists = Boolean(contact)
 
    elements.avatar.src = getAvatarUrl(displayUser)
    elements.name.textContent = displayUser.full_name
    elements.username.textContent = `@${displayUser.username}`
    elements.email.textContent = displayUser.email
    elements.email.href = `mailto:${displayUser.email}`
-   elements.status.textContent = exists
-      ? 'Dieses Projektkonto ist in der App vorhanden und dauerhaft vor Loeschung geschuetzt.'
-      : 'Dieses Projektkonto wurde in der App noch nicht erstellt. Nach der Erstellung werden hier die aktuellen Profildaten angezeigt.'
 
    setImprintContactLink(elements.imprintLink, contact, elements.fallback)
 }
