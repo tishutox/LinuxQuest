@@ -36,6 +36,7 @@ const loginPanel      = document.getElementById('login'),
       registerPanel   = document.getElementById('register'),
       changeUsernamePanel = document.getElementById('change-username'),
       resetPasswordPanel = document.getElementById('reset-password'),
+   profileModal    = document.getElementById('profile-modal'),
       loginBtn        = document.getElementById('login-btn'),
       loginClose      = document.getElementById('login-close'),
       registerClose   = document.getElementById('register-close'),
@@ -43,12 +44,13 @@ const loginPanel      = document.getElementById('login'),
       loginLink       = document.getElementById('login-link'),
       forgotPasswordLink = document.getElementById('forgot-password-link'),
       resetPasswordClose = document.getElementById('reset-password-close'),
-      backToLoginLink = document.getElementById('back-to-login-link')
+   backToLoginLink = document.getElementById('back-to-login-link'),
+   profileClose    = document.getElementById('profile-close')
 
-const showLogin    = () => { loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login') }
-const showRegister = () => { registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login') }
-const showResetPassword = () => { resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login') }
+const showLogin    = () => { loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
+const showRegister = () => { registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
+const showResetPassword = () => { resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
 
 loginBtn.addEventListener('click', showLogin)
 loginClose.addEventListener('click', hideAll)
@@ -58,6 +60,7 @@ loginLink.addEventListener('click',  (e) => { e.preventDefault(); showLogin() })
 forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showResetPassword() })
 resetPasswordClose.addEventListener('click', hideAll)
 backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLogin() })
+profileClose.addEventListener('click', hideAll)
 
 /*=============== AVATAR PREVIEW ===============*/
 const avatarInput       = document.getElementById('avatar-input')
@@ -92,25 +95,139 @@ function clearMsg(id) {
 const navUser     = document.getElementById('nav-user')
 const navAvatar   = document.getElementById('nav-avatar')
 const navUsername = document.getElementById('nav-username')
+const profileBtn  = document.getElementById('profile-btn')
 const logoutBtn   = document.getElementById('logout-btn')
+const profileAvatarInput  = document.getElementById('profile-avatar-input')
+const profileAvatarButton = document.getElementById('profile-avatar-button')
+const profileAvatarImage  = document.getElementById('profile-avatar-image')
+const profileUsername     = document.getElementById('profile-username')
+const profileForm         = document.getElementById('profile-form')
+const profileFullNameInput = document.getElementById('profile-full-name-input')
+const profileUsernameInput = document.getElementById('profile-username-input')
+const profileSaveBtn       = document.getElementById('profile-save-btn')
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=3d5af1&color=fff&name='
+let currentUser = null
 
-function setLoggedIn(user) {
-   loginBtn.style.display   = 'none'
-   navUser.style.display    = 'flex'
-   navUsername.textContent  = user.username
-   navAvatar.src = user.avatar
+function getAvatarUrl(user) {
+   return user.avatar
       ? '/' + user.avatar
       : DEFAULT_AVATAR + encodeURIComponent(user.full_name)
 }
 
+function updateProfileView(user) {
+   profileAvatarImage.src  = getAvatarUrl(user)
+   profileFullNameInput.value = user.full_name
+   profileUsernameInput.value = user.username
+   profileUsername.textContent = '@' + user.username
+}
+
+function setLoggedIn(user) {
+   currentUser = user
+   loginBtn.style.display   = 'none'
+   navUser.style.display    = 'flex'
+   navUsername.textContent  = user.username
+   navAvatar.src = getAvatarUrl(user)
+   updateProfileView(user)
+}
+
 function setLoggedOut() {
+   currentUser = null
    loginBtn.style.display  = ''
    navUser.style.display   = 'none'
    navAvatar.src           = ''
    navUsername.textContent = ''
+   profileAvatarImage.src  = ''
+   profileFullNameInput.value = ''
+   profileUsernameInput.value = ''
+   profileUsername.textContent = ''
+   hideAll()
 }
+
+function showProfileModal() {
+   if (!currentUser) return
+   clearMsg('profile-message')
+   updateProfileView(currentUser)
+   hideAll()
+   profileModal.classList.add('show-login')
+}
+
+profileBtn.addEventListener('click', showProfileModal)
+profileAvatarButton.addEventListener('click', () => profileAvatarInput.click())
+
+profileAvatarInput.addEventListener('change', async () => {
+   const avatarFile = profileAvatarInput.files[0]
+   if (!avatarFile) return
+
+   clearMsg('profile-message')
+   profileAvatarButton.disabled = true
+
+   try {
+      const formData = new FormData()
+      formData.append('avatar', avatarFile)
+
+      const res = await fetch('/api/auth/update-avatar', {
+         method: 'POST',
+         credentials: 'include',
+         body: formData
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+         showMsg('profile-message', data.error || 'Could not update profile picture.', 'error')
+      } else {
+         showMsg('profile-message', data.message || 'Profile picture updated!', 'success')
+         setLoggedIn(data.user)
+      }
+   } catch (_) {
+      showMsg('profile-message', 'Cannot reach server.', 'error')
+   } finally {
+      profileAvatarInput.value = ''
+      profileAvatarButton.disabled = false
+   }
+})
+
+profileUsernameInput.addEventListener('input', () => {
+   const value = profileUsernameInput.value.trim()
+   profileUsername.textContent = value ? '@' + value : '@'
+})
+
+profileForm.addEventListener('submit', async (e) => {
+   e.preventDefault()
+   clearMsg('profile-message')
+
+   const full_name = profileFullNameInput.value.trim()
+   const username  = profileUsernameInput.value.trim()
+
+   if (!full_name || !username) {
+      return showMsg('profile-message', 'Full name and username are required.', 'error')
+   }
+
+   profileSaveBtn.disabled = true
+   profileSaveBtn.textContent = 'Saving…'
+
+   try {
+      const res = await fetch('/api/auth/update-profile', {
+         method: 'POST',
+         credentials: 'include',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ full_name, username })
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+         showMsg('profile-message', data.error || 'Could not update profile.', 'error')
+      } else {
+         showMsg('profile-message', data.message || 'Profile updated!', 'success')
+         setLoggedIn(data.user)
+      }
+   } catch (_) {
+      showMsg('profile-message', 'Cannot reach server.', 'error')
+   } finally {
+      profileSaveBtn.disabled = false
+      profileSaveBtn.textContent = 'Save Changes'
+   }
+})
 
 /*=============== CHECK SESSION ON LOAD ===============*/
 async function checkSession() {

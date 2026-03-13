@@ -37,6 +37,21 @@ const THA_REGEX      = /^[^\s@]+@tha\.de$/i;
 const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;  // Only letters, numbers, underscore, hyphen
 const SALT_ROUNDS    = 12;
 
+function deleteOldAvatar(avatarPath) {
+  if (!avatarPath || !avatarPath.startsWith('uploads/')) return;
+
+  const fileName = path.basename(avatarPath);
+  const filePath = path.join(uploadsDir, fileName);
+
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch (err) {
+    console.error('[DELETE AVATAR ERROR]', err);
+  }
+}
+
 // ─── REGISTER ─────────────────────────────────────────────────────────────────
 router.post('/register', upload.single('avatar'), async (req, res) => {
   try {
@@ -188,6 +203,86 @@ router.post('/update-username', (req, res) => {
     return res.json({ message: 'Username updated!', user });
   } catch (err) {
     console.error('[UPDATE USERNAME ERROR]', err);
+    return res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+// ─── UPDATE AVATAR ────────────────────────────────────────────────────────────
+router.post('/update-avatar', upload.single('avatar'), (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Not authenticated.' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'Please choose an image file.' });
+    }
+
+    const currentUser = db.prepare('SELECT avatar FROM users WHERE id = ?')
+                          .get(req.session.userId);
+
+    if (!currentUser) {
+      deleteOldAvatar('uploads/' + req.file.filename);
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    const newAvatarPath = 'uploads/' + req.file.filename;
+
+    db.prepare('UPDATE users SET avatar = ? WHERE id = ?')
+      .run(newAvatarPath, req.session.userId);
+
+    deleteOldAvatar(currentUser.avatar);
+
+    const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
+                   .get(req.session.userId);
+
+    return res.json({ message: 'Profile picture updated!', user });
+  } catch (err) {
+    console.error('[UPDATE AVATAR ERROR]', err);
+    return res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+// ─── UPDATE PROFILE (NAME + USERNAME) ───────────────────────────────────────
+router.post('/update-profile', (req, res) => {
+  try {
+    const { full_name, username } = req.body;
+
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Not authenticated.' });
+    }
+
+    if (!full_name || !username) {
+      return res.status(400).json({ error: 'Full name and username are required.' });
+    }
+
+    const trimmedName = full_name.trim();
+    const trimmedUsername = username.trim();
+
+    if (!trimmedName) {
+      return res.status(400).json({ error: 'Full name is required.' });
+    }
+
+    if (!USERNAME_REGEX.test(trimmedUsername)) {
+      return res.status(400).json({ error: 'Username can only contain letters, numbers, underscores, and hyphens.' });
+    }
+
+    const existing = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?')
+                       .get(trimmedUsername, req.session.userId);
+
+    if (existing) {
+      return res.status(409).json({ error: 'This username is already taken.' });
+    }
+
+    db.prepare('UPDATE users SET full_name = ?, username = ? WHERE id = ?')
+      .run(trimmedName, trimmedUsername, req.session.userId);
+
+    const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
+                   .get(req.session.userId);
+
+    return res.json({ message: 'Profile updated!', user });
+  } catch (err) {
+    console.error('[UPDATE PROFILE ERROR]', err);
     return res.status(500).json({ error: 'Server error.' });
   }
 });

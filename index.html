@@ -61,8 +61,10 @@
 
                <!-- User info (shown when logged in) -->
                <div class="nav__user" id="nav-user" style="display:none;">
-                  <img src="" alt="avatar" class="nav__avatar" id="nav-avatar">
-                  <span class="nav__username" id="nav-username"></span>
+                  <button class="nav__profile-trigger" id="profile-btn" type="button" title="Open profile">
+                     <img src="" alt="avatar" class="nav__avatar" id="nav-avatar">
+                     <span class="nav__username" id="nav-username"></span>
+                  </button>
                   <button class="nav__logout" id="logout-btn" title="Log out">
                      <i class="fi fi-br-sign-out-alt"></i>
                   </button>
@@ -233,6 +235,40 @@
          </form>
 
          <i class="fi fi-br-cross-small login__close" id="reset-password-close"></i>
+      </div>
+
+      <!--==================== PROFILE ====================-->
+      <div class="login" id="profile-modal">
+         <form class="login__form profile__form" id="profile-form">
+            <h2 class="login__title">Profile</h2>
+
+            <div class="login__message" id="profile-message"></div>
+
+            <div class="profile__avatar-wrap">
+               <input type="file" id="profile-avatar-input" accept="image/*" style="display:none;">
+               <button class="profile__avatar-button" id="profile-avatar-button" type="button" title="Change profile picture">
+                  <img src="" alt="profile avatar" class="profile__avatar-image" id="profile-avatar-image">
+               </button>
+            </div>
+
+            <p class="profile__username" id="profile-username"></p>
+
+            <div class="login__group">
+               <div>
+                  <label for="profile-full-name-input" class="login__label">Full Name</label>
+                  <input type="text" id="profile-full-name-input" class="login__input" autocomplete="name">
+               </div>
+
+               <div>
+                  <label for="profile-username-input" class="login__label">Username</label>
+                  <input type="text" id="profile-username-input" class="login__input" autocomplete="username">
+               </div>
+            </div>
+
+            <button type="submit" class="login__button" id="profile-save-btn">Save Changes</button>
+         </form>
+
+         <i class="fi fi-br-cross-small login__close" id="profile-close"></i>
       </div>
 
       <!--==================== MAIN ====================-->
