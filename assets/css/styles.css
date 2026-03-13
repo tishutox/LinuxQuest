@@ -1,5 +1,5 @@
-/*=============== GOOGLE FONTS ===============*/
-@import url("https://fonts.googleapis.com/css2?family=Russo+One&display=swap");
+/*=============== M PLUS ROUNDED 1C ===============*/
+@import url("https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap");
 
 /*=============== VARIABLES CSS ===============*/
 :root {
@@ -7,7 +7,7 @@
 
   /*========== Colors ==========*/
   /*Color mode HSL(hue, saturation, lightness)*/
-  --first-color: hsl(230, 75%, 56%);
+  --first-color: #352C59;
   --title-color: hsl(230, 75%, 15%);
   --text-color: hsl(230, 12%, 40%);
   --body-color: hsl(230, 100%, 98%);
@@ -16,7 +16,7 @@
 
   /*========== Font and typography ==========*/
   /*.5rem = 8px | 1rem = 16px ...*/
-  --body-font: "Russo One", sans-serif;
+  --body-font: "M PLUS Rounded 1c", sans-serif;
   --h2-font-size: 1.25rem;
   --normal-font-size: .938rem;
 
@@ -147,7 +147,7 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: "Russo One", sans-serif;
+  font-family: "M PLUS Rounded 1c", sans-serif;
 }
 
 .nav__logo {

@@ -108,7 +108,7 @@ const profileDeletePasswordInput = document.getElementById('profile-delete-passw
 const profileSaveBtn       = document.getElementById('profile-save-btn')
 const profileDeleteBtn     = document.getElementById('profile-delete-btn')
 
-const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=3d5af1&color=fff&name='
+const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
 let currentUser = null
 
 function getAvatarUrl(user) {
