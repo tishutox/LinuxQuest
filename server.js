@@ -96,7 +96,11 @@ async function logMailStatus() {
   const mailConfig = getMailConfig();
 
   if (!mailConfig.isConfigured) {
-    console.warn('[MAILER] SMTP is not fully configured. Verification codes will only be logged on the server.');
+    if (mailConfig.allowConsoleFallback) {
+      console.warn('[MAILER] SMTP is not fully configured. Verification codes will only be logged on the server.');
+    } else {
+      console.error('[MAILER] SMTP is not configured for this deployment. Email verification will fail until SMTP_* variables are set.');
+    }
     return;
   }
 

@@ -41,6 +41,29 @@ const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
 const VERIFY_IP_MAX_REQUESTS = 6;
 const verificationIpRequests = new Map();
 
+function getMailErrorMessage(error) {
+  const message = typeof error?.message === 'string' ? error.message : '';
+  const code = typeof error?.code === 'string' ? error.code : '';
+
+  if (code === 'ETIMEDOUT' || code === 'ESOCKET' || message.toLowerCase().includes('timeout')) {
+    return 'The email service timed out. On Railway, try SMTP_PORT 465 with SMTP_SERVICE=gmail and redeploy.';
+  }
+
+  if (code === 'EAUTH') {
+    return 'The email service rejected the login. Check SMTP_USER and SMTP_PASS in Railway.';
+  }
+
+  if (code === 'ENOTFOUND' || code === 'EAI_AGAIN') {
+    return 'The server could not reach the SMTP host. Check SMTP_HOST and Railway outbound networking.';
+  }
+
+  if (message === 'SMTP is not configured for this environment.') {
+    return 'Email delivery is not configured on the server. Set the SMTP variables in Railway and redeploy.';
+  }
+
+  return 'Could not send verification email. Please try again.';
+}
+
 function deleteOldAvatar(avatarPath) {
   if (!avatarPath || !avatarPath.startsWith('uploads/')) return;
 
@@ -132,8 +155,15 @@ router.post('/send-verification', async (req, res) => {
       VALUES (?, ?, datetime('now', '+15 minutes'))
     `).run(normalizedEmail, code);
 
-    const transport = createMailTransport();
     const mailConfig = getMailConfig();
+
+    if (!mailConfig.isConfigured && !mailConfig.allowConsoleFallback) {
+      return res.status(503).json({
+        error: 'Email delivery is not configured on the server. Please contact support.'
+      });
+    }
+
+    const transport = createMailTransport();
 
     const info = await transport.sendMail({
       from: mailConfig.from,
@@ -164,8 +194,13 @@ router.post('/send-verification', async (req, res) => {
 
     return res.json({ message: 'Verification code sent! Please check your inbox.' });
   } catch (err) {
-    console.error('[SEND VERIFICATION ERROR]', err);
-    return res.status(500).json({ error: 'Could not send verification email. Please try again.' });
+    console.error('[SEND VERIFICATION ERROR]', {
+      code: err?.code || err?.responseCode || null,
+      message: err?.message || 'Unknown error',
+      response: err?.response || null,
+      command: err?.command || null
+    });
+    return res.status(500).json({ error: getMailErrorMessage(err) });
   }
 });
 
