@@ -89,6 +89,21 @@
       gap: .55rem;
    }
 
+   &__avatar-wrap{
+      display: flex;
+      justify-content: center;
+      margin-bottom: .35rem;
+   }
+
+   &__avatar{
+      width: 5.5rem;
+      height: 5.5rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--border-color);
+      background-color: var(--container-color);
+   }
+
    &__person-label{
       color: var(--first-color);
       font-weight: var(--font-semi-bold);
@@ -101,6 +116,15 @@
       color: var(--title-color);
       font-size: 1.2rem;
       font-weight: var(--font-semi-bold);
+   }
+
+   &__person-username{
+      color: var(--text-color);
+      font-weight: var(--font-medium);
+   }
+
+   &__person-status{
+      color: var(--text-color);
    }
 }
 

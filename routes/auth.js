@@ -98,6 +98,14 @@ function touchUserActivity(userId) {
   }
 }
 
+function getPublicUserProfileByEmail(email) {
+  return db.prepare(`
+    SELECT id, username, full_name, email, avatar, created_at
+    FROM users
+    WHERE email = ?
+  `).get(normalizeEmail(email));
+}
+
 function getClientIp(req) {
   const forwarded = req.headers['x-forwarded-for'];
   if (typeof forwarded === 'string' && forwarded.length) {
@@ -351,6 +359,20 @@ router.get('/me', (req, res) => {
   const isValidUsername = USERNAME_REGEX.test(user.username);
 
   return res.json({ user, needsUsernameUpdate: !isValidUsername });
+});
+
+router.get('/project-contacts', (_req, res) => {
+  try {
+    const contacts = {
+      armand: getPublicUserProfileByEmail('armand.patrick.asztalos@tha.de') || null,
+      jost: getPublicUserProfileByEmail('jost.witthauer@tha.de') || null
+    };
+
+    return res.json({ contacts });
+  } catch (err) {
+    console.error('[PROJECT CONTACTS ERROR]', err);
+    return res.status(500).json({ error: 'Could not load project contacts.' });
+  }
 });
 
 // ─── UPDATE USERNAME ──────────────────────────────────────────────────────────

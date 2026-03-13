@@ -50,6 +50,37 @@ const loginPanel      = document.getElementById('login'),
 const staticModalTriggers = document.querySelectorAll('[data-modal-target]')
 const staticModalCloseButtons = document.querySelectorAll('[data-modal-close]')
 const staticModalPanels = Array.from(document.querySelectorAll('.info-modal'))
+const imprintArmandLink = document.getElementById('imprint-armand-link')
+const imprintJostLink = document.getElementById('imprint-jost-link')
+
+const projectContactElements = {
+   armand: {
+      fallback: {
+         full_name: 'Armand Patrick Asztalos',
+         username: 'armand',
+         email: 'armand.patrick.asztalos@tha.de'
+      },
+      avatar: document.getElementById('armand-modal-avatar'),
+      name: document.getElementById('armand-modal-name'),
+      username: document.getElementById('armand-modal-username'),
+      email: document.getElementById('armand-modal-email'),
+      status: document.getElementById('armand-modal-status'),
+      imprintLink: imprintArmandLink
+   },
+   jost: {
+      fallback: {
+         full_name: 'Jost Witthauer',
+         username: 'jost',
+         email: 'jost.witthauer@tha.de'
+      },
+      avatar: document.getElementById('jost-modal-avatar'),
+      name: document.getElementById('jost-modal-name'),
+      username: document.getElementById('jost-modal-username'),
+      email: document.getElementById('jost-modal-email'),
+      status: document.getElementById('jost-modal-status'),
+      imprintLink: imprintJostLink
+   }
+}
 
 function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
@@ -142,6 +173,50 @@ const PROTECTED_EMAILS = new Set([
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
 let currentUser = null
 
+function getDisplayUser(contact, fallback) {
+   return contact || fallback
+}
+
+function setImprintContactLink(link, contact, fallback) {
+   if (!link) return
+
+   const displayUser = getDisplayUser(contact, fallback)
+   link.textContent = `${displayUser.full_name}, ${displayUser.email}`
+}
+
+function updateProjectContactModal(contactKey, contact) {
+   const elements = projectContactElements[contactKey]
+   if (!elements) return
+
+   const displayUser = getDisplayUser(contact, elements.fallback)
+   const exists = Boolean(contact)
+
+   elements.avatar.src = getAvatarUrl(displayUser)
+   elements.name.textContent = displayUser.full_name
+   elements.username.textContent = `@${displayUser.username}`
+   elements.email.textContent = displayUser.email
+   elements.email.href = `mailto:${displayUser.email}`
+   elements.status.textContent = exists
+      ? 'Dieses Projektkonto ist in der App vorhanden und dauerhaft vor Loeschung geschuetzt.'
+      : 'Dieses Projektkonto wurde in der App noch nicht erstellt. Nach der Erstellung werden hier die aktuellen Profildaten angezeigt.'
+
+   setImprintContactLink(elements.imprintLink, contact, elements.fallback)
+}
+
+async function refreshProjectContacts() {
+   try {
+      const response = await fetch('/api/auth/project-contacts', { credentials: 'include' })
+      if (!response.ok) throw new Error('Could not load contacts')
+
+      const data = await response.json()
+      updateProjectContactModal('armand', data.contacts?.armand || null)
+      updateProjectContactModal('jost', data.contacts?.jost || null)
+   } catch (_) {
+      updateProjectContactModal('armand', null)
+      updateProjectContactModal('jost', null)
+   }
+}
+
 function isProtectedUser(user) {
    return Boolean(user?.email) && PROTECTED_EMAILS.has(user.email.trim().toLowerCase())
 }
@@ -178,6 +253,7 @@ function setLoggedIn(user) {
    navUsername.textContent  = user.username
    navAvatar.src = getAvatarUrl(user)
    updateProfileView(user)
+   refreshProjectContacts()
 }
 
 function setLoggedOut() {
@@ -196,6 +272,7 @@ function setLoggedOut() {
    if (profileDeleteNote) {
       profileDeleteNote.textContent = 'Zum Loeschen des Kontos ist dein Passwort erforderlich.'
    }
+   refreshProjectContacts()
    hideAll()
 }
 
@@ -330,7 +407,9 @@ profileDeleteBtn.addEventListener('click', async () => {
 })
 
 staticModalTriggers.forEach((trigger) => {
-   trigger.addEventListener('click', () => {
+   trigger.addEventListener('click', async (event) => {
+      event.preventDefault()
+      await refreshProjectContacts()
       showStaticModal(trigger.dataset.modalTarget)
    })
 })
@@ -365,6 +444,8 @@ async function checkSession() {
          }
       }
    } catch (_) { /* not logged in */ }
+
+   refreshProjectContacts()
 }
 checkSession()
 
