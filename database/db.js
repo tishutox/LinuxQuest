@@ -24,8 +24,21 @@ db.exec(`
     email       TEXT    NOT NULL UNIQUE COLLATE NOCASE,
     password    TEXT    NOT NULL,
     avatar      TEXT    DEFAULT NULL,
-    created_at  TEXT    DEFAULT (datetime('now'))
+    created_at  TEXT    DEFAULT (datetime('now')),
+    last_active_at TEXT DEFAULT (datetime('now'))
   )
+`);
+
+const userColumns = db.prepare("PRAGMA table_info(users)").all();
+const hasLastActiveColumn = userColumns.some((column) => column.name === 'last_active_at');
+
+if (!hasLastActiveColumn) {
+  db.exec('ALTER TABLE users ADD COLUMN last_active_at TEXT');
+}
+
+db.exec(`
+  UPDATE users
+  SET last_active_at = COALESCE(last_active_at, created_at, datetime('now'))
 `);
 
 module.exports = db;

@@ -52,6 +52,17 @@ function deleteOldAvatar(avatarPath) {
   }
 }
 
+function touchUserActivity(userId) {
+  if (!userId) return;
+
+  try {
+    db.prepare("UPDATE users SET last_active_at = datetime('now') WHERE id = ?")
+      .run(userId);
+  } catch (err) {
+    console.error('[TOUCH ACTIVITY ERROR]', err);
+  }
+}
+
 // ─── REGISTER ─────────────────────────────────────────────────────────────────
 router.post('/register', upload.single('avatar'), async (req, res) => {
   try {
@@ -92,8 +103,8 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     const hashed = await bcrypt.hash(password, SALT_ROUNDS);
 
     const info = db.prepare(`
-      INSERT INTO users (username, full_name, email, password, avatar)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO users (username, full_name, email, password, avatar, last_active_at)
+      VALUES (?, ?, ?, ?, ?, datetime('now'))
     `).run(username.trim(), full_name.trim(), email.toLowerCase().trim(), hashed, avatarPath);
 
     // ── Start session ─────────────────────────────────────────────────────────
@@ -133,6 +144,8 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
+    touchUserActivity(user.id);
+
     req.session.userId = user.id;
 
     return res.json({
@@ -168,6 +181,8 @@ router.get('/me', (req, res) => {
 
   if (!user) return res.status(401).json({ error: 'User not found.' });
 
+  touchUserActivity(req.session.userId);
+
   // Check if username is valid; if not, frontend should show change modal
   const isValidUsername = USERNAME_REGEX.test(user.username);
 
@@ -194,7 +209,7 @@ router.post('/update-username', (req, res) => {
       return res.status(409).json({ error: 'This username is already taken.' });
     }
 
-    db.prepare('UPDATE users SET username = ? WHERE id = ?')
+    db.prepare("UPDATE users SET username = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(newUsername, req.session.userId);
 
     const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
@@ -228,7 +243,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 
     const newAvatarPath = 'uploads/' + req.file.filename;
 
-    db.prepare('UPDATE users SET avatar = ? WHERE id = ?')
+    db.prepare("UPDATE users SET avatar = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(newAvatarPath, req.session.userId);
 
     deleteOldAvatar(currentUser.avatar);
@@ -274,7 +289,7 @@ router.post('/update-profile', (req, res) => {
       return res.status(409).json({ error: 'This username is already taken.' });
     }
 
-    db.prepare('UPDATE users SET full_name = ?, username = ? WHERE id = ?')
+    db.prepare("UPDATE users SET full_name = ?, username = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(trimmedName, trimmedUsername, req.session.userId);
 
     const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
@@ -359,7 +374,7 @@ router.post('/reset-password', async (req, res) => {
 
     // Hash and update password
     const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
-    db.prepare('UPDATE users SET password = ? WHERE id = ?')
+    db.prepare("UPDATE users SET password = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(hashed, user.id);
 
     return res.json({ message: 'Password reset successfully! You can now log in with your new password.' });
