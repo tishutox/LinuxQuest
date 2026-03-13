@@ -1,9 +1,10 @@
-const express = require('express');
-const bcrypt  = require('bcryptjs');
-const multer  = require('multer');
-const path    = require('path');
-const fs      = require('fs');
-const db      = require('../database/db');
+const express    = require('express');
+const bcrypt     = require('bcryptjs');
+const multer     = require('multer');
+const path       = require('path');
+const fs         = require('fs');
+const nodemailer = require('nodemailer');
+const db         = require('../database/db');
 
 const router = express.Router();
 
@@ -63,14 +64,95 @@ function touchUserActivity(userId) {
   }
 }
 
+// ─── MAIL TRANSPORT ───────────────────────────────────────────────────────────
+function getMailTransport() {
+  const host = process.env.SMTP_HOST;
+  const port = parseInt(process.env.SMTP_PORT || '587', 10);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!host || !user || !pass) {
+    // No SMTP configured – development fallback, code is logged to console
+    return nodemailer.createTransport({ jsonTransport: true });
+  }
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass }
+  });
+}
+
+// ─── SEND EMAIL VERIFICATION ──────────────────────────────────────────────────
+router.post('/send-verification', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || !THA_REGEX.test(email.trim())) {
+      return res.status(400).json({ error: 'Only @tha.de email addresses are allowed.' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(normalizedEmail);
+    if (existing) {
+      return res.status(409).json({ error: 'This email is already registered.' });
+    }
+
+    // Rate limit: one code per 60 seconds
+    const recent = db.prepare(`
+      SELECT id FROM email_verifications
+      WHERE email = ? AND datetime(created_at) > datetime('now', '-60 seconds')
+    `).get(normalizedEmail);
+
+    if (recent) {
+      return res.status(429).json({ error: 'Please wait a moment before requesting a new code.' });
+    }
+
+    // Generate 6-digit code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizedEmail);
+    db.prepare(`
+      INSERT INTO email_verifications (email, code, expires_at)
+      VALUES (?, ?, datetime('now', '+15 minutes'))
+    `).run(normalizedEmail, code);
+
+    const transport = getMailTransport();
+    const from = process.env.SMTP_FROM || 'noreply@tha.de';
+
+    await transport.sendMail({
+      from,
+      to:      normalizedEmail,
+      subject: 'Your verification code',
+      text:    `Your verification code is: ${code}\n\nThis code expires in 15 minutes.\nIf you did not request this, please ignore this email.`,
+      html:    `<p>Your verification code is:</p><p style="font-size:1.6em;font-weight:bold;letter-spacing:6px">${code}</p><p>This code expires in 15 minutes.</p><p style="color:#999;font-size:.85em">If you did not request this, you can ignore this email.</p>`
+    });
+
+    if (!process.env.SMTP_HOST) {
+      console.log(`[EMAIL VERIFICATION] No SMTP configured – code for ${normalizedEmail}: ${code}`);
+    }
+
+    return res.json({ message: 'Verification code sent! Please check your inbox.' });
+  } catch (err) {
+    console.error('[SEND VERIFICATION ERROR]', err);
+    return res.status(500).json({ error: 'Could not send verification email. Please try again.' });
+  }
+});
+
 // ─── REGISTER ─────────────────────────────────────────────────────────────────
 router.post('/register', upload.single('avatar'), async (req, res) => {
   try {
-    const { username, full_name, email, password, confirm_password } = req.body;
+    const { username, full_name, email, password, confirm_password, verificationCode } = req.body;
 
     // ── Validation ────────────────────────────────────────────────────────────
     if (!username || !full_name || !email || !password || !confirm_password) {
       return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    if (!verificationCode) {
+      return res.status(400).json({ error: 'Please verify your email address first.' });
     }
 
     if (!USERNAME_REGEX.test(username)) {
@@ -79,6 +161,16 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
 
     if (!THA_REGEX.test(email)) {
       return res.status(400).json({ error: 'Only @tha.de email addresses are allowed.' });
+    }
+
+    // ── Email verification check ──────────────────────────────────────────────
+    const emailVerification = db.prepare(`
+      SELECT id FROM email_verifications
+      WHERE email = ? AND code = ? AND datetime(expires_at) > datetime('now')
+    `).get(email.toLowerCase().trim(), verificationCode.trim());
+
+    if (!emailVerification) {
+      return res.status(400).json({ error: 'Invalid or expired verification code.' });
     }
 
     if (password !== confirm_password) {
@@ -109,6 +201,8 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
 
     // ── Start session ─────────────────────────────────────────────────────────
     req.session.userId = info.lastInsertRowid;
+
+    db.prepare('DELETE FROM email_verifications WHERE email = ?').run(email.toLowerCase().trim());
 
     const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
                    .get(info.lastInsertRowid);

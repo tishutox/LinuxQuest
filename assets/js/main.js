@@ -55,7 +55,16 @@ const hideAll      = () => { loginPanel.classList.remove('show-login');    regis
 loginBtn.addEventListener('click', showLogin)
 loginClose.addEventListener('click', hideAll)
 registerClose.addEventListener('click', hideAll)
-signupLink.addEventListener('click', (e) => { e.preventDefault(); showRegister() })
+signupLink.addEventListener('click', (e) => {
+   e.preventDefault()
+   showRegister()
+   emailCodeWrap.style.display = 'none'
+   regVerifyCode.value = ''
+   sendCodeBtn.disabled = false
+   sendCodeBtn.textContent = 'Send Code'
+   if (sendCodeTimer) { clearInterval(sendCodeTimer); sendCodeTimer = null }
+   clearMsg('register-message')
+})
 loginLink.addEventListener('click',  (e) => { e.preventDefault(); showLogin() })
 forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showResetPassword() })
 resetPasswordClose.addEventListener('click', hideAll)
@@ -333,6 +342,62 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 })
 
 /*=============== REGISTER ===============*/
+const sendCodeBtn   = document.getElementById('send-code-btn')
+const emailCodeWrap = document.getElementById('email-code-wrap')
+const regVerifyCode = document.getElementById('reg-verify-code')
+let   sendCodeTimer = null
+
+sendCodeBtn.addEventListener('click', async () => {
+   const email = document.getElementById('reg-email').value.trim()
+   if (!email) {
+      return showMsg('register-message', 'Please enter your email first.', 'error')
+   }
+   if (!/^[^\s@]+@tha\.de$/i.test(email)) {
+      return showMsg('register-message', 'Only @tha.de email addresses are allowed.', 'error')
+   }
+
+   clearMsg('register-message')
+   sendCodeBtn.disabled = true
+   sendCodeBtn.textContent = 'Sending…'
+
+   try {
+      const res  = await fetch('/api/auth/send-verification', {
+         method:      'POST',
+         credentials: 'include',
+         headers:     { 'Content-Type': 'application/json' },
+         body:        JSON.stringify({ email })
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+         showMsg('register-message', data.error, 'error')
+         sendCodeBtn.disabled = false
+         sendCodeBtn.textContent = 'Send Code'
+      } else {
+         showMsg('register-message', data.message, 'success')
+         emailCodeWrap.style.display = 'block'
+         regVerifyCode.focus()
+         if (sendCodeTimer) clearInterval(sendCodeTimer)
+         let countdown = 60
+         sendCodeBtn.textContent = `Resend (${countdown}s)`
+         sendCodeTimer = setInterval(() => {
+            countdown--
+            sendCodeBtn.textContent = `Resend (${countdown}s)`
+            if (countdown <= 0) {
+               clearInterval(sendCodeTimer)
+               sendCodeTimer = null
+               sendCodeBtn.disabled = false
+               sendCodeBtn.textContent = 'Resend Code'
+            }
+         }, 1000)
+      }
+   } catch (_) {
+      showMsg('register-message', 'Cannot reach server.', 'error')
+      sendCodeBtn.disabled = false
+      sendCodeBtn.textContent = 'Send Code'
+   }
+})
+
 document.getElementById('register-form').addEventListener('submit', async (e) => {
    e.preventDefault()
    clearMsg('register-message')
@@ -342,11 +407,15 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
    const email            = document.getElementById('reg-email').value.trim()
    const password         = document.getElementById('reg-password').value
    const confirm_password = document.getElementById('reg-confirm').value
+   const verificationCode = regVerifyCode.value.trim()
    const avatarFile       = document.getElementById('avatar-input').files[0]
 
    // Basic client-side validation
    if (!username || !full_name || !email || !password || !confirm_password) {
       return showMsg('register-message', 'Please fill in all fields.', 'error')
+   }
+   if (!verificationCode) {
+      return showMsg('register-message', 'Please verify your email first – click “Send Code”.', 'error')
    }
    if (!/^[^\s@]+@tha\.de$/i.test(email)) {
       return showMsg('register-message', 'Only @tha.de email addresses are allowed.', 'error')
@@ -366,6 +435,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
       formData.append('email',            email)
       formData.append('password',         password)
       formData.append('confirm_password', confirm_password)
+      formData.append('verificationCode', verificationCode)
       if (avatarFile) formData.append('avatar', avatarFile)
 
       const res  = await fetch('/api/auth/register', {

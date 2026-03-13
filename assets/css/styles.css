@@ -545,6 +545,44 @@ img {
   color: var(--first-color);
 }
 
+/*=============== EMAIL VERIFICATION ===============*/
+.email-verify-row {
+  display: flex;
+  gap: .5rem;
+  align-items: stretch;
+}
+
+.email-verify-row .login__input {
+  flex: 1;
+  min-width: 0;
+}
+
+.email-verify-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 0 1rem;
+  background-color: var(--first-color);
+  color: #fff;
+  border-radius: .5rem;
+  cursor: pointer;
+  font-size: .8rem;
+  font-family: var(--body-font);
+  transition: box-shadow .4s, opacity .4s;
+}
+
+.email-verify-btn:hover {
+  box-shadow: 0 4px 24px hsla(230, 75%, 40%, .4);
+}
+
+.email-verify-btn:disabled {
+  opacity: .65;
+  cursor: not-allowed;
+}
+
+.email-code-wrap {
+  margin-top: .5rem;
+}
+
 /*=============== BUTTON LOADING ===============*/
 .login__button:disabled {
   opacity: .7;

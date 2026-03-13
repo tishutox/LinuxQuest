@@ -41,4 +41,15 @@ db.exec(`
   SET last_active_at = COALESCE(last_active_at, created_at, datetime('now'))
 `);
 
+// Email verification codes (for registration)
+db.exec(`
+  CREATE TABLE IF NOT EXISTS email_verifications (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    email      TEXT    NOT NULL,
+    code       TEXT    NOT NULL,
+    expires_at TEXT    NOT NULL,
+    created_at TEXT    DEFAULT (datetime('now'))
+  )
+`);
+
 module.exports = db;

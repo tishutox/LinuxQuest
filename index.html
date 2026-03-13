@@ -157,7 +157,13 @@
 
                <div>
                   <label for="reg-email" class="login__label">Email <small>(@tha.de only)</small></label>
-                  <input type="email" placeholder="yourname@tha.de" id="reg-email" class="login__input" autocomplete="email">
+                  <div class="email-verify-row">
+                     <input type="email" placeholder="yourname@tha.de" id="reg-email" class="login__input" autocomplete="email">
+                     <button type="button" class="email-verify-btn" id="send-code-btn">Send Code</button>
+                  </div>
+                  <div class="email-code-wrap" id="email-code-wrap" style="display:none;">
+                     <input type="text" placeholder="6-digit code" id="reg-verify-code" class="login__input" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+                  </div>
                </div>
 
                <div>
