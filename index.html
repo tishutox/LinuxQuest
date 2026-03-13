@@ -263,9 +263,15 @@
                   <label for="profile-username-input" class="login__label">Username</label>
                   <input type="text" id="profile-username-input" class="login__input" autocomplete="username">
                </div>
+
+               <div>
+                  <label for="profile-delete-password" class="login__label">Password (required for account deletion)</label>
+                  <input type="password" id="profile-delete-password" class="login__input" autocomplete="current-password">
+               </div>
             </div>
 
             <button type="submit" class="login__button" id="profile-save-btn">Save Changes</button>
+            <button type="button" class="login__button profile__delete-button" id="profile-delete-btn">Delete Account</button>
          </form>
 
          <i class="fi fi-br-cross-small login__close" id="profile-close"></i>

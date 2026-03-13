@@ -104,7 +104,9 @@ const profileUsername     = document.getElementById('profile-username')
 const profileForm         = document.getElementById('profile-form')
 const profileFullNameInput = document.getElementById('profile-full-name-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
+const profileDeletePasswordInput = document.getElementById('profile-delete-password')
 const profileSaveBtn       = document.getElementById('profile-save-btn')
+const profileDeleteBtn     = document.getElementById('profile-delete-btn')
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=3d5af1&color=fff&name='
 let currentUser = null
@@ -140,6 +142,7 @@ function setLoggedOut() {
    profileAvatarImage.src  = ''
    profileFullNameInput.value = ''
    profileUsernameInput.value = ''
+   profileDeletePasswordInput.value = ''
    profileUsername.textContent = ''
    hideAll()
 }
@@ -148,6 +151,7 @@ function showProfileModal() {
    if (!currentUser) return
    clearMsg('profile-message')
    updateProfileView(currentUser)
+   profileDeletePasswordInput.value = ''
    hideAll()
    profileModal.classList.add('show-login')
 }
@@ -226,6 +230,47 @@ profileForm.addEventListener('submit', async (e) => {
    } finally {
       profileSaveBtn.disabled = false
       profileSaveBtn.textContent = 'Save Changes'
+   }
+})
+
+profileDeleteBtn.addEventListener('click', async () => {
+   if (!currentUser) return
+
+   const password = profileDeletePasswordInput.value
+   if (!password) {
+      return showMsg('profile-message', 'Please enter your password to delete the account.', 'error')
+   }
+
+   const confirmed = window.confirm('Are you sure you want to delete your account? This cannot be undone.')
+   if (!confirmed) return
+
+   clearMsg('profile-message')
+   profileDeleteBtn.disabled = true
+   profileSaveBtn.disabled = true
+   profileDeleteBtn.textContent = 'Deleting…'
+
+   try {
+      const res = await fetch('/api/auth/delete-account', {
+         method: 'DELETE',
+         credentials: 'include',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ password })
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+         showMsg('profile-message', data.error || 'Could not delete account.', 'error')
+      } else {
+         setLoggedOut()
+         showLogin()
+         showMsg('login-message', data.message || 'Account deleted successfully.', 'success')
+      }
+   } catch (_) {
+      showMsg('profile-message', 'Cannot reach server.', 'error')
+   } finally {
+      profileDeleteBtn.disabled = false
+      profileSaveBtn.disabled = false
+      profileDeleteBtn.textContent = 'Delete Account'
    }
 })
 

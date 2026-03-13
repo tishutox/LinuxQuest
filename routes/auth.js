@@ -287,6 +287,50 @@ router.post('/update-profile', (req, res) => {
   }
 });
 
+// ─── DELETE ACCOUNT ───────────────────────────────────────────────────────────
+router.delete('/delete-account', async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Not authenticated.' });
+    }
+
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required.' });
+    }
+
+    const user = db.prepare('SELECT avatar, password FROM users WHERE id = ?')
+                   .get(req.session.userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Incorrect password.' });
+    }
+
+    db.prepare('DELETE FROM users WHERE id = ?')
+      .run(req.session.userId);
+
+    deleteOldAvatar(user.avatar);
+
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('[DELETE ACCOUNT SESSION ERROR]', err);
+        return res.status(500).json({ error: 'Account deleted, but session cleanup failed.' });
+      }
+
+      return res.json({ message: 'Account deleted successfully.' });
+    });
+  } catch (err) {
+    console.error('[DELETE ACCOUNT ERROR]', err);
+    return res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 // ─── RESET PASSWORD ───────────────────────────────────────────────────────────
 router.post('/reset-password', async (req, res) => {
   try {
