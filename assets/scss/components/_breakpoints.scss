@@ -25,6 +25,10 @@
       max-width: 400px;
       margin-inline: auto;
    }
+
+   .login__form.login__form--wide{
+      max-width: 680px;
+   }
 }
 
 /* For large devices */
@@ -48,6 +52,18 @@
 
    .login__form{
       padding: 3rem 2rem 3.5rem;
+   }
+
+   .footer__container{
+      padding-block: 1.5rem;
+   }
+
+   .footer__links{
+      justify-content: space-between;
+   }
+
+   .login__form.login__form--wide{
+      max-width: 760px;
    }
 }
 

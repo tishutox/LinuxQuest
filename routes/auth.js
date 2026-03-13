@@ -5,6 +5,7 @@ const path       = require('path');
 const fs         = require('fs');
 const db         = require('../database/db');
 const { createMailTransport, getMailConfig } = require('../services/mailer');
+const { isProtectedEmail, normalizeEmail } = require('../protectedUsers');
 
 const router = express.Router();
 
@@ -129,7 +130,7 @@ router.post('/send-verification', async (req, res) => {
       return res.status(400).json({ error: 'Only @tha.de email addresses are allowed.' });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedEmail = normalizeEmail(email);
 
     const ipLimit = checkIpVerificationRateLimit(req);
     if (ipLimit.limited) {
@@ -181,7 +182,7 @@ router.post('/send-verification', async (req, res) => {
     `).run(normalizedEmail, code);
 
     if (!mailConfig.isConfigured) {
-      console.log(`[EMAIL VERIFICATION] No SMTP configured � code for ${normalizedEmail}: ${code}`);
+      console.log(`[EMAIL VERIFICATION] No SMTP configured � code for ${normalizedEmail}: ${code}`);
     } else {
       const accepted = Array.isArray(info.accepted) ? info.accepted : [];
       const rejected = Array.isArray(info.rejected) ? info.rejected : [];
@@ -236,7 +237,7 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     const emailVerification = db.prepare(`
       SELECT id FROM email_verifications
       WHERE email = ? AND code = ? AND datetime(expires_at) > datetime('now')
-    `).get(email.toLowerCase().trim(), verificationCode.trim());
+    `).get(normalizeEmail(email), verificationCode.trim());
 
     if (!emailVerification) {
       return res.status(400).json({ error: 'Invalid or expired verification code.' });
@@ -251,7 +252,7 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     }
 
     // ── Uniqueness checks ─────────────────────────────────────────────────────
-    const existingEmail    = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    const existingEmail    = db.prepare('SELECT id FROM users WHERE email = ?').get(normalizeEmail(email));
     const existingUsername = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
 
     if (existingEmail)    return res.status(409).json({ error: 'This email is already registered.' });
@@ -266,12 +267,12 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     const info = db.prepare(`
       INSERT INTO users (username, full_name, email, password, avatar, last_active_at)
       VALUES (?, ?, ?, ?, ?, datetime('now'))
-    `).run(username.trim(), full_name.trim(), email.toLowerCase().trim(), hashed, avatarPath);
+    `).run(username.trim(), full_name.trim(), normalizeEmail(email), hashed, avatarPath);
 
     // ── Start session ─────────────────────────────────────────────────────────
     req.session.userId = info.lastInsertRowid;
 
-    db.prepare('DELETE FROM email_verifications WHERE email = ?').run(email.toLowerCase().trim());
+    db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizeEmail(email));
 
     const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
                    .get(info.lastInsertRowid);
@@ -478,11 +479,15 @@ router.delete('/delete-account', async (req, res) => {
       return res.status(400).json({ error: 'Password is required.' });
     }
 
-    const user = db.prepare('SELECT avatar, password FROM users WHERE id = ?')
+    const user = db.prepare('SELECT avatar, password, email FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found.' });
+    }
+
+    if (isProtectedEmail(user.email)) {
+      return res.status(403).json({ error: 'This project account is protected and cannot be deleted.' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -529,7 +534,7 @@ router.post('/reset-password', async (req, res) => {
     // Find user by email or username
     const user = db.prepare(
       'SELECT id FROM users WHERE email = ? OR username = ?'
-    ).get(identifier.toLowerCase().trim(), identifier.trim());
+    ).get(normalizeEmail(identifier), identifier.trim());
 
     if (!user) {
       return res.status(404).json({ error: 'User not found.' });

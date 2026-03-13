@@ -278,6 +278,8 @@
                   <label for="profile-delete-password" class="login__label">Password (required for account deletion)</label>
                   <input type="password" id="profile-delete-password" class="login__input" autocomplete="current-password">
                </div>
+
+               <p class="profile__delete-note" id="profile-delete-note">Zum Loeschen des Kontos ist dein Passwort erforderlich.</p>
             </div>
 
             <button type="submit" class="login__button" id="profile-save-btn">Save Changes</button>
@@ -291,6 +293,89 @@
       <main class="main">
          <img src="assets/img/bg-image.png" alt="image" class="main__bg">
       </main>
+
+      <footer class="footer">
+         <div class="footer__container container">
+            <div class="footer__links" aria-label="Footer navigation">
+                  <a href="https://github.com/tishutox/LinuxQuest" class="footer__link" target="_blank" rel="noopener noreferrer">GitHub Projekt</a>
+                  <a href="https://showcase.informatik.tha.de" class="footer__link" target="_blank" rel="noopener noreferrer">showcase.informatik.tha.de</a>
+                  <a href="#" class="footer__link" data-modal-target="imprint-modal">Impressum</a>
+                  <a href="#" class="footer__link" data-modal-target="privacy-modal">Datenschutz</a>
+                  <a href="#" class="footer__link" data-modal-target="armand-modal">Armand</a>
+                  <a href="#" class="footer__link" data-modal-target="jost-modal">Jost</a>
+            </div>
+         </div>
+      </footer>
+
+      <div class="login info-modal" id="imprint-modal">
+         <div class="login__form login__form--wide info-modal__form">
+            <div class="info-modal__header">
+               <h2 class="login__title">Impressum</h2>
+            </div>
+
+            <div class="info-modal__body">
+               <p>Dies ist eine studentische Projektarbeit im Umfeld der Technischen Hochschule Augsburg.</p>
+               <p>Projektverantwortliche Kontakte:</p>
+               <p>Armand Patrick Asztalos, <a href="mailto:armand.patrick.asztalos@tha.de">armand.patrick.asztalos@tha.de</a></p>
+               <p>Jost Witthauer, <a href="mailto:jost.witthauer@tha.de">jost.witthauer@tha.de</a></p>
+               <p>Hinweis: Falls fuer eure Abgabe eine vollstaendige ladungsfaehige Anschrift erforderlich ist, sollte sie hier noch ergaenzt werden.</p>
+            </div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" data-modal-close="imprint-modal"></i>
+      </div>
+
+      <div class="login info-modal" id="privacy-modal">
+         <div class="login__form login__form--wide info-modal__form">
+            <div class="info-modal__header">
+               <h2 class="login__title">Datenschutz</h2>
+            </div>
+
+            <div class="info-modal__body">
+               <p>Im Rahmen dieser Anwendung werden nur die fuer Registrierung und Nutzung notwendigen Daten verarbeitet.</p>
+               <p>Gespeichert werden insbesondere Benutzername, voller Name, THA-E-Mail-Adresse, optionales Profilbild sowie technisch erforderliche Session-Daten.</p>
+               <p>Die Daten werden ausschliesslich fuer Authentifizierung, Profilverwaltung und die Bereitstellung der Projektfunktionen verwendet.</p>
+               <p>Es erfolgt keine Weitergabe an Dritte ausser an technisch notwendige Dienste fuer den Mailversand, sofern diese konfiguriert sind.</p>
+               <p>Bei Fragen zum Datenschutz koennt ihr euch an die im Impressum genannten Projektkontakte wenden.</p>
+            </div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" data-modal-close="privacy-modal"></i>
+      </div>
+
+      <div class="login info-modal" id="armand-modal">
+         <div class="login__form info-modal__form info-modal__form--person">
+            <div class="info-modal__header">
+               <h2 class="login__title">Armand</h2>
+            </div>
+
+            <div class="info-modal__body info-modal__body--person">
+               <p class="info-modal__person-label">Projektkonto</p>
+               <p class="info-modal__person-name">Armand Patrick Asztalos</p>
+               <p><a href="mailto:armand.patrick.asztalos@tha.de">armand.patrick.asztalos@tha.de</a></p>
+               <p>Dieses Konto ist dauerhaft vor Loeschung geschuetzt.</p>
+            </div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" data-modal-close="armand-modal"></i>
+      </div>
+
+      <div class="login info-modal" id="jost-modal">
+         <div class="login__form info-modal__form info-modal__form--person">
+            <div class="info-modal__header">
+               <h2 class="login__title">Jost</h2>
+            </div>
+
+            <div class="info-modal__body info-modal__body--person">
+               <p class="info-modal__person-label">Projektkonto</p>
+               <p class="info-modal__person-name">Jost Witthauer</p>
+               <p><a href="mailto:jost.witthauer@tha.de">jost.witthauer@tha.de</a></p>
+               <p>Dieses Konto ist dauerhaft vor Loeschung geschuetzt.</p>
+            </div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" data-modal-close="jost-modal"></i>
+      </div>
       
       <!--=============== MAIN JS ===============-->
       <script src="assets/js/main.js"></script>

@@ -47,10 +47,26 @@ const loginPanel      = document.getElementById('login'),
    backToLoginLink = document.getElementById('back-to-login-link'),
    profileClose    = document.getElementById('profile-close')
 
-const showLogin    = () => { loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
-const showRegister = () => { registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
-const showResetPassword = () => { resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
+const staticModalTriggers = document.querySelectorAll('[data-modal-target]')
+const staticModalCloseButtons = document.querySelectorAll('[data-modal-close]')
+const staticModalPanels = Array.from(document.querySelectorAll('.info-modal'))
+
+function hideStaticModals() {
+   staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
+}
+
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); hideStaticModals() }
+
+function showStaticModal(modalId) {
+   const modal = document.getElementById(modalId)
+   if (!modal) return
+
+   hideAll()
+   modal.classList.add('show-login')
+}
 
 loginBtn.addEventListener('click', showLogin)
 loginClose.addEventListener('click', hideAll)
@@ -114,11 +130,21 @@ const profileForm         = document.getElementById('profile-form')
 const profileFullNameInput = document.getElementById('profile-full-name-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
 const profileDeletePasswordInput = document.getElementById('profile-delete-password')
+const profileDeleteNote = document.getElementById('profile-delete-note')
 const profileSaveBtn       = document.getElementById('profile-save-btn')
 const profileDeleteBtn     = document.getElementById('profile-delete-btn')
 
+const PROTECTED_EMAILS = new Set([
+   'armand.patrick.asztalos@tha.de',
+   'jost.witthauer@tha.de'
+])
+
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
 let currentUser = null
+
+function isProtectedUser(user) {
+   return Boolean(user?.email) && PROTECTED_EMAILS.has(user.email.trim().toLowerCase())
+}
 
 function getAvatarUrl(user) {
    return user.avatar
@@ -131,6 +157,18 @@ function updateProfileView(user) {
    profileFullNameInput.value = user.full_name
    profileUsernameInput.value = user.username
    profileUsername.textContent = '@' + user.username
+
+   const protectedUser = isProtectedUser(user)
+   profileDeletePasswordInput.value = ''
+   profileDeletePasswordInput.disabled = protectedUser
+   profileDeleteBtn.disabled = protectedUser
+   profileDeleteBtn.textContent = protectedUser ? 'Account Protected' : 'Delete Account'
+
+   if (profileDeleteNote) {
+      profileDeleteNote.textContent = protectedUser
+         ? 'Dieses Projektkonto ist dauerhaft vor Loeschung geschuetzt.'
+         : 'Zum Loeschen des Kontos ist dein Passwort erforderlich.'
+   }
 }
 
 function setLoggedIn(user) {
@@ -152,7 +190,12 @@ function setLoggedOut() {
    profileFullNameInput.value = ''
    profileUsernameInput.value = ''
    profileDeletePasswordInput.value = ''
+   profileDeletePasswordInput.disabled = false
    profileUsername.textContent = ''
+   profileDeleteBtn.textContent = 'Delete Account'
+   if (profileDeleteNote) {
+      profileDeleteNote.textContent = 'Zum Loeschen des Kontos ist dein Passwort erforderlich.'
+   }
    hideAll()
 }
 
@@ -244,6 +287,9 @@ profileForm.addEventListener('submit', async (e) => {
 
 profileDeleteBtn.addEventListener('click', async () => {
    if (!currentUser) return
+   if (isProtectedUser(currentUser)) {
+      return showMsg('profile-message', 'Dieses Projektkonto kann nicht geloescht werden.', 'error')
+   }
 
    const password = profileDeletePasswordInput.value
    if (!password) {
@@ -281,6 +327,29 @@ profileDeleteBtn.addEventListener('click', async () => {
       profileSaveBtn.disabled = false
       profileDeleteBtn.textContent = 'Delete Account'
    }
+})
+
+staticModalTriggers.forEach((trigger) => {
+   trigger.addEventListener('click', () => {
+      showStaticModal(trigger.dataset.modalTarget)
+   })
+})
+
+staticModalCloseButtons.forEach((button) => {
+   button.addEventListener('click', () => {
+      const modal = document.getElementById(button.dataset.modalClose)
+      if (modal) {
+         modal.classList.remove('show-login')
+      }
+   })
+})
+
+staticModalPanels.forEach((panel) => {
+   panel.addEventListener('click', (event) => {
+      if (event.target === panel) {
+         panel.classList.remove('show-login')
+      }
+   })
 })
 
 /*=============== CHECK SESSION ON LOAD ===============*/

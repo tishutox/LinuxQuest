@@ -7,6 +7,7 @@ const fs       = require('fs');
 const createSqliteStore = require('./database/sessionStore');
 const db       = require('./database/db');
 const { verifyMailTransport, getMailConfig } = require('./services/mailer');
+const { PROTECTED_EMAILS } = require('./protectedUsers');
 
 const SqliteStore = createSqliteStore(session);
 const authRoutes  = require('./routes/auth');
@@ -66,7 +67,8 @@ function cleanupInactiveAccounts() {
       SELECT id, avatar
       FROM users
       WHERE datetime(COALESCE(last_active_at, created_at)) <= datetime('now', ?)
-    `).all(`-${INACTIVE_DAYS} days`);
+        AND email NOT IN (${PROTECTED_EMAILS.map(() => '?').join(', ')})
+    `).all(`-${INACTIVE_DAYS} days`, ...PROTECTED_EMAILS);
 
     if (!inactiveUsers.length) return;
 

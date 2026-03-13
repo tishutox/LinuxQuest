@@ -1,0 +1,112 @@
+/*=============== FOOTER ===============*/
+.footer{
+   background-color: var(--body-color);
+   box-shadow: 0 -2px 16px hsla(230, 75%, 32%, .12);
+   position: relative;
+   z-index: 1;
+
+   &__container{
+      padding-block: 1.25rem;
+   }
+
+   &__links{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: .75rem;
+   }
+
+   &__link{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 1.25rem;
+      padding: .25rem 0;
+      background-color: transparent;
+      border: none;
+      appearance: none;
+      color: var(--title-color);
+      font-weight: var(--font-semi-bold);
+      line-height: 1;
+      text-decoration: underline;
+      text-decoration-color: transparent;
+      text-decoration-style: dotted;
+      text-underline-offset: .3rem;
+      transition: color .4s, text-decoration-color .4s;
+      cursor: pointer;
+
+      &:hover{
+         color: var(--first-color);
+         text-decoration-color: currentColor;
+      }
+
+      &:visited{
+         color: var(--title-color);
+      }
+
+      &:focus-visible{
+         outline: 2px dotted var(--first-color);
+         outline-offset: .3rem;
+      }
+   }
+}
+
+/*=============== INFO MODALS ===============*/
+.login__form--wide{
+   max-width: 100%;
+}
+
+.info-modal{
+   &__form{
+      text-align: left;
+      row-gap: 1rem;
+   }
+
+   &__header{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+   }
+
+   &__body{
+      display: grid;
+      gap: .85rem;
+      color: var(--text-color);
+      line-height: 1.6;
+
+      a{
+         color: var(--first-color);
+         font-weight: var(--font-medium);
+      }
+   }
+
+   &__form--person{
+      text-align: center;
+   }
+
+   &__body--person{
+      gap: .55rem;
+   }
+
+   &__person-label{
+      color: var(--first-color);
+      font-weight: var(--font-semi-bold);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: .75rem;
+   }
+
+   &__person-name{
+      color: var(--title-color);
+      font-size: 1.2rem;
+      font-weight: var(--font-semi-bold);
+   }
+}
+
+.profile__delete-note{
+   color: var(--text-color);
+   font-size: .8rem;
+   text-align: left;
+   margin-top: -.4rem;
+}

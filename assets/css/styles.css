@@ -229,6 +229,59 @@ img {
   top: 0;
 }
 
+/*=============== FOOTER ===============*/
+.footer {
+  background-color: var(--body-color);
+  box-shadow: 0 -2px 16px hsla(230, 75%, 32%, .12);
+  position: relative;
+  z-index: 1;
+}
+
+.footer__container {
+  padding-block: 1.25rem;
+}
+
+.footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .75rem;
+}
+
+.footer__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.25rem;
+  padding: .25rem 0;
+  background-color: transparent;
+  border: none;
+  appearance: none;
+  color: var(--title-color);
+  font-weight: var(--font-semi-bold);
+  line-height: 1;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-style: dotted;
+  text-underline-offset: .3rem;
+  transition: color .4s, text-decoration-color .4s;
+  cursor: pointer;
+}
+
+.footer__link:hover {
+  color: var(--first-color);
+  text-decoration-color: currentColor;
+}
+
+.footer__link:visited {
+  color: var(--title-color);
+}
+
+.footer__link:focus-visible {
+  outline: 2px dotted var(--first-color);
+  outline-offset: .3rem;
+}
+
 /*=============== SEARCH ===============*/
 .search__form {
   display: flex;
@@ -363,6 +416,64 @@ img {
 
 .show-register .login__form {
   transform: translateY(0);
+}
+
+/*=============== INFO MODALS ===============*/
+.login__form--wide {
+  max-width: 100%;
+}
+
+.info-modal__form {
+  text-align: left;
+  row-gap: 1rem;
+}
+
+.info-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.info-modal__body {
+  display: grid;
+  gap: .85rem;
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.info-modal__body a {
+  color: var(--first-color);
+  font-weight: var(--font-medium);
+}
+
+.info-modal__form--person {
+  text-align: center;
+}
+
+.info-modal__body--person {
+  gap: .55rem;
+}
+
+.info-modal__person-label {
+  color: var(--first-color);
+  font-weight: var(--font-semi-bold);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: .75rem;
+}
+
+.info-modal__person-name {
+  color: var(--title-color);
+  font-size: 1.2rem;
+  font-weight: var(--font-semi-bold);
+}
+
+.profile__delete-note {
+  color: var(--text-color);
+  font-size: .8rem;
+  text-align: left;
+  margin-top: -.4rem;
 }
 
 /*=============== NAV USER (logged-in state) ===============*/
@@ -616,6 +727,10 @@ img {
     max-width: 400px;
     margin-inline: auto;
   }
+
+  .login__form.login__form--wide {
+    max-width: 680px;
+  }
 }
 
 /* For large devices */
@@ -638,6 +753,18 @@ img {
 
   .login__form {
     padding: 3rem 2rem 3.5rem;
+  }
+
+  .footer__container {
+    padding-block: 1.5rem;
+  }
+
+  .footer__links {
+    justify-content: space-between;
+  }
+
+  .login__form.login__form--wide {
+    max-width: 760px;
   }
 }
 
