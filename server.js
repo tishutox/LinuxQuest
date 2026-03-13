@@ -106,7 +106,7 @@ async function logMailStatus() {
 
   const result = await verifyMailTransport();
   if (result.ok) {
-    console.log('[MAILER] SMTP connection verified successfully.');
+    console.log(`[MAILER] ${result.provider === 'resend' ? 'Resend' : 'SMTP'} connection verified successfully.`);
     return;
   }
 

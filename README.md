@@ -11,9 +11,11 @@
 
 ![preview img](/preview.png)
 
-## SMTP setup
+## Mail setup
 
-Create a `.env` file in the project root before starting the server:
+### Lokal (`.env`-Datei im Projektordner)
+
+Gmail mit App-Passwort funktioniert lokal:
 
 ```env
 SMTP_HOST=smtp.gmail.com
@@ -24,19 +26,23 @@ SMTP_FROM=your-account@gmail.com
 SESSION_SECRET=replace-this-in-production
 ```
 
-For Gmail, use an App Password with 2-factor authentication enabled. If you copy the password from Google with spaces, the server now normalizes it automatically.
+Bei Gmail ein App-Passwort unter Google-Konto → Sicherheit → 2-Schritt-Verifizierung → App-Passwörter erstellen.
 
-Start the app with `npm start` and open `http://localhost:3000`. The server prints SMTP verification details on startup and logs whether a verification email was accepted by the SMTP server.
+### Railway (und andere Cloud-Hoster)
 
-In deployments, `.env` is usually not present because it is ignored by Git. Set the `SMTP_*` variables in your hosting provider dashboard. Without them, the app now returns an explicit error instead of pretending the email was sent.
+Railway blockiert ausgehende SMTP-Verbindungen (Ports 25, 465, 587). Deshalb muss auf **Resend** als Mail-Dienst gewechselt werden.
 
-If sending times out on Railway, try these values first for Gmail:
+1. Kostenlosen Account auf [resend.com](https://resend.com) erstellen (3.000 Mails/Monat gratis).
+2. Eine Domain verifizieren **oder** `onboarding@resend.dev` als Absender nutzen (nur zum Testen, sendet nur an die eigene Resend-Account-Adresse).
+3. Einen API-Key unter *API Keys* erstellen.
+4. In Railway unter *Variables* setzen:
 
 ```env
-SMTP_SERVICE=gmail
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
-SMTP_CONNECTION_TIMEOUT=10000
-SMTP_GREETING_TIMEOUT=10000
-SMTP_SOCKET_TIMEOUT=15000
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+RESEND_FROM=noreply@deine-verifizierte-domain.de
+SESSION_SECRET=dein-langer-geheimer-wert
 ```
+
+Wenn `RESEND_API_KEY` gesetzt ist, ignoriert die App die `SMTP_*`-Variablen vollständig.
+
+Start the app with `npm start` and open `http://localhost:3000`. The server logs which mail provider is active on startup.

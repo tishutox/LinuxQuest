@@ -46,7 +46,7 @@ function getMailErrorMessage(error) {
   const code = typeof error?.code === 'string' ? error.code : '';
 
   if (code === 'ETIMEDOUT' || code === 'ESOCKET' || message.toLowerCase().includes('timeout')) {
-    return 'The email service timed out. On Railway, try SMTP_PORT 465 with SMTP_SERVICE=gmail and redeploy.';
+    return 'The email service timed out. Railway blocks SMTP – set RESEND_API_KEY in Railway and redeploy.';
   }
 
   if (code === 'EAUTH') {

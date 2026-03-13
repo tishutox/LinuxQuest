@@ -10,10 +10,12 @@ function parsePositiveInt(value, fallback) {
 }
 
 function getMailConfig() {
+  const resendApiKey = cleanEnvValue(process.env.RESEND_API_KEY);
+  const resendFrom = cleanEnvValue(process.env.RESEND_FROM);
+
   const host = cleanEnvValue(process.env.SMTP_HOST);
   const service = cleanEnvValue(process.env.SMTP_SERVICE);
   const user = cleanEnvValue(process.env.SMTP_USER);
-  const from = cleanEnvValue(process.env.SMTP_FROM) || user || 'noreply@tha.de';
   const rawPass = typeof process.env.SMTP_PASS === 'string' ? process.env.SMTP_PASS.trim() : '';
   const isGmail = service.toLowerCase() === 'gmail' || host.toLowerCase() === 'smtp.gmail.com';
   const pass = isGmail ? rawPass.replace(/\s+/g, '') : rawPass;
@@ -26,7 +28,21 @@ function getMailConfig() {
   const greetingTimeout = parsePositiveInt(process.env.SMTP_GREETING_TIMEOUT, 10000);
   const socketTimeout = parsePositiveInt(process.env.SMTP_SOCKET_TIMEOUT, 15000);
 
+  // Resend takes priority over raw SMTP when RESEND_API_KEY is set
+  if (resendApiKey) {
+    return {
+      provider: 'resend',
+      resendApiKey,
+      from: resendFrom || cleanEnvValue(process.env.SMTP_FROM) || user || 'noreply@tha.de',
+      allowConsoleFallback,
+      isConfigured: true
+    };
+  }
+
+  const from = cleanEnvValue(process.env.SMTP_FROM) || user || 'noreply@tha.de';
+
   return {
+    provider: 'smtp',
     host,
     port,
     service,
@@ -46,9 +62,23 @@ function createMailTransport() {
 
   if (!config.isConfigured) {
     if (!config.allowConsoleFallback) {
-      throw new Error('SMTP is not configured for this environment.');
+      throw new Error('Email delivery is not configured for this environment.');
     }
     return nodemailer.createTransport({ jsonTransport: true });
+  }
+
+  // Resend: uses their SMTP relay over HTTPS-backed infrastructure
+  // Works on cloud providers (Railway, Render, …) that block raw SMTP
+  if (config.provider === 'resend') {
+    return nodemailer.createTransport({
+      host: 'smtp.resend.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'resend',
+        pass: config.resendApiKey
+      }
+    });
   }
 
   const transportConfig = {
@@ -87,9 +117,9 @@ async function verifyMailTransport() {
   try {
     const transport = createMailTransport();
     await transport.verify();
-    return { ok: true, skipped: false };
+    return { ok: true, skipped: false, provider: config.provider || 'smtp' };
   } catch (error) {
-    return { ok: false, skipped: false, error };
+    return { ok: false, skipped: false, provider: config.provider || 'smtp', error };
   }
 }
 
