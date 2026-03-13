@@ -6,6 +6,7 @@ const path     = require('path');
 const fs       = require('fs');
 const createSqliteStore = require('./database/sessionStore');
 const db       = require('./database/db');
+const { verifyMailTransport, getMailConfig } = require('./services/mailer');
 
 const SqliteStore = createSqliteStore(session);
 const authRoutes  = require('./routes/auth');
@@ -91,7 +92,32 @@ cleanupInactiveAccounts();
 const cleanupTimer = setInterval(cleanupInactiveAccounts, CLEANUP_INTERVAL_MS);
 cleanupTimer.unref();
 
+async function logMailStatus() {
+  const mailConfig = getMailConfig();
+
+  if (!mailConfig.isConfigured) {
+    console.warn('[MAILER] SMTP is not fully configured. Verification codes will only be logged on the server.');
+    return;
+  }
+
+  const result = await verifyMailTransport();
+  if (result.ok) {
+    console.log('[MAILER] SMTP connection verified successfully.');
+    return;
+  }
+
+  const error = result.error;
+  console.error('[MAILER] SMTP verification failed.', {
+    code: error?.code || error?.responseCode || null,
+    message: error?.message || 'Unknown SMTP error',
+    response: error?.response || null
+  });
+}
+
 // ─── Start ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+  logMailStatus().catch((error) => {
+    console.error('[MAILER] Unexpected verification error.', error);
+  });
 });

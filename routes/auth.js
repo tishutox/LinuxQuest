@@ -3,8 +3,8 @@ const bcrypt     = require('bcryptjs');
 const multer     = require('multer');
 const path       = require('path');
 const fs         = require('fs');
-const nodemailer = require('nodemailer');
 const db         = require('../database/db');
+const { createMailTransport, getMailConfig } = require('../services/mailer');
 
 const router = express.Router();
 
@@ -90,26 +90,6 @@ function checkIpVerificationRateLimit(req) {
   return { limited: false, retryAfterSeconds: 0 };
 }
 
-// ─── MAIL TRANSPORT ───────────────────────────────────────────────────────────
-function getMailTransport() {
-  const host = process.env.SMTP_HOST;
-  const port = parseInt(process.env.SMTP_PORT || '587', 10);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-
-  if (!host || !user || !pass) {
-    // No SMTP configured – development fallback, code is logged to console
-    return nodemailer.createTransport({ jsonTransport: true });
-  }
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass }
-  });
-}
-
 // ─── SEND EMAIL VERIFICATION ──────────────────────────────────────────────────
 router.post('/send-verification', async (req, res) => {
   try {
@@ -152,19 +132,34 @@ router.post('/send-verification', async (req, res) => {
       VALUES (?, ?, datetime('now', '+15 minutes'))
     `).run(normalizedEmail, code);
 
-    const transport = getMailTransport();
-    const from = process.env.SMTP_FROM || 'noreply@tha.de';
+    const transport = createMailTransport();
+    const mailConfig = getMailConfig();
 
-    await transport.sendMail({
-      from,
+    const info = await transport.sendMail({
+      from: mailConfig.from,
       to:      normalizedEmail,
       subject: 'Your verification code',
       text:    `Your verification code is: ${code}\n\nThis code expires in 15 minutes.\nIf you did not request this, please ignore this email.`,
       html:    `<p>Your verification code is:</p><p style="font-size:1.6em;font-weight:bold;letter-spacing:6px">${code}</p><p>This code expires in 15 minutes.</p><p style="color:#999;font-size:.85em">If you did not request this, you can ignore this email.</p>`
     });
 
-    if (!process.env.SMTP_HOST) {
+    if (!mailConfig.isConfigured) {
       console.log(`[EMAIL VERIFICATION] No SMTP configured – code for ${normalizedEmail}: ${code}`);
+    } else {
+      const accepted = Array.isArray(info.accepted) ? info.accepted : [];
+      const rejected = Array.isArray(info.rejected) ? info.rejected : [];
+
+      console.log('[EMAIL VERIFICATION SENT]', {
+        to: normalizedEmail,
+        messageId: info.messageId,
+        accepted,
+        rejected,
+        response: info.response || null
+      });
+
+      if (!accepted.length) {
+        throw new Error('SMTP accepted no recipients for verification email.');
+      }
     }
 
     return res.json({ message: 'Verification code sent! Please check your inbox.' });
