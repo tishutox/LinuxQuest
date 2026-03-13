@@ -46,24 +46,31 @@ function getMailErrorMessage(error) {
   const code = typeof error?.code === 'string' ? error.code : '';
 
   if (code === 'ETIMEDOUT' || code === 'ESOCKET' || message.toLowerCase().includes('timeout')) {
-    return 'The email service timed out. Railway blocks SMTP – set RESEND_API_KEY in Railway and redeploy.';
+    return 'The email service timed out. Please try again. If this keeps happening, check the Railway logs.';
   }
 
   if (code === 'EAUTH') {
-    return 'The email service rejected the login. Check SMTP_USER and SMTP_PASS in Railway.';
+    return 'The email provider rejected the login. Check RESEND_API_KEY or SMTP credentials in Railway.';
+  }
+
+  if (code === 'EFORBIDDEN') {
+    return 'The sender address was rejected. Verify tishu.dev in Resend and set RESEND_FROM correctly.';
+  }
+
+  if (code === 'ERESEND') {
+    return 'Resend rejected the request. Check RESEND_FROM and your verified domain settings.';
   }
 
   if (code === 'ENOTFOUND' || code === 'EAI_AGAIN') {
-    return 'The server could not reach the SMTP host. Check SMTP_HOST and Railway outbound networking.';
+    return 'The server could not reach the mail service. Check Railway outbound networking and your mail provider settings.';
   }
 
-  if (message === 'SMTP is not configured for this environment.') {
-    return 'Email delivery is not configured on the server. Set the SMTP variables in Railway and redeploy.';
+  if (message === 'Email delivery is not configured for this environment.' || message === 'Resend is not configured for this environment.') {
+    return 'Email delivery is not configured on the server. Set RESEND_API_KEY and RESEND_FROM in Railway and redeploy.';
   }
 
   return 'Could not send verification email. Please try again.';
 }
-
 function deleteOldAvatar(avatarPath) {
   if (!avatarPath || !avatarPath.startsWith('uploads/')) return;
 
@@ -149,12 +156,6 @@ router.post('/send-verification', async (req, res) => {
     // Generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-    db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizedEmail);
-    db.prepare(`
-      INSERT INTO email_verifications (email, code, expires_at)
-      VALUES (?, ?, datetime('now', '+15 minutes'))
-    `).run(normalizedEmail, code);
-
     const mailConfig = getMailConfig();
 
     if (!mailConfig.isConfigured && !mailConfig.allowConsoleFallback) {
@@ -173,8 +174,14 @@ router.post('/send-verification', async (req, res) => {
       html:    `<p>Your verification code is:</p><p style="font-size:1.6em;font-weight:bold;letter-spacing:6px">${code}</p><p>This code expires in 15 minutes.</p><p style="color:#999;font-size:.85em">If you did not request this, you can ignore this email.</p>`
     });
 
+    db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizedEmail);
+    db.prepare(`
+      INSERT INTO email_verifications (email, code, expires_at)
+      VALUES (?, ?, datetime('now', '+15 minutes'))
+    `).run(normalizedEmail, code);
+
     if (!mailConfig.isConfigured) {
-      console.log(`[EMAIL VERIFICATION] No SMTP configured – code for ${normalizedEmail}: ${code}`);
+      console.log(`[EMAIL VERIFICATION] No SMTP configured � code for ${normalizedEmail}: ${code}`);
     } else {
       const accepted = Array.isArray(info.accepted) ? info.accepted : [];
       const rejected = Array.isArray(info.rejected) ? info.rejected : [];
@@ -188,10 +195,9 @@ router.post('/send-verification', async (req, res) => {
       });
 
       if (!accepted.length) {
-        throw new Error('SMTP accepted no recipients for verification email.');
+        throw new Error('Mail provider accepted no recipients for verification email.');
       }
     }
-
     return res.json({ message: 'Verification code sent! Please check your inbox.' });
   } catch (err) {
     console.error('[SEND VERIFICATION ERROR]', {
@@ -542,3 +548,6 @@ router.post('/reset-password', async (req, res) => {
 });
 
 module.exports = router;
+
+
+

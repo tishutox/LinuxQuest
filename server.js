@@ -97,9 +97,9 @@ async function logMailStatus() {
 
   if (!mailConfig.isConfigured) {
     if (mailConfig.allowConsoleFallback) {
-      console.warn('[MAILER] SMTP is not fully configured. Verification codes will only be logged on the server.');
+      console.warn('[MAILER] Email delivery is not fully configured. Verification codes will only be logged on the server.');
     } else {
-      console.error('[MAILER] SMTP is not configured for this deployment. Email verification will fail until SMTP_* variables are set.');
+      console.error('[MAILER] Email delivery is not configured for this deployment. Email verification will fail until RESEND_* or SMTP_* variables are set.');
     }
     return;
   }
@@ -111,9 +111,9 @@ async function logMailStatus() {
   }
 
   const error = result.error;
-  console.error('[MAILER] SMTP verification failed.', {
+  console.error('[MAILER] Email provider verification failed.', {
     code: error?.code || error?.responseCode || null,
-    message: error?.message || 'Unknown SMTP error',
+    message: error?.message || 'Unknown email provider error',
     response: error?.response || null
   });
 }

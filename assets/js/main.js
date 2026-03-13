@@ -365,14 +365,18 @@ sendCodeBtn.addEventListener('click', async () => {
 
    clearMsg('register-message')
    sendCodeBtn.disabled = true
-   sendCodeBtn.textContent = 'Sending…'
+   sendCodeBtn.textContent = 'Sending...'
+
+   const controller = new AbortController()
+   const requestTimeout = window.setTimeout(() => controller.abort(), 20000)
 
    try {
       const res  = await fetch('/api/auth/send-verification', {
          method:      'POST',
          credentials: 'include',
          headers:     { 'Content-Type': 'application/json' },
-         body:        JSON.stringify({ email })
+         body:        JSON.stringify({ email }),
+         signal:      controller.signal
       })
       const data = await res.json()
 
@@ -398,13 +402,17 @@ sendCodeBtn.addEventListener('click', async () => {
             }
          }, 1000)
       }
-   } catch (_) {
-      showMsg('register-message', 'Cannot reach server.', 'error')
+   } catch (error) {
+      const message = error?.name === 'AbortError'
+         ? 'Sending the code took too long. Please try again.'
+         : 'Cannot reach server.'
+      showMsg('register-message', message, 'error')
       sendCodeBtn.disabled = false
       sendCodeBtn.textContent = 'Send Code'
+   } finally {
+      window.clearTimeout(requestTimeout)
    }
 })
-
 document.getElementById('register-form').addEventListener('submit', async (e) => {
    e.preventDefault()
    clearMsg('register-message')
@@ -546,4 +554,7 @@ document.getElementById('reset-password-form').addEventListener('submit', async 
       btn.textContent = 'Reset Password'
    }
 })
+
+
+
 

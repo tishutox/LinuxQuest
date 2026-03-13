@@ -11,7 +11,9 @@ function parsePositiveInt(value, fallback) {
 
 function getMailConfig() {
   const resendApiKey = cleanEnvValue(process.env.RESEND_API_KEY);
-  const resendFrom = cleanEnvValue(process.env.RESEND_FROM);
+  const resendFrom = cleanEnvValue(process.env.RESEND_FROM) || cleanEnvValue(process.env.SMTP_FROM);
+  const resendApiUrl = cleanEnvValue(process.env.RESEND_API_URL) || 'https://api.resend.com/emails';
+  const resendApiTimeout = parsePositiveInt(process.env.RESEND_API_TIMEOUT, 15000);
 
   const host = cleanEnvValue(process.env.SMTP_HOST);
   const service = cleanEnvValue(process.env.SMTP_SERVICE);
@@ -28,14 +30,15 @@ function getMailConfig() {
   const greetingTimeout = parsePositiveInt(process.env.SMTP_GREETING_TIMEOUT, 10000);
   const socketTimeout = parsePositiveInt(process.env.SMTP_SOCKET_TIMEOUT, 15000);
 
-  // Resend takes priority over raw SMTP when RESEND_API_KEY is set
   if (resendApiKey) {
     return {
       provider: 'resend',
       resendApiKey,
-      from: resendFrom || cleanEnvValue(process.env.SMTP_FROM) || user || 'noreply@tha.de',
+      resendApiUrl,
+      resendApiTimeout,
+      from: resendFrom,
       allowConsoleFallback,
-      isConfigured: true
+      isConfigured: Boolean(resendFrom)
     };
   }
 
@@ -57,30 +60,68 @@ function getMailConfig() {
   };
 }
 
-function createMailTransport() {
-  const config = getMailConfig();
-
-  if (!config.isConfigured) {
-    if (!config.allowConsoleFallback) {
-      throw new Error('Email delivery is not configured for this environment.');
-    }
-    return nodemailer.createTransport({ jsonTransport: true });
-  }
-
-  // Resend: uses their SMTP relay over HTTPS-backed infrastructure
-  // Works on cloud providers (Railway, Render, …) that block raw SMTP
-  if (config.provider === 'resend') {
-    return nodemailer.createTransport({
-      host: 'smtp.resend.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: 'resend',
-        pass: config.resendApiKey
+function createResendTransport(config) {
+  return {
+    async verify() {
+      if (!config.resendApiKey || !config.from) {
+        throw new Error('Resend is not configured for this environment.');
       }
-    });
-  }
+      return true;
+    },
+    async sendMail(message) {
+      const recipients = Array.isArray(message.to) ? message.to : [message.to];
 
+      try {
+        const response = await fetch(config.resendApiUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${config.resendApiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: message.from || config.from,
+            to: recipients,
+            subject: message.subject,
+            html: message.html,
+            text: message.text
+          }),
+          signal: AbortSignal.timeout(config.resendApiTimeout)
+        });
+
+        let payload = {};
+        try {
+          payload = await response.json();
+        } catch (_error) {
+          payload = {};
+        }
+
+        if (!response.ok) {
+          const error = new Error(
+            payload.message || payload.error || `Resend API request failed with status ${response.status}.`
+          );
+          error.code = response.status === 401 ? 'EAUTH' : response.status === 403 ? 'EFORBIDDEN' : 'ERESEND';
+          error.responseCode = response.status;
+          error.response = JSON.stringify(payload);
+          throw error;
+        }
+
+        return {
+          messageId: payload.id || null,
+          accepted: recipients,
+          rejected: [],
+          response: payload.id || null
+        };
+      } catch (error) {
+        if (error?.name === 'AbortError' || error?.name === 'TimeoutError') {
+          error.code = 'ETIMEDOUT';
+        }
+        throw error;
+      }
+    }
+  };
+}
+
+function createSmtpTransport(config) {
   const transportConfig = {
     port: config.port,
     secure: config.port === 465,
@@ -102,6 +143,23 @@ function createMailTransport() {
   return nodemailer.createTransport(transportConfig);
 }
 
+function createMailTransport() {
+  const config = getMailConfig();
+
+  if (!config.isConfigured) {
+    if (!config.allowConsoleFallback) {
+      throw new Error('Email delivery is not configured for this environment.');
+    }
+    return nodemailer.createTransport({ jsonTransport: true });
+  }
+
+  if (config.provider === 'resend') {
+    return createResendTransport(config);
+  }
+
+  return createSmtpTransport(config);
+}
+
 async function verifyMailTransport() {
   const config = getMailConfig();
 
@@ -110,7 +168,8 @@ async function verifyMailTransport() {
       ok: false,
       skipped: true,
       reason: 'missing-config',
-      allowConsoleFallback: config.allowConsoleFallback
+      allowConsoleFallback: config.allowConsoleFallback,
+      provider: config.provider || 'smtp'
     };
   }
 
