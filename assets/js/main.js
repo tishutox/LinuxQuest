@@ -106,7 +106,7 @@ signupLink.addEventListener('click', (e) => {
    emailCodeWrap.style.display = 'none'
    regVerifyCode.value = ''
    sendCodeBtn.disabled = false
-   sendCodeBtn.textContent = 'Send Code'
+   sendCodeBtn.textContent = 'Code senden'
    if (sendCodeTimer) { clearInterval(sendCodeTimer); sendCodeTimer = null }
    clearMsg('register-message')
 })
@@ -200,7 +200,7 @@ function updateProjectContactModal(contactKey, contact) {
 async function refreshProjectContacts() {
    try {
       const response = await fetch('/api/auth/project-contacts', { credentials: 'include' })
-      if (!response.ok) throw new Error('Could not load contacts')
+      if (!response.ok) throw new Error('Kontakte konnten nicht geladen werden')
 
       const data = await response.json()
       updateProjectContactModal('armand', data.contacts?.armand || null)
@@ -231,12 +231,12 @@ function updateProfileView(user) {
    profileDeletePasswordInput.value = ''
    profileDeletePasswordInput.disabled = protectedUser
    profileDeleteBtn.disabled = protectedUser
-   profileDeleteBtn.textContent = protectedUser ? 'Account Protected' : 'Delete Account'
+   profileDeleteBtn.textContent = protectedUser ? 'Konto geschützt' : 'Konto löschen'
 
    if (profileDeleteNote) {
       profileDeleteNote.textContent = protectedUser
          ? 'Dieses Projektkonto ist dauerhaft vor Loeschung geschuetzt.'
-         : 'Zum Loeschen des Kontos ist dein Passwort erforderlich.'
+         : 'Zum Löschen des Kontos ist dein Passwort erforderlich.'
    }
 }
 
@@ -262,9 +262,9 @@ function setLoggedOut() {
    profileDeletePasswordInput.value = ''
    profileDeletePasswordInput.disabled = false
    profileUsername.textContent = ''
-   profileDeleteBtn.textContent = 'Delete Account'
+   profileDeleteBtn.textContent = 'Konto löschen'
    if (profileDeleteNote) {
-      profileDeleteNote.textContent = 'Zum Loeschen des Kontos ist dein Passwort erforderlich.'
+      profileDeleteNote.textContent = 'Zum Löschen des Kontos ist dein Passwort erforderlich.'
    }
    refreshProjectContacts()
    hideAll()
@@ -301,13 +301,13 @@ profileAvatarInput.addEventListener('change', async () => {
       const data = await res.json()
 
       if (!res.ok) {
-         showMsg('profile-message', data.error || 'Could not update profile picture.', 'error')
+         showMsg('profile-message', data.error || 'Profilbild konnte nicht aktualisiert werden.', 'error')
       } else {
-         showMsg('profile-message', data.message || 'Profile picture updated!', 'success')
+            showMsg('profile-message', data.message || 'Profilbild aktualisiert!', 'success')
          setLoggedIn(data.user)
       }
    } catch (_) {
-      showMsg('profile-message', 'Cannot reach server.', 'error')
+         showMsg('profile-message', 'Server nicht erreichbar.', 'error')
    } finally {
       profileAvatarInput.value = ''
       profileAvatarButton.disabled = false
@@ -327,11 +327,11 @@ profileForm.addEventListener('submit', async (e) => {
    const username  = profileUsernameInput.value.trim()
 
    if (!full_name || !username) {
-      return showMsg('profile-message', 'Full name and username are required.', 'error')
+      return showMsg('profile-message', 'Vollständiger Name und Benutzername sind erforderlich.', 'error')
    }
 
    profileSaveBtn.disabled = true
-   profileSaveBtn.textContent = 'Saving…'
+   profileSaveBtn.textContent = 'Speichern…'
 
    try {
       const res = await fetch('/api/auth/update-profile', {
@@ -343,37 +343,37 @@ profileForm.addEventListener('submit', async (e) => {
       const data = await res.json()
 
       if (!res.ok) {
-         showMsg('profile-message', data.error || 'Could not update profile.', 'error')
+         showMsg('profile-message', data.error || 'Profil konnte nicht aktualisiert werden.', 'error')
       } else {
-         showMsg('profile-message', data.message || 'Profile updated!', 'success')
+         showMsg('profile-message', data.message || 'Profil aktualisiert!', 'success')
          setLoggedIn(data.user)
       }
    } catch (_) {
-      showMsg('profile-message', 'Cannot reach server.', 'error')
+      showMsg('profile-message', 'Server nicht erreichbar.', 'error')
    } finally {
       profileSaveBtn.disabled = false
-      profileSaveBtn.textContent = 'Save Changes'
+      profileSaveBtn.textContent = 'Änderungen speichern'
    }
 })
 
 profileDeleteBtn.addEventListener('click', async () => {
    if (!currentUser) return
    if (isProtectedUser(currentUser)) {
-      return showMsg('profile-message', 'Dieses Projektkonto kann nicht geloescht werden.', 'error')
+      return showMsg('profile-message', 'Dieses Projektkonto kann nicht gelöscht werden.', 'error')
    }
 
    const password = profileDeletePasswordInput.value
    if (!password) {
-      return showMsg('profile-message', 'Please enter your password to delete the account.', 'error')
+      return showMsg('profile-message', 'Bitte gib dein Passwort ein, um das Konto zu löschen.', 'error')
    }
 
-   const confirmed = window.confirm('Are you sure you want to delete your account? This cannot be undone.')
+   const confirmed = window.confirm('Möchtest du dein Konto wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.')
    if (!confirmed) return
 
    clearMsg('profile-message')
    profileDeleteBtn.disabled = true
    profileSaveBtn.disabled = true
-   profileDeleteBtn.textContent = 'Deleting…'
+   profileDeleteBtn.textContent = 'Löschen…'
 
    try {
       const res = await fetch('/api/auth/delete-account', {
@@ -385,18 +385,18 @@ profileDeleteBtn.addEventListener('click', async () => {
       const data = await res.json()
 
       if (!res.ok) {
-         showMsg('profile-message', data.error || 'Could not delete account.', 'error')
+         showMsg('profile-message', data.error || 'Konto konnte nicht gelöscht werden.', 'error')
       } else {
          setLoggedOut()
          showLogin()
-         showMsg('login-message', data.message || 'Account deleted successfully.', 'success')
+         showMsg('login-message', data.message || 'Konto erfolgreich gelöscht.', 'success')
       }
    } catch (_) {
-      showMsg('profile-message', 'Cannot reach server.', 'error')
+      showMsg('profile-message', 'Server nicht erreichbar.', 'error')
    } finally {
       profileDeleteBtn.disabled = false
       profileSaveBtn.disabled = false
-      profileDeleteBtn.textContent = 'Delete Account'
+      profileDeleteBtn.textContent = 'Konto löschen'
    }
 })
 
@@ -459,7 +459,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
    const btn = document.getElementById('login-submit')
    btn.disabled = true
-   btn.textContent = 'Logging in…'
+   btn.textContent = 'Anmelden…'
 
    try {
       const res  = await fetch('/api/auth/login', {
@@ -478,10 +478,10 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
          setTimeout(() => { hideAll(); clearMsg('login-message') }, 800)
       }
    } catch (_) {
-      showMsg('login-message', 'Cannot reach server. Is it running?', 'error')
+      showMsg('login-message', 'Server nicht erreichbar. Läuft der Server?', 'error')
    } finally {
       btn.disabled = false
-      btn.textContent = 'Log In'
+      btn.textContent = 'Anmelden'
    }
 })
 
@@ -492,24 +492,24 @@ const regVerifyCode = document.getElementById('reg-verify-code')
 let   sendCodeTimer = null
 
 function getFriendlyRegisterError(errorMessage) {
-   if (!errorMessage) return 'Something went wrong. Please try again.'
-   if (errorMessage.includes('already registered')) return 'This email already has an account. Please log in or reset your password.'
-   if (errorMessage.includes('Invalid or expired verification code')) return 'Your code is invalid or expired. Please click “Send Code” again.'
+   if (!errorMessage) return 'Etwas ist schiefgelaufen. Bitte versuche es erneut.'
+   if (errorMessage.includes('already registered') || errorMessage.includes('bereits registriert')) return 'Für diese E-Mail existiert bereits ein Konto. Bitte melde dich an oder setze dein Passwort zurück.'
+   if (errorMessage.includes('Invalid or expired verification code') || errorMessage.includes('ungültig') || errorMessage.includes('abgelaufen')) return 'Dein Code ist ungültig oder abgelaufen. Bitte klicke erneut auf „Code senden“.'
    return errorMessage
 }
 
 sendCodeBtn.addEventListener('click', async () => {
    const email = document.getElementById('reg-email').value.trim()
    if (!email) {
-      return showMsg('register-message', 'Please enter your email first.', 'error')
+      return showMsg('register-message', 'Bitte gib zuerst deine E-Mail-Adresse ein.', 'error')
    }
    if (!/^[^\s@]+@tha\.de$/i.test(email)) {
-      return showMsg('register-message', 'Only @tha.de email addresses are allowed.', 'error')
+      return showMsg('register-message', 'Nur @tha.de-E-Mail-Adressen sind erlaubt.', 'error')
    }
 
    clearMsg('register-message')
    sendCodeBtn.disabled = true
-   sendCodeBtn.textContent = 'Sending...'
+   sendCodeBtn.textContent = 'Senden…'
 
    const controller = new AbortController()
    const requestTimeout = window.setTimeout(() => controller.abort(), 20000)
@@ -527,32 +527,32 @@ sendCodeBtn.addEventListener('click', async () => {
       if (!res.ok) {
          showMsg('register-message', getFriendlyRegisterError(data.error), 'error')
          sendCodeBtn.disabled = false
-         sendCodeBtn.textContent = 'Send Code'
+         sendCodeBtn.textContent = 'Code senden'
       } else {
          showMsg('register-message', data.message, 'success')
          emailCodeWrap.style.display = 'block'
          regVerifyCode.focus()
          if (sendCodeTimer) clearInterval(sendCodeTimer)
          let countdown = 60
-         sendCodeBtn.textContent = `Resend (${countdown}s)`
+         sendCodeBtn.textContent = `Erneut senden (${countdown}s)`
          sendCodeTimer = setInterval(() => {
             countdown--
-            sendCodeBtn.textContent = `Resend (${countdown}s)`
+            sendCodeBtn.textContent = `Erneut senden (${countdown}s)`
             if (countdown <= 0) {
                clearInterval(sendCodeTimer)
                sendCodeTimer = null
                sendCodeBtn.disabled = false
-               sendCodeBtn.textContent = 'Resend Code'
+               sendCodeBtn.textContent = 'Code erneut senden'
             }
          }, 1000)
       }
    } catch (error) {
       const message = error?.name === 'AbortError'
-         ? 'Sending the code took too long. Please try again.'
-         : 'Cannot reach server.'
+         ? 'Das Senden des Codes hat zu lange gedauert. Bitte versuche es erneut.'
+         : 'Server nicht erreichbar.'
       showMsg('register-message', message, 'error')
       sendCodeBtn.disabled = false
-      sendCodeBtn.textContent = 'Send Code'
+      sendCodeBtn.textContent = 'Code senden'
    } finally {
       window.clearTimeout(requestTimeout)
    }
@@ -571,21 +571,21 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
 
    // Basic client-side validation
    if (!username || !full_name || !email || !password || !confirm_password) {
-      return showMsg('register-message', 'Please fill in all fields.', 'error')
+      return showMsg('register-message', 'Bitte fülle alle Felder aus.', 'error')
    }
    if (!verificationCode) {
-      return showMsg('register-message', 'Please verify your email first – click “Send Code”.', 'error')
+      return showMsg('register-message', 'Bitte verifiziere zuerst deine E-Mail-Adresse – klicke auf „Code senden“.', 'error')
    }
    if (!/^[^\s@]+@tha\.de$/i.test(email)) {
-      return showMsg('register-message', 'Only @tha.de email addresses are allowed.', 'error')
+      return showMsg('register-message', 'Nur @tha.de-E-Mail-Adressen sind erlaubt.', 'error')
    }
    if (password !== confirm_password) {
-      return showMsg('register-message', 'Passwords do not match.', 'error')
+      return showMsg('register-message', 'Passwörter stimmen nicht überein.', 'error')
    }
 
    const btn = document.getElementById('register-submit')
    btn.disabled = true
-   btn.textContent = 'Creating account…'
+   btn.textContent = 'Konto wird erstellt…'
 
    try {
       const formData = new FormData()
@@ -612,10 +612,10 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
          setTimeout(() => { hideAll(); clearMsg('register-message') }, 800)
       }
    } catch (_) {
-      showMsg('register-message', 'Cannot reach server. Is it running?', 'error')
+      showMsg('register-message', 'Server nicht erreichbar. Läuft der Server?', 'error')
    } finally {
       btn.disabled = false
-      btn.textContent = 'Sign Up'
+      btn.textContent = 'Registrieren'
    }
 })
 
@@ -628,7 +628,7 @@ document.getElementById('change-username-form').addEventListener('submit', async
 
    const btn = document.getElementById('change-username-submit')
    btn.disabled = true
-   btn.textContent = 'Updating…'
+   btn.textContent = 'Aktualisieren…'
 
    try {
       const res  = await fetch('/api/auth/update-username', {
@@ -647,10 +647,10 @@ document.getElementById('change-username-form').addEventListener('submit', async
          setTimeout(() => { hideAll(); clearMsg('change-username-message') }, 1000)
       }
    } catch (_) {
-      showMsg('change-username-message', 'Cannot reach server.', 'error')
+      showMsg('change-username-message', 'Server nicht erreichbar.', 'error')
    } finally {
       btn.disabled = false
-      btn.textContent = 'Update Username'
+      btn.textContent = 'Benutzernamen aktualisieren'
    }
 })
 
@@ -665,16 +665,16 @@ document.getElementById('reset-password-form').addEventListener('submit', async 
 
    // Client-side validation
    if (!identifier || !newPassword || !confirmPassword) {
-      return showMsg('reset-password-message', 'All fields are required.', 'error')
+      return showMsg('reset-password-message', 'Alle Felder sind erforderlich.', 'error')
    }
 
    if (newPassword !== confirmPassword) {
-      return showMsg('reset-password-message', 'Passwords do not match.', 'error')
+      return showMsg('reset-password-message', 'Passwörter stimmen nicht überein.', 'error')
    }
 
    const btn = document.getElementById('reset-password-submit')
    btn.disabled = true
-   btn.textContent = 'Resetting…'
+   btn.textContent = 'Zurücksetzen…'
 
    try {
       const res  = await fetch('/api/auth/reset-password', {
@@ -692,10 +692,10 @@ document.getElementById('reset-password-form').addEventListener('submit', async 
          setTimeout(() => { hideAll(); clearMsg('reset-password-message') }, 1500)
       }
    } catch (_) {
-      showMsg('reset-password-message', 'Cannot reach server.', 'error')
+      showMsg('reset-password-message', 'Server nicht erreichbar.', 'error')
    } finally {
       btn.disabled = false
-      btn.textContent = 'Reset Password'
+      btn.textContent = 'Passwort zurücksetzen'
    }
 })
 

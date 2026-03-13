@@ -17,7 +17,7 @@
       <!--=============== CSS ===============-->
       <link rel="stylesheet" href="assets/css/styles.css">
 
-      <title>Responsive navbar with search and login - Bedimcode</title>
+      <title>Responsive Navbar mit Suche und Login - Bedimcode</title>
    </head>
    <body>
       <!--==================== HEADER ====================-->
@@ -30,23 +30,23 @@
             <div class="nav__menu" id="nav-menu">
                <ul class="nav__list">
                   <li class="nav__item">
-                     <a href="#" class="nav__link">Home</a>
+                     <a href="#" class="nav__link">Startseite</a>
                   </li>
 
                   <li class="nav__item">
-                     <a href="#" class="nav__link">About Us</a>
+                     <a href="#" class="nav__link">Über uns</a>
                   </li>
 
                   <li class="nav__item">
-                     <a href="#" class="nav__link">Services</a>
+                     <a href="#" class="nav__link">Dienste</a>
                   </li>
 
                   <li class="nav__item">
-                     <a href="#" class="nav__link">Featured</a>
+                     <a href="#" class="nav__link">Highlights</a>
                   </li>
 
                   <li class="nav__item">
-                     <a href="#" class="nav__link">Contact Me</a>
+                     <a href="#" class="nav__link">Kontakt</a>
                   </li>
                </ul>
 
@@ -65,11 +65,11 @@
 
                <!-- User info (shown when logged in) -->
                <div class="nav__user" id="nav-user" style="display:none;">
-                  <button class="nav__profile-trigger" id="profile-btn" type="button" title="Open profile">
+                  <button class="nav__profile-trigger" id="profile-btn" type="button" title="Profil öffnen">
                      <img src="" alt="avatar" class="nav__avatar" id="nav-avatar">
                      <span class="nav__username" id="nav-username"></span>
                   </button>
-                  <button class="nav__logout" id="logout-btn" title="Log out">
+                  <button class="nav__logout" id="logout-btn" title="Abmelden">
                      <i class="fi fi-rc-sign-out-alt"></i>
                   </button>
                </div>
@@ -86,7 +86,7 @@
       <div class="search" id="search">
          <form action="/" method="GET" class="search__form" id="search-form">
             <i class="fi fi-rc-search search__icon"></i>
-            <input type="search" placeholder="What are you looking for?" class="search__input" id="search-input" name="q">
+            <input type="search" placeholder="Wonach suchst du?" class="search__input" id="search-input" name="q">
          </form>
 
          <i class="fi fi-rr-cross-small search__close" id="search-close"></i>
@@ -95,30 +95,30 @@
       <!--==================== LOGIN ====================-->
       <div class="login" id="login">
          <form id="login-form" class="login__form">
-            <h2 class="login__title">Log In</h2>
+            <h2 class="login__title">Anmelden</h2>
 
             <div class="login__message" id="login-message"></div>
 
             <div class="login__group">
                <div>
-                  <label for="identifier" class="login__label">Email or Username</label>
-                  <input type="text" placeholder="Enter email or username" id="identifier" class="login__input" autocomplete="username">
+                  <label for="identifier" class="login__label">E-Mail oder Benutzername</label>
+                  <input type="text" placeholder="E-Mail oder Benutzernamen eingeben" id="identifier" class="login__input" autocomplete="username">
                </div>
 
                <div>
-                  <label for="login-password" class="login__label">Password</label>
-                  <input type="password" placeholder="Enter your password" id="login-password" class="login__input" autocomplete="current-password">
+                  <label for="login-password" class="login__label">Passwort</label>
+                  <input type="password" placeholder="Passwort eingeben" id="login-password" class="login__input" autocomplete="current-password">
                </div>
             </div>
 
             <div>
                <p class="login__signup">
-                  You do not have an account? <a href="#" id="signup-link">Sign up</a>
+                  Du hast noch kein Konto? <a href="#" id="signup-link">Registrieren</a>
                </p>
 
-               <a href="#" class="login__forgot" id="forgot-password-link">You forgot your password</a>
+               <a href="#" class="login__forgot" id="forgot-password-link">Passwort vergessen?</a>
 
-               <button type="submit" class="login__button" id="login-submit">Log In</button>
+               <button type="submit" class="login__button" id="login-submit">Anmelden</button>
             </div>
          </form>
 
@@ -128,7 +128,7 @@
       <!--==================== REGISTER ====================-->
       <div class="login" id="register">
          <form id="register-form" class="login__form">
-            <h2 class="login__title">Create Account</h2>
+            <h2 class="login__title">Konto erstellen</h2>
 
             <div class="login__message" id="register-message"></div>
 
@@ -138,7 +138,7 @@
                   <img src="" alt="" class="avatar-upload__preview" id="avatar-preview" style="display:none;">
                   <span class="avatar-upload__placeholder" id="avatar-placeholder">
                      <i class="ri-camera-line"></i>
-                     <span>Profile Picture</span>
+                     <span>Profilbild</span>
                   </span>
                </label>
                <input type="file" id="avatar-input" accept="image/*" style="display:none;">
@@ -146,43 +146,43 @@
 
             <div class="login__group">
                <div>
-                  <label for="reg-username" class="login__label">Username</label>
-                  <input type="text" placeholder="Choose a username" id="reg-username" class="login__input" autocomplete="off">
+                  <label for="reg-username" class="login__label">Benutzername</label>
+                  <input type="text" placeholder="Benutzernamen wählen" id="reg-username" class="login__input" autocomplete="off">
                </div>
 
                <div>
-                  <label for="reg-name" class="login__label">Full Name</label>
-                  <input type="text" placeholder="Enter your full name" id="reg-name" class="login__input" autocomplete="name">
+                  <label for="reg-name" class="login__label">Vollständiger Name</label>
+                  <input type="text" placeholder="Vollständigen Namen eingeben" id="reg-name" class="login__input" autocomplete="name">
                </div>
 
                <div>
                   <label for="reg-email" class="login__label">Email <small>(@tha.de only)</small></label>
                   <div class="email-verify-row">
                      <input type="email" placeholder="yourname@tha.de" id="reg-email" class="login__input" autocomplete="email">
-                     <button type="button" class="email-verify-btn" id="send-code-btn">Send Code</button>
+                     <button type="button" class="email-verify-btn" id="send-code-btn">Code senden</button>
                   </div>
                   <div class="email-code-wrap" id="email-code-wrap" style="display:none;">
-                     <input type="text" placeholder="6-digit code" id="reg-verify-code" class="login__input" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+                     <input type="text" placeholder="6-stelliger Code" id="reg-verify-code" class="login__input" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
                   </div>
                </div>
 
                <div>
-                  <label for="reg-password" class="login__label">Password</label>
-                  <input type="password" placeholder="Create a password (min. 6 chars)" id="reg-password" class="login__input" autocomplete="new-password">
+                  <label for="reg-password" class="login__label">Passwort</label>
+                  <input type="password" placeholder="Passwort erstellen (mind. 6 Zeichen)" id="reg-password" class="login__input" autocomplete="new-password">
                </div>
 
                <div>
-                  <label for="reg-confirm" class="login__label">Confirm Password</label>
-                  <input type="password" placeholder="Confirm your password" id="reg-confirm" class="login__input" autocomplete="new-password">
+                  <label for="reg-confirm" class="login__label">Passwort bestätigen</label>
+                  <input type="password" placeholder="Passwort bestätigen" id="reg-confirm" class="login__input" autocomplete="new-password">
                </div>
             </div>
 
             <div>
                <p class="login__signup">
-                  Already have an account? <a href="#" id="login-link">Log in</a>
+                  Bereits ein Konto? <a href="#" id="login-link">Anmelden</a>
                </p>
 
-               <button type="submit" class="login__button" id="register-submit">Sign Up</button>
+               <button type="submit" class="login__button" id="register-submit">Registrieren</button>
             </div>
          </form>
 
@@ -192,55 +192,55 @@
       <!--==================== CHANGE USERNAME ====================-->
       <div class="login" id="change-username">
          <form id="change-username-form" class="login__form">
-            <h2 class="login__title">Update Username</h2>
+            <h2 class="login__title">Benutzernamen aktualisieren</h2>
 
             <div class="login__message" id="change-username-message"></div>
 
             <p style="font-size: 0.9rem; color: var(--text-color); margin-bottom: 1rem;">
-               Your username contains invalid characters. Please choose a new one using only letters, numbers, underscores, and hyphens.
+               Dein Benutzername enthält ungültige Zeichen. Bitte wähle einen neuen Benutzernamen nur mit Buchstaben, Zahlen, Unterstrichen und Bindestrichen.
             </p>
 
             <div class="login__group">
                <div>
-                  <label for="new-username" class="login__label">New Username</label>
-                  <input type="text" placeholder="Choose a new username" id="new-username" class="login__input" autocomplete="off">
+                  <label for="new-username" class="login__label">Neuer Benutzername</label>
+                  <input type="text" placeholder="Neuen Benutzernamen wählen" id="new-username" class="login__input" autocomplete="off">
                </div>
             </div>
 
-            <button type="submit" class="login__button" id="change-username-submit">Update Username</button>
+            <button type="submit" class="login__button" id="change-username-submit">Benutzernamen aktualisieren</button>
          </form>
       </div>
 
       <!--==================== RESET PASSWORD ====================-->
       <div class="login" id="reset-password">
          <form id="reset-password-form" class="login__form">
-            <h2 class="login__title">Reset Password</h2>
+            <h2 class="login__title">Passwort zurücksetzen</h2>
 
             <div class="login__message" id="reset-password-message"></div>
 
             <div class="login__group">
                <div>
-                  <label for="reset-identifier" class="login__label">Email or Username</label>
-                  <input type="text" placeholder="Enter your email or username" id="reset-identifier" class="login__input" autocomplete="off">
+                  <label for="reset-identifier" class="login__label">E-Mail oder Benutzername</label>
+                  <input type="text" placeholder="E-Mail oder Benutzernamen eingeben" id="reset-identifier" class="login__input" autocomplete="off">
                </div>
 
                <div>
-                  <label for="reset-new-password" class="login__label">New Password</label>
-                  <input type="password" placeholder="Enter new password" id="reset-new-password" class="login__input" autocomplete="new-password">
+                  <label for="reset-new-password" class="login__label">Neues Passwort</label>
+                  <input type="password" placeholder="Neues Passwort eingeben" id="reset-new-password" class="login__input" autocomplete="new-password">
                </div>
 
                <div>
-                  <label for="reset-confirm-password" class="login__label">Confirm Password</label>
-                  <input type="password" placeholder="Confirm new password" id="reset-confirm-password" class="login__input" autocomplete="new-password">
+                  <label for="reset-confirm-password" class="login__label">Passwort bestätigen</label>
+                  <input type="password" placeholder="Neues Passwort bestätigen" id="reset-confirm-password" class="login__input" autocomplete="new-password">
                </div>
             </div>
 
             <div>
                <p class="login__signup">
-                  <a href="#" id="back-to-login-link">Back to login</a>
+                  <a href="#" id="back-to-login-link">Zurück zur Anmeldung</a>
                </p>
 
-               <button type="submit" class="login__button" id="reset-password-submit">Reset Password</button>
+               <button type="submit" class="login__button" id="reset-password-submit">Passwort zurücksetzen</button>
             </div>
          </form>
 
@@ -250,14 +250,14 @@
       <!--==================== PROFILE ====================-->
       <div class="login" id="profile-modal">
          <form class="login__form profile__form" id="profile-form">
-            <h2 class="login__title">Profile</h2>
+            <h2 class="login__title">Profil</h2>
 
             <div class="login__message" id="profile-message"></div>
 
             <div class="profile__avatar-wrap">
                <input type="file" id="profile-avatar-input" accept="image/*" style="display:none;">
-               <button class="profile__avatar-button" id="profile-avatar-button" type="button" title="Change profile picture">
-                  <img src="" alt="profile avatar" class="profile__avatar-image" id="profile-avatar-image">
+               <button class="profile__avatar-button" id="profile-avatar-button" type="button" title="Profilbild ändern">
+                  <img src="" alt="Profilbild" class="profile__avatar-image" id="profile-avatar-image">
                </button>
             </div>
 
@@ -265,25 +265,25 @@
 
             <div class="login__group">
                <div>
-                  <label for="profile-full-name-input" class="login__label">Full Name</label>
+                  <label for="profile-full-name-input" class="login__label">Vollständiger Name</label>
                   <input type="text" id="profile-full-name-input" class="login__input" autocomplete="name">
                </div>
 
                <div>
-                  <label for="profile-username-input" class="login__label">Username</label>
+                  <label for="profile-username-input" class="login__label">Benutzername</label>
                   <input type="text" id="profile-username-input" class="login__input" autocomplete="username">
                </div>
 
                <div>
-                  <label for="profile-delete-password" class="login__label">Password (required for account deletion)</label>
+                  <label for="profile-delete-password" class="login__label">Passwort (erforderlich zum Löschen des Kontos)</label>
                   <input type="password" id="profile-delete-password" class="login__input" autocomplete="current-password">
                </div>
 
-               <p class="profile__delete-note" id="profile-delete-note">Zum Loeschen des Kontos ist dein Passwort erforderlich.</p>
+               <p class="profile__delete-note" id="profile-delete-note">Zum Löschen des Kontos ist dein Passwort erforderlich.</p>
             </div>
 
-            <button type="submit" class="login__button" id="profile-save-btn">Save Changes</button>
-            <button type="button" class="login__button profile__delete-button" id="profile-delete-btn">Delete Account</button>
+            <button type="submit" class="login__button" id="profile-save-btn">Änderungen speichern</button>
+            <button type="button" class="login__button profile__delete-button" id="profile-delete-btn">Konto löschen</button>
          </form>
 
          <i class="fi fi-rr-cross-small login__close" id="profile-close"></i>
@@ -318,7 +318,7 @@
                <p>Projektverantwortliche Kontakte:</p>
                <p><a href="#" data-modal-target="armand-modal" id="imprint-armand-link">Armand Patrick Asztalos, armand.patrick.asztalos@tha.de</a></p>
                <p><a href="#" data-modal-target="jost-modal" id="imprint-jost-link">Jost Witthauer, jost.witthauer@tha.de</a></p>
-               <p>Hinweis: Falls fuer eure Abgabe eine vollstaendige ladungsfaehige Anschrift erforderlich ist, sollte sie hier noch ergaenzt werden.</p>
+               <p>Hinweis: Falls für eure Abgabe eine vollständige ladungsfähige Anschrift erforderlich ist, sollte sie hier noch ergänzt werden.</p>
             </div>
          </div>
 
@@ -332,11 +332,11 @@
             </div>
 
             <div class="info-modal__body">
-               <p>Im Rahmen dieser Anwendung werden nur die fuer Registrierung und Nutzung notwendigen Daten verarbeitet.</p>
+               <p>Im Rahmen dieser Anwendung werden nur die für Registrierung und Nutzung notwendigen Daten verarbeitet.</p>
                <p>Gespeichert werden insbesondere Benutzername, voller Name, THA-E-Mail-Adresse, optionales Profilbild sowie technisch erforderliche Session-Daten.</p>
-               <p>Die Daten werden ausschliesslich fuer Authentifizierung, Profilverwaltung und die Bereitstellung der Projektfunktionen verwendet.</p>
-               <p>Es erfolgt keine Weitergabe an Dritte ausser an technisch notwendige Dienste fuer den Mailversand, sofern diese konfiguriert sind.</p>
-               <p>Bei Fragen zum Datenschutz koennt ihr euch an die im Impressum genannten Projektkontakte wenden.</p>
+               <p>Die Daten werden ausschließlich für Authentifizierung, Profilverwaltung und die Bereitstellung der Projektfunktionen verwendet.</p>
+               <p>Es erfolgt keine Weitergabe an Dritte außer an technisch notwendige Dienste für den Mailversand, sofern diese konfiguriert sind.</p>
+               <p>Bei Fragen zum Datenschutz könnt ihr euch an die im Impressum genannten Projektkontakte wenden.</p>
             </div>
          </div>
 
