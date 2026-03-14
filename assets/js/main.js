@@ -37,6 +37,7 @@ const loginPanel      = document.getElementById('login'),
       changeUsernamePanel = document.getElementById('change-username'),
       resetPasswordPanel = document.getElementById('reset-password'),
       profileModal    = document.getElementById('profile-modal'),
+      accentColorModal = document.getElementById('accent-color-modal'),
       publicProfileModal = document.getElementById('public-profile-modal'),
    followListModal = document.getElementById('follow-list-modal'),
       loginBtn        = document.getElementById('login-btn'),
@@ -48,6 +49,7 @@ const loginPanel      = document.getElementById('login'),
       resetPasswordClose = document.getElementById('reset-password-close'),
       backToLoginLink = document.getElementById('back-to-login-link'),
       profileClose    = document.getElementById('profile-close'),
+      accentColorClose = document.getElementById('accent-color-close'),
       publicProfileClose = document.getElementById('public-profile-close'),
       followListClose = document.getElementById('follow-list-close')
 
@@ -80,10 +82,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -126,6 +128,7 @@ backToLoginLink.addEventListener('click', (e) => {
    sendResetCodeBtn.textContent = 'Code senden'
 })
 profileClose.addEventListener('click', hideAll)
+accentColorClose.addEventListener('click', () => accentColorModal.classList.remove('show-login'))
 publicProfileClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
 
@@ -188,7 +191,16 @@ const profileShareCopyBtn = document.getElementById('profile-share-copy-btn')
 const profileForm         = document.getElementById('profile-form')
 const profileFullNameInput = document.getElementById('profile-full-name-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
+const profileAccentColorOpen = document.getElementById('profile-accent-color-open')
+const profileAccentColorPreview = document.getElementById('profile-accent-color-preview')
+const profileAccentColorValue = document.getElementById('profile-accent-color-value')
 const profileAccentColorInput = document.getElementById('profile-accent-color-input')
+const accentColorWheel = document.getElementById('accent-color-wheel')
+const accentColorWheelIndicator = document.getElementById('accent-color-wheel-indicator')
+const accentBrightnessInput = document.getElementById('accent-brightness')
+const accentSaturationInput = document.getElementById('accent-saturation')
+const accentHexInput = document.getElementById('accent-hex-input')
+const accentApplyBtn = document.getElementById('accent-apply-btn')
 const profileDeletePasswordInput = document.getElementById('profile-delete-password')
 const profileDeleteNote = document.getElementById('profile-delete-note')
 const profileSaveBtn       = document.getElementById('profile-save-btn')
@@ -227,6 +239,12 @@ const messageTimers = new Map()
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
 let currentUser = null
+let isDraggingAccentWheel = false
+let accentPickerState = {
+   hue: 270,
+   saturation: 35,
+   lightness: 26
+}
 let currentPublicProfileUser = null
 let currentPublicProfileFollowState = {
    followersCount: 0,
@@ -305,6 +323,135 @@ function normalizeHexColor(value) {
    if (typeof value !== 'string') return null
    const trimmed = value.trim()
    return /^#[0-9A-Fa-f]{6}$/.test(trimmed) ? trimmed.toUpperCase() : null
+}
+
+function hslToHex(h, s, l) {
+   const hue = ((Number(h) % 360) + 360) % 360
+   const saturation = Math.max(0, Math.min(100, Number(s))) / 100
+   const lightness = Math.max(0, Math.min(100, Number(l))) / 100
+
+   const c = (1 - Math.abs(2 * lightness - 1)) * saturation
+   const x = c * (1 - Math.abs(((hue / 60) % 2) - 1))
+   const m = lightness - c / 2
+
+   let rPrime = 0
+   let gPrime = 0
+   let bPrime = 0
+
+   if (hue < 60) {
+      rPrime = c; gPrime = x; bPrime = 0
+   } else if (hue < 120) {
+      rPrime = x; gPrime = c; bPrime = 0
+   } else if (hue < 180) {
+      rPrime = 0; gPrime = c; bPrime = x
+   } else if (hue < 240) {
+      rPrime = 0; gPrime = x; bPrime = c
+   } else if (hue < 300) {
+      rPrime = x; gPrime = 0; bPrime = c
+   } else {
+      rPrime = c; gPrime = 0; bPrime = x
+   }
+
+   const r = Math.round((rPrime + m) * 255)
+   const g = Math.round((gPrime + m) * 255)
+   const b = Math.round((bPrime + m) * 255)
+
+   return '#' + [r, g, b].map((value) => value.toString(16).padStart(2, '0')).join('').toUpperCase()
+}
+
+function hexToHsl(hexColor) {
+   const normalizedHex = normalizeHexColor(hexColor)
+   if (!normalizedHex) return null
+
+   const red = parseInt(normalizedHex.slice(1, 3), 16) / 255
+   const green = parseInt(normalizedHex.slice(3, 5), 16) / 255
+   const blue = parseInt(normalizedHex.slice(5, 7), 16) / 255
+
+   const max = Math.max(red, green, blue)
+   const min = Math.min(red, green, blue)
+   const delta = max - min
+
+   let hue = 0
+   if (delta !== 0) {
+      if (max === red) {
+         hue = 60 * (((green - blue) / delta) % 6)
+      } else if (max === green) {
+         hue = 60 * ((blue - red) / delta + 2)
+      } else {
+         hue = 60 * ((red - green) / delta + 4)
+      }
+   }
+
+   if (hue < 0) hue += 360
+
+   const lightness = (max + min) / 2
+   const saturation = delta === 0 ? 0 : delta / (1 - Math.abs(2 * lightness - 1))
+
+   return {
+      hue: Math.round(hue),
+      saturation: Math.round(saturation * 100),
+      lightness: Math.round(lightness * 100)
+   }
+}
+
+function updateProfileAccentSummary(hexColor) {
+   const normalizedHex = normalizeHexColor(hexColor) || getDefaultAccentColor()
+   profileAccentColorInput.value = normalizedHex
+   profileAccentColorPreview.style.backgroundColor = normalizedHex
+   profileAccentColorValue.textContent = normalizedHex
+}
+
+function syncAccentPickerUi() {
+   const wheelRect = accentColorWheel.getBoundingClientRect()
+   const radius = wheelRect.width / 2
+   const distance = radius - 8
+   const hueRadians = (accentPickerState.hue - 90) * (Math.PI / 180)
+   const indicatorX = radius + Math.cos(hueRadians) * distance
+   const indicatorY = radius + Math.sin(hueRadians) * distance
+
+   accentColorWheelIndicator.style.left = `${indicatorX}px`
+   accentColorWheelIndicator.style.top = `${indicatorY}px`
+
+   accentColorWheel.setAttribute('aria-valuenow', String(Math.round(accentPickerState.hue)))
+   accentColorWheel.style.filter = `saturate(${Math.max(0.15, accentPickerState.saturation / 100)}) brightness(${Math.max(0.15, accentPickerState.lightness / 50)})`
+
+   accentBrightnessInput.value = String(accentPickerState.lightness)
+   accentSaturationInput.value = String(accentPickerState.saturation)
+
+   const hexColor = hslToHex(accentPickerState.hue, accentPickerState.saturation, accentPickerState.lightness)
+   accentHexInput.value = hexColor
+}
+
+function setAccentPickerFromHex(hexColor) {
+   const normalizedHex = normalizeHexColor(hexColor) || getDefaultAccentColor()
+   const hslColor = hexToHsl(normalizedHex)
+   if (!hslColor) return
+
+   accentPickerState = {
+      hue: hslColor.hue,
+      saturation: hslColor.saturation,
+      lightness: hslColor.lightness
+   }
+   syncAccentPickerUi()
+}
+
+function setAccentHueFromClientPosition(clientX, clientY) {
+   const wheelRect = accentColorWheel.getBoundingClientRect()
+   const centerX = wheelRect.left + wheelRect.width / 2
+   const centerY = wheelRect.top + wheelRect.height / 2
+   const deltaX = clientX - centerX
+   const deltaY = clientY - centerY
+
+   let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI)
+   angle = (angle + 90 + 360) % 360
+
+   accentPickerState.hue = angle
+   syncAccentPickerUi()
+}
+
+function openAccentColorModal() {
+   setAccentPickerFromHex(profileAccentColorInput.value)
+   accentColorModal.classList.add('show-login')
 }
 
 function applyUserAccentColor(accentColor) {
@@ -562,7 +709,7 @@ function updateProfileView(user) {
    profileAvatarImage.src  = getAvatarUrl(user)
    profileFullNameInput.value = user.full_name
    profileUsernameInput.value = user.username
-   profileAccentColorInput.value = normalizeHexColor(user?.accent_color) || getDefaultAccentColor()
+   updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
    profileUsername.textContent = '@' + user.username
    updateProfileShareLink(user.username)
 
@@ -600,7 +747,7 @@ function setLoggedOut() {
    profileAvatarImage.src  = ''
    profileFullNameInput.value = ''
    profileUsernameInput.value = ''
-   profileAccentColorInput.value = getDefaultAccentColor()
+   updateProfileAccentSummary(getDefaultAccentColor())
    profileDeletePasswordInput.value = ''
    profileDeletePasswordInput.disabled = false
    profileUsername.textContent = ''
@@ -694,6 +841,62 @@ async function openSharedProfileFromUrl() {
 
 profileBtn.addEventListener('click', showProfileModal)
 profileAvatarButton.addEventListener('click', () => profileAvatarInput.click())
+profileAccentColorOpen.addEventListener('click', openAccentColorModal)
+
+accentColorModal.addEventListener('click', (event) => {
+   if (event.target === accentColorModal) {
+      accentColorModal.classList.remove('show-login')
+   }
+})
+
+accentColorWheel.addEventListener('mousedown', (event) => {
+   isDraggingAccentWheel = true
+   setAccentHueFromClientPosition(event.clientX, event.clientY)
+})
+
+window.addEventListener('mousemove', (event) => {
+   if (!isDraggingAccentWheel) return
+   setAccentHueFromClientPosition(event.clientX, event.clientY)
+})
+
+window.addEventListener('mouseup', () => {
+   isDraggingAccentWheel = false
+})
+
+accentColorWheel.addEventListener('keydown', (event) => {
+   if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+   event.preventDefault()
+   const direction = event.key === 'ArrowRight' ? 1 : -1
+   accentPickerState.hue = (accentPickerState.hue + direction + 360) % 360
+   syncAccentPickerUi()
+})
+
+accentBrightnessInput.addEventListener('input', () => {
+   accentPickerState.lightness = Number(accentBrightnessInput.value)
+   syncAccentPickerUi()
+})
+
+accentSaturationInput.addEventListener('input', () => {
+   accentPickerState.saturation = Number(accentSaturationInput.value)
+   syncAccentPickerUi()
+})
+
+accentHexInput.addEventListener('input', () => {
+   const parsedColor = normalizeHexColor(accentHexInput.value)
+   if (!parsedColor) return
+   setAccentPickerFromHex(parsedColor)
+})
+
+accentApplyBtn.addEventListener('click', () => {
+   const selectedColor = normalizeHexColor(accentHexInput.value)
+   if (!selectedColor) {
+      return showMsg('profile-message', 'Bitte gib einen gültigen Hexcode ein.', 'error')
+   }
+
+   clearMsg('profile-message')
+   updateProfileAccentSummary(selectedColor)
+   accentColorModal.classList.remove('show-login')
+})
 
 profileAvatarInput.addEventListener('change', async () => {
    const avatarFile = profileAvatarInput.files[0]

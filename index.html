@@ -289,8 +289,12 @@
                </div>
 
                <div>
-                  <label for="profile-accent-color-input" class="login__label">Profilfarbe (Links & Profilrahmen)</label>
-                  <input type="color" id="profile-accent-color-input" class="login__input" value="#352C59" autocomplete="off">
+                  <label for="profile-accent-color-open" class="login__label">Profilfarbe (Links & Profilrahmen)</label>
+                  <button type="button" id="profile-accent-color-open" class="profile-color-trigger" aria-haspopup="dialog" aria-controls="accent-color-modal">
+                     <span class="profile-color-trigger__preview" id="profile-accent-color-preview" aria-hidden="true"></span>
+                     <span class="profile-color-trigger__value" id="profile-accent-color-value">#352C59</span>
+                  </button>
+                  <input type="hidden" id="profile-accent-color-input" value="#352C59">
                </div>
 
                <div>
@@ -348,6 +352,37 @@
          </div>
 
          <i class="fi fi-rr-cross-small login__close" id="public-profile-close"></i>
+      </div>
+
+      <div class="login" id="accent-color-modal">
+         <div class="login__form profile__form accent-picker__form">
+            <h2 class="login__title">Profilfarbe wählen</h2>
+
+            <div class="accent-picker__wheel-wrap">
+               <div class="accent-picker__wheel" id="accent-color-wheel" role="slider" tabindex="0" aria-label="Farbkreis" aria-valuemin="0" aria-valuemax="360" aria-valuenow="0">
+                  <span class="accent-picker__wheel-indicator" id="accent-color-wheel-indicator"></span>
+               </div>
+            </div>
+
+            <div class="accent-picker__controls">
+               <div>
+                  <label for="accent-brightness" class="login__label">Helligkeit</label>
+                  <input type="range" id="accent-brightness" class="accent-picker__range" min="0" max="100" step="1" value="50">
+               </div>
+               <div>
+                  <label for="accent-saturation" class="login__label">Sättigung</label>
+                  <input type="range" id="accent-saturation" class="accent-picker__range" min="0" max="100" step="1" value="60">
+               </div>
+               <div>
+                  <label for="accent-hex-input" class="login__label">Hexcode</label>
+                  <input type="text" id="accent-hex-input" class="login__input" placeholder="#352C59" maxlength="7" autocomplete="off">
+               </div>
+            </div>
+
+            <button type="button" class="login__button" id="accent-apply-btn">Farbe übernehmen</button>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" id="accent-color-close"></i>
       </div>
 
       <div class="login" id="follow-list-modal">
