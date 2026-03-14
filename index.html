@@ -298,6 +298,16 @@
                </div>
 
                <div>
+                  <label for="profile-background-input" class="login__label">Custom Hintergrund <small>(nur lokal)</small></label>
+                  <input type="file" id="profile-background-input" class="login__input" accept="image/*">
+                  <p class="profile__local-note">Wird nur in diesem Browser gespeichert und nicht mit dem Konto synchronisiert.</p>
+               </div>
+
+               <div class="profile-background__actions">
+                  <button type="button" class="login__button profile-background__reset" id="profile-background-reset-btn">Hintergrund zurücksetzen</button>
+               </div>
+
+               <div>
                   <label for="profile-delete-password" class="login__label">Passwort (erforderlich zum Löschen des Kontos)</label>
                   <input type="password" id="profile-delete-password" class="login__input" autocomplete="current-password">
                </div>

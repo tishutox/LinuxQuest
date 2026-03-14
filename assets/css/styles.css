@@ -700,6 +700,25 @@ body.user-theme-active .profile__avatar-button:hover {
   margin-top: -.5rem;
 }
 
+.profile__local-note {
+  margin-top: .45rem;
+  font-size: .78rem;
+  color: var(--text-color);
+}
+
+.profile-background__actions {
+  display: flex;
+}
+
+.profile-background__reset {
+  margin-top: .15rem;
+}
+
+.profile-background__reset:disabled {
+  opacity: .65;
+  cursor: not-allowed;
+}
+
 .public-profile__username-row {
   display: flex;
   align-items: center;

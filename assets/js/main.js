@@ -195,6 +195,8 @@ const profileAccentColorOpen = document.getElementById('profile-accent-color-ope
 const profileAccentColorPreview = document.getElementById('profile-accent-color-preview')
 const profileAccentColorValue = document.getElementById('profile-accent-color-value')
 const profileAccentColorInput = document.getElementById('profile-accent-color-input')
+const profileBackgroundInput = document.getElementById('profile-background-input')
+const profileBackgroundResetBtn = document.getElementById('profile-background-reset-btn')
 const accentColorWheel = document.getElementById('accent-color-wheel')
 const accentColorWheelIndicator = document.getElementById('accent-color-wheel-indicator')
 const accentBrightnessInput = document.getElementById('accent-brightness')
@@ -234,6 +236,10 @@ const PROJECT_CONTACTS_CACHE_MS = 15000
 let projectContactsLastLoadedAt = 0
 let projectContactsRefreshPromise = null
 const USER_THEME_CLASS = 'user-theme-active'
+const LOCAL_BACKGROUND_STORAGE_PREFIX = 'local-custom-bg:'
+const LOCAL_BACKGROUND_MAX_DATA_URL_LENGTH = 2400000
+const mainBackgroundImage = document.querySelector('.main__bg')
+const DEFAULT_MAIN_BACKGROUND_SRC = mainBackgroundImage?.getAttribute('src') || 'assets/img/bg-image.png'
 
 const messageTimers = new Map()
 
@@ -496,6 +502,72 @@ function updateProfileShareLink(username) {
    profileShareLinkInput.value = buildProfileUrl(username)
 }
 
+function getBackgroundStorageKey(user) {
+   const username = user?.username?.trim().toLowerCase()
+   if (!username) return null
+   return `${LOCAL_BACKGROUND_STORAGE_PREFIX}${username}`
+}
+
+function applyMainBackground(source) {
+   if (!mainBackgroundImage) return
+   mainBackgroundImage.src = source || DEFAULT_MAIN_BACKGROUND_SRC
+}
+
+function getStoredBackgroundForUser(user) {
+   const storageKey = getBackgroundStorageKey(user)
+   if (!storageKey) return null
+
+   try {
+      const storedValue = localStorage.getItem(storageKey)
+      if (typeof storedValue === 'string' && storedValue.startsWith('data:image/')) {
+         return storedValue
+      }
+   } catch (_) {
+      return null
+   }
+
+   return null
+}
+
+function saveBackgroundForCurrentUser(dataUrl) {
+   const storageKey = getBackgroundStorageKey(currentUser)
+   if (!storageKey) return false
+
+   try {
+      localStorage.setItem(storageKey, dataUrl)
+      return true
+   } catch (_) {
+      return false
+   }
+}
+
+function clearBackgroundForCurrentUser() {
+   const storageKey = getBackgroundStorageKey(currentUser)
+   if (!storageKey) return false
+
+   try {
+      localStorage.removeItem(storageKey)
+      return true
+   } catch (_) {
+      return false
+   }
+}
+
+function applyStoredBackgroundForUser(user) {
+   const storedBackground = getStoredBackgroundForUser(user)
+   applyMainBackground(storedBackground)
+}
+
+function updateBackgroundControls(user) {
+   if (!profileBackgroundResetBtn) return
+
+   const hasCustomBackground = Boolean(getStoredBackgroundForUser(user))
+   profileBackgroundResetBtn.disabled = !hasCustomBackground
+   profileBackgroundResetBtn.textContent = hasCustomBackground
+      ? 'Hintergrund zurücksetzen'
+      : 'Kein eigener Hintergrund'
+}
+
 function updateFollowButton() {
    if (!publicProfileFollowBtn) return
 
@@ -715,6 +787,7 @@ function updateProfileView(user) {
    profileFullNameInput.value = user.full_name
    profileUsernameInput.value = user.username
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
+   updateBackgroundControls(user)
    profileUsername.textContent = '@' + user.username
    updateProfileShareLink(user.username)
 
@@ -734,6 +807,7 @@ function updateProfileView(user) {
 function setLoggedIn(user) {
    currentUser = user
    applyUserAccentColor(user?.accent_color)
+   applyStoredBackgroundForUser(user)
    loginBtn.style.display   = 'none'
    navUser.style.display    = 'flex'
    navUsername.textContent  = user.username
@@ -745,6 +819,7 @@ function setLoggedIn(user) {
 function setLoggedOut() {
    currentUser = null
    applyUserAccentColor(null)
+   applyMainBackground(null)
    loginBtn.style.display  = ''
    navUser.style.display   = 'none'
    navAvatar.src           = ''
@@ -757,6 +832,10 @@ function setLoggedOut() {
    profileDeletePasswordInput.disabled = false
    profileUsername.textContent = ''
    profileShareLinkInput.value = ''
+   if (profileBackgroundInput) {
+      profileBackgroundInput.value = ''
+   }
+   updateBackgroundControls(null)
    profileDeleteBtn.textContent = 'Konto löschen'
    if (profileDeleteNote) {
       profileDeleteNote.textContent = 'Zum Löschen des Kontos ist dein Passwort erforderlich.'
@@ -933,6 +1012,73 @@ profileAvatarInput.addEventListener('change', async () => {
       profileAvatarInput.value = ''
       profileAvatarButton.disabled = false
    }
+})
+
+profileBackgroundInput.addEventListener('change', () => {
+   const backgroundFile = profileBackgroundInput.files[0]
+   if (!backgroundFile) return
+
+   if (!currentUser) {
+      profileBackgroundInput.value = ''
+      return showMsg('profile-message', 'Bitte melde dich an, um einen lokalen Hintergrund zu verwenden.', 'error')
+   }
+
+   if (!backgroundFile.type.startsWith('image/')) {
+      profileBackgroundInput.value = ''
+      return showMsg('profile-message', 'Bitte wähle eine Bilddatei aus.', 'error')
+   }
+
+   if (backgroundFile.size > 2 * 1024 * 1024) {
+      profileBackgroundInput.value = ''
+      return showMsg('profile-message', 'Bild ist zu groß (max. 2 MB).', 'error')
+   }
+
+   clearMsg('profile-message')
+   profileBackgroundInput.disabled = true
+   profileBackgroundResetBtn.disabled = true
+
+   const reader = new FileReader()
+   reader.onload = () => {
+      const dataUrl = typeof reader.result === 'string' ? reader.result : ''
+
+      if (!dataUrl.startsWith('data:image/')) {
+         showMsg('profile-message', 'Ungültiges Bildformat.', 'error')
+      } else if (dataUrl.length > LOCAL_BACKGROUND_MAX_DATA_URL_LENGTH) {
+         showMsg('profile-message', 'Bild ist zu groß für die lokale Speicherung.', 'error')
+      } else if (!saveBackgroundForCurrentUser(dataUrl)) {
+         showMsg('profile-message', 'Lokaler Speicher voll oder blockiert. Bitte kleineres Bild wählen.', 'error')
+      } else {
+         applyMainBackground(dataUrl)
+         updateBackgroundControls(currentUser)
+         showMsg('profile-message', 'Lokaler Hintergrund gespeichert.', 'success')
+      }
+
+      profileBackgroundInput.value = ''
+      profileBackgroundInput.disabled = false
+      profileBackgroundResetBtn.disabled = false
+   }
+
+   reader.onerror = () => {
+      showMsg('profile-message', 'Bild konnte nicht gelesen werden.', 'error')
+      profileBackgroundInput.value = ''
+      profileBackgroundInput.disabled = false
+      profileBackgroundResetBtn.disabled = false
+   }
+
+   reader.readAsDataURL(backgroundFile)
+})
+
+profileBackgroundResetBtn.addEventListener('click', () => {
+   if (!currentUser) return
+
+   const removed = clearBackgroundForCurrentUser()
+   if (!removed) {
+      return showMsg('profile-message', 'Lokaler Hintergrund konnte nicht entfernt werden.', 'error')
+   }
+
+   applyMainBackground(null)
+   updateBackgroundControls(currentUser)
+   showMsg('profile-message', 'Lokaler Hintergrund entfernt.', 'success')
 })
 
 profileUsernameInput.addEventListener('input', () => {
