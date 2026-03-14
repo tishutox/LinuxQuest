@@ -560,6 +560,11 @@ body.user-theme-active .nav__avatar {
   row-gap: 1rem;
 }
 
+#profile-modal .profile__form,
+#public-profile-modal .profile__form {
+  padding-top: 1.25rem;
+}
+
 .profile-color-trigger {
   width: 100%;
   display: flex;
