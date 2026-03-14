@@ -37,6 +37,7 @@ const upload = multer({
 // ─── Helper ───────────────────────────────────────────────────────────────────
 const THA_REGEX      = /^[^\s@]+@tha\.de$/i;
 const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;  // Only letters, numbers, underscore, hyphen
+const HEX_COLOR_REGEX = /^#[0-9a-fA-F]{6}$/;
 const SALT_ROUNDS    = 12;
 const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
 const VERIFY_IP_MAX_REQUESTS = 6;
@@ -100,10 +101,18 @@ function touchUserActivity(userId) {
 
 function getPublicUserProfileByEmail(email) {
   return db.prepare(`
-    SELECT id, username, full_name, email, avatar, created_at
+    SELECT id, username, full_name, email, avatar, accent_color, created_at
     FROM users
     WHERE email = ?
   `).get(normalizeEmail(email));
+}
+
+function normalizeAccentColor(colorValue) {
+  if (typeof colorValue !== 'string') return null;
+  const trimmedColor = colorValue.trim();
+  if (!trimmedColor) return null;
+  if (!HEX_COLOR_REGEX.test(trimmedColor)) return null;
+  return trimmedColor.toUpperCase();
 }
 
 function getFollowCounts(userId) {
@@ -151,6 +160,49 @@ function checkIpVerificationRateLimit(req) {
   return { limited: false, retryAfterSeconds: 0 };
 }
 
+async function sendVerificationCodeEmail(email, code, subject) {
+  const mailConfig = getMailConfig();
+
+  if (!mailConfig.isConfigured && !mailConfig.allowConsoleFallback) {
+    return {
+      ok: false,
+      status: 503,
+      error: 'Der E-Mail-Versand ist auf dem Server nicht konfiguriert. Bitte kontaktiere den Support.'
+    };
+  }
+
+  const transport = createMailTransport();
+  const info = await transport.sendMail({
+    from: mailConfig.from,
+    to: email,
+    subject,
+    text: `Dein Verifizierungscode lautet: ${code}\n\nDieser Code läuft in 15 Minuten ab.\nFalls du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.`,
+    html: `<p>Dein Verifizierungscode lautet:</p><p style="font-size:1.6em;font-weight:bold;letter-spacing:6px">${code}</p><p>Dieser Code läuft in 15 Minuten ab.</p><p style="color:#999;font-size:.85em">Falls du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.</p>`
+  });
+
+  if (!mailConfig.isConfigured) {
+    console.log(`[EMAIL VERIFICATION] No SMTP configured - code for ${email}: ${code}`);
+    return { ok: true };
+  }
+
+  const accepted = Array.isArray(info.accepted) ? info.accepted : [];
+  const rejected = Array.isArray(info.rejected) ? info.rejected : [];
+
+  console.log('[EMAIL VERIFICATION SENT]', {
+    to: email,
+    messageId: info.messageId,
+    accepted,
+    rejected,
+    response: info.response || null
+  });
+
+  if (!accepted.length) {
+    throw new Error('Der Mail-Anbieter hat keine Empfänger für die Verifizierungs-E-Mail akzeptiert.');
+  }
+
+  return { ok: true };
+}
+
 // ─── SEND EMAIL VERIFICATION ──────────────────────────────────────────────────
 router.post('/send-verification', async (req, res) => {
   try {
@@ -187,23 +239,10 @@ router.post('/send-verification', async (req, res) => {
     // Generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-    const mailConfig = getMailConfig();
-
-    if (!mailConfig.isConfigured && !mailConfig.allowConsoleFallback) {
-      return res.status(503).json({
-        error: 'Der E-Mail-Versand ist auf dem Server nicht konfiguriert. Bitte kontaktiere den Support.'
-      });
+    const mailResult = await sendVerificationCodeEmail(normalizedEmail, code, 'Dein Verifizierungscode');
+    if (!mailResult.ok) {
+      return res.status(mailResult.status).json({ error: mailResult.error });
     }
-
-    const transport = createMailTransport();
-
-    const info = await transport.sendMail({
-      from: mailConfig.from,
-      to:      normalizedEmail,
-      subject: 'Dein Verifizierungscode',
-      text:    `Dein Verifizierungscode lautet: ${code}\n\nDieser Code läuft in 15 Minuten ab.\nFalls du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.`,
-      html:    `<p>Dein Verifizierungscode lautet:</p><p style="font-size:1.6em;font-weight:bold;letter-spacing:6px">${code}</p><p>Dieser Code läuft in 15 Minuten ab.</p><p style="color:#999;font-size:.85em">Falls du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.</p>`
-    });
 
     db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizedEmail);
     db.prepare(`
@@ -211,27 +250,71 @@ router.post('/send-verification', async (req, res) => {
       VALUES (?, ?, datetime('now', '+15 minutes'))
     `).run(normalizedEmail, code);
 
-    if (!mailConfig.isConfigured) {
-      console.log(`[EMAIL VERIFICATION] No SMTP configured � code for ${normalizedEmail}: ${code}`);
-    } else {
-      const accepted = Array.isArray(info.accepted) ? info.accepted : [];
-      const rejected = Array.isArray(info.rejected) ? info.rejected : [];
-
-      console.log('[EMAIL VERIFICATION SENT]', {
-        to: normalizedEmail,
-        messageId: info.messageId,
-        accepted,
-        rejected,
-        response: info.response || null
-      });
-
-      if (!accepted.length) {
-        throw new Error('Der Mail-Anbieter hat keine Empfänger für die Verifizierungs-E-Mail akzeptiert.');
-      }
-    }
     return res.json({ message: 'Verifizierungscode gesendet! Bitte prüfe dein Postfach.' });
   } catch (err) {
     console.error('[SEND VERIFICATION ERROR]', {
+      code: err?.code || err?.responseCode || null,
+      message: err?.message || 'Unknown error',
+      response: err?.response || null,
+      command: err?.command || null
+    });
+    return res.status(500).json({ error: getMailErrorMessage(err) });
+  }
+});
+
+// ─── SEND PASSWORD RESET VERIFICATION ────────────────────────────────────────
+router.post('/send-password-reset-verification', async (req, res) => {
+  try {
+    const { identifier } = req.body;
+
+    if (!identifier || !identifier.trim()) {
+      return res.status(400).json({ error: 'Bitte gib deine E-Mail-Adresse oder deinen Benutzernamen ein.' });
+    }
+
+    const trimmedIdentifier = identifier.trim();
+
+    const ipLimit = checkIpVerificationRateLimit(req);
+    if (ipLimit.limited) {
+      return res.status(429).json({
+        error: `Zu viele Verifizierungsanfragen aus deinem Netzwerk. Bitte versuche es in etwa ${ipLimit.retryAfterSeconds} Sekunden erneut.`
+      });
+    }
+
+    const user = db.prepare(
+      'SELECT email FROM users WHERE email = ? OR username = ?'
+    ).get(normalizeEmail(trimmedIdentifier), trimmedIdentifier);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    const normalizedEmail = normalizeEmail(user.email);
+
+    const recent = db.prepare(`
+      SELECT id FROM password_reset_verifications
+      WHERE email = ? AND datetime(created_at) > datetime('now', '-60 seconds')
+    `).get(normalizedEmail);
+
+    if (recent) {
+      return res.status(429).json({ error: 'Bitte warte einen Moment, bevor du einen neuen Code anforderst.' });
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const mailResult = await sendVerificationCodeEmail(normalizedEmail, code, 'Dein Code zum Zurücksetzen des Passworts');
+    if (!mailResult.ok) {
+      return res.status(mailResult.status).json({ error: mailResult.error });
+    }
+
+    db.prepare('DELETE FROM password_reset_verifications WHERE email = ?').run(normalizedEmail);
+    db.prepare(`
+      INSERT INTO password_reset_verifications (email, code, expires_at)
+      VALUES (?, ?, datetime('now', '+15 minutes'))
+    `).run(normalizedEmail, code);
+
+    return res.json({ message: 'Verifizierungscode gesendet! Bitte prüfe dein Postfach.' });
+  } catch (err) {
+    console.error('[SEND RESET VERIFICATION ERROR]', {
       code: err?.code || err?.responseCode || null,
       message: err?.message || 'Unknown error',
       response: err?.response || null,
@@ -304,7 +387,7 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
 
     db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizeEmail(email));
 
-    const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
                    .get(info.lastInsertRowid);
 
     return res.status(201).json({ message: 'Konto erfolgreich erstellt!', user });
@@ -350,6 +433,7 @@ router.post('/login', async (req, res) => {
         full_name:  user.full_name,
         email:      user.email,
         avatar:     user.avatar,
+        accent_color: user.accent_color,
         created_at: user.created_at
       }
     });
@@ -370,7 +454,7 @@ router.get('/me', (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Nicht authentifiziert.' });
 
   const user = db.prepare(
-    'SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?'
+    'SELECT id, username, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?'
   ).get(req.session.userId);
 
   if (!user) return res.status(401).json({ error: 'Benutzer nicht gefunden.' });
@@ -406,7 +490,7 @@ router.get('/public/:username', (req, res) => {
     }
 
     const user = db.prepare(`
-      SELECT id, username, full_name, email, avatar, created_at
+      SELECT id, username, full_name, email, avatar, accent_color, created_at
       FROM users
       WHERE username = ?
     `).get(username);
@@ -583,7 +667,7 @@ router.post('/update-username', (req, res) => {
     db.prepare("UPDATE users SET username = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(newUsername, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Benutzername aktualisiert!', user });
@@ -619,7 +703,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 
     deleteOldAvatar(currentUser.avatar);
 
-    const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profilbild aktualisiert!', user });
@@ -632,7 +716,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 // ─── UPDATE PROFILE (NAME + USERNAME) ───────────────────────────────────────
 router.post('/update-profile', (req, res) => {
   try {
-    const { full_name, username } = req.body;
+    const { full_name, username, accent_color } = req.body;
 
     if (!req.session.userId) {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
@@ -653,6 +737,11 @@ router.post('/update-profile', (req, res) => {
       return res.status(400).json({ error: 'Der Benutzername darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten.' });
     }
 
+    const normalizedAccentColor = normalizeAccentColor(accent_color);
+    if (typeof accent_color === 'string' && accent_color.trim() && !normalizedAccentColor) {
+      return res.status(400).json({ error: 'Die Profilfarbe muss ein gültiger Hex-Farbwert sein (z. B. #352C59).' });
+    }
+
     const existing = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?')
                        .get(trimmedUsername, req.session.userId);
 
@@ -660,10 +749,10 @@ router.post('/update-profile', (req, res) => {
       return res.status(409).json({ error: 'Dieser Benutzername ist bereits vergeben.' });
     }
 
-    db.prepare("UPDATE users SET full_name = ?, username = ?, last_active_at = datetime('now') WHERE id = ?")
-      .run(trimmedName, trimmedUsername, req.session.userId);
+    db.prepare("UPDATE users SET full_name = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
+      .run(trimmedName, trimmedUsername, normalizedAccentColor, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, full_name, email, avatar, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profil aktualisiert!', user });
@@ -724,9 +813,9 @@ router.delete('/delete-account', async (req, res) => {
 // ─── RESET PASSWORD ───────────────────────────────────────────────────────────
 router.post('/reset-password', async (req, res) => {
   try {
-    const { identifier, newPassword, confirmPassword } = req.body;
+    const { identifier, verificationCode, newPassword, confirmPassword } = req.body;
 
-    if (!identifier || !newPassword || !confirmPassword) {
+    if (!identifier || !verificationCode || !newPassword || !confirmPassword) {
       return res.status(400).json({ error: 'Alle Felder sind erforderlich.' });
     }
 
@@ -740,17 +829,30 @@ router.post('/reset-password', async (req, res) => {
 
     // Find user by email or username
     const user = db.prepare(
-      'SELECT id FROM users WHERE email = ? OR username = ?'
+      'SELECT id, email FROM users WHERE email = ? OR username = ?'
     ).get(normalizeEmail(identifier), identifier.trim());
 
     if (!user) {
       return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
     }
 
+    const normalizedEmail = normalizeEmail(user.email);
+
+    const resetVerification = db.prepare(`
+      SELECT id FROM password_reset_verifications
+      WHERE email = ? AND code = ? AND datetime(expires_at) > datetime('now')
+    `).get(normalizedEmail, verificationCode.trim());
+
+    if (!resetVerification) {
+      return res.status(400).json({ error: 'Ungültiger oder abgelaufener Verifizierungscode.' });
+    }
+
     // Hash and update password
     const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
     db.prepare("UPDATE users SET password = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(hashed, user.id);
+
+    db.prepare('DELETE FROM password_reset_verifications WHERE email = ?').run(normalizedEmail);
 
     return res.json({ message: 'Passwort erfolgreich zurückgesetzt! Du kannst dich jetzt mit deinem neuen Passwort anmelden.' });
   } catch (err) {

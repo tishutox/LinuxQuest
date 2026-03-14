@@ -107,9 +107,24 @@ signupLink.addEventListener('click', (e) => {
    clearMsg('register-message')
 })
 loginLink.addEventListener('click',  (e) => { e.preventDefault(); showLogin() })
-forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showResetPassword() })
+forgotPasswordLink.addEventListener('click', (e) => {
+   e.preventDefault()
+   showResetPassword()
+   resetEmailCodeWrap.style.display = 'none'
+   resetVerifyCode.value = ''
+   sendResetCodeBtn.disabled = false
+   sendResetCodeBtn.textContent = 'Code senden'
+   if (sendResetCodeTimer) { clearInterval(sendResetCodeTimer); sendResetCodeTimer = null }
+   clearMsg('reset-password-message')
+})
 resetPasswordClose.addEventListener('click', hideAll)
-backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLogin() })
+backToLoginLink.addEventListener('click', (e) => {
+   e.preventDefault()
+   showLogin()
+   if (sendResetCodeTimer) { clearInterval(sendResetCodeTimer); sendResetCodeTimer = null }
+   sendResetCodeBtn.disabled = false
+   sendResetCodeBtn.textContent = 'Code senden'
+})
 profileClose.addEventListener('click', hideAll)
 publicProfileClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
@@ -173,6 +188,7 @@ const profileShareCopyBtn = document.getElementById('profile-share-copy-btn')
 const profileForm         = document.getElementById('profile-form')
 const profileFullNameInput = document.getElementById('profile-full-name-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
+const profileAccentColorInput = document.getElementById('profile-accent-color-input')
 const profileDeletePasswordInput = document.getElementById('profile-delete-password')
 const profileDeleteNote = document.getElementById('profile-delete-note')
 const profileSaveBtn       = document.getElementById('profile-save-btn')
@@ -205,6 +221,7 @@ const projectContactsByKey = {
 const PROJECT_CONTACTS_CACHE_MS = 15000
 let projectContactsLastLoadedAt = 0
 let projectContactsRefreshPromise = null
+const USER_THEME_CLASS = 'user-theme-active'
 
 const messageTimers = new Map()
 
@@ -278,6 +295,35 @@ function isProtectedUser(user) {
    return Boolean(user?.email) && PROTECTED_EMAILS.has(user.email.trim().toLowerCase())
 }
 
+function getDefaultAccentColor() {
+   const cssValue = getComputedStyle(document.documentElement).getPropertyValue('--first-color').trim()
+   if (/^#[0-9A-Fa-f]{6}$/.test(cssValue)) return cssValue.toUpperCase()
+   return '#352C59'
+}
+
+function normalizeHexColor(value) {
+   if (typeof value !== 'string') return null
+   const trimmed = value.trim()
+   return /^#[0-9A-Fa-f]{6}$/.test(trimmed) ? trimmed.toUpperCase() : null
+}
+
+function applyUserAccentColor(accentColor) {
+   const normalizedAccentColor = normalizeHexColor(accentColor)
+   if (!normalizedAccentColor) {
+      document.body.classList.remove(USER_THEME_CLASS)
+      document.documentElement.style.setProperty('--user-accent-color', getDefaultAccentColor())
+      return
+   }
+
+   document.body.classList.add(USER_THEME_CLASS)
+   document.documentElement.style.setProperty('--user-accent-color', normalizedAccentColor)
+}
+
+function applyPublicProfileAccentColor(accentColor) {
+   const normalizedAccentColor = normalizeHexColor(accentColor) || getDefaultAccentColor()
+   publicProfileModal.style.setProperty('--public-profile-accent-color', normalizedAccentColor)
+}
+
 function getAvatarUrl(user) {
    return user.avatar
       ? '/' + user.avatar
@@ -341,6 +387,7 @@ function updatePublicProfileView(payload) {
    }
 
    currentPublicProfileUser = user
+   applyPublicProfileAccentColor(user?.accent_color)
    currentPublicProfileFollowState = {
       followersCount: follow.followersCount || 0,
       followingCount: follow.followingCount || 0,
@@ -368,6 +415,7 @@ function showPublicProfileError(message) {
    }
 
    currentPublicProfileUser = null
+   applyPublicProfileAccentColor(null)
    currentPublicProfileFollowState = {
       followersCount: 0,
       followingCount: 0,
@@ -514,6 +562,7 @@ function updateProfileView(user) {
    profileAvatarImage.src  = getAvatarUrl(user)
    profileFullNameInput.value = user.full_name
    profileUsernameInput.value = user.username
+   profileAccentColorInput.value = normalizeHexColor(user?.accent_color) || getDefaultAccentColor()
    profileUsername.textContent = '@' + user.username
    updateProfileShareLink(user.username)
 
@@ -532,6 +581,7 @@ function updateProfileView(user) {
 
 function setLoggedIn(user) {
    currentUser = user
+   applyUserAccentColor(user?.accent_color)
    loginBtn.style.display   = 'none'
    navUser.style.display    = 'flex'
    navUsername.textContent  = user.username
@@ -542,6 +592,7 @@ function setLoggedIn(user) {
 
 function setLoggedOut() {
    currentUser = null
+   applyUserAccentColor(null)
    loginBtn.style.display  = ''
    navUser.style.display   = 'none'
    navAvatar.src           = ''
@@ -549,6 +600,7 @@ function setLoggedOut() {
    profileAvatarImage.src  = ''
    profileFullNameInput.value = ''
    profileUsernameInput.value = ''
+   profileAccentColorInput.value = getDefaultAccentColor()
    profileDeletePasswordInput.value = ''
    profileDeletePasswordInput.disabled = false
    profileUsername.textContent = ''
@@ -686,9 +738,14 @@ profileForm.addEventListener('submit', async (e) => {
 
    const full_name = profileFullNameInput.value.trim()
    const username  = profileUsernameInput.value.trim()
+   const accent_color = normalizeHexColor(profileAccentColorInput.value)
 
    if (!full_name || !username) {
       return showMsg('profile-message', 'Vollständiger Name und Benutzername sind erforderlich.', 'error')
+   }
+
+    if (!accent_color) {
+      return showMsg('profile-message', 'Bitte wähle eine gültige Profilfarbe.', 'error')
    }
 
    profileSaveBtn.disabled = true
@@ -699,7 +756,7 @@ profileForm.addEventListener('submit', async (e) => {
          method: 'POST',
          credentials: 'include',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ full_name, username })
+         body: JSON.stringify({ full_name, username, accent_color })
       })
       const data = await res.json()
 
@@ -867,11 +924,22 @@ const sendCodeBtn   = document.getElementById('send-code-btn')
 const emailCodeWrap = document.getElementById('email-code-wrap')
 const regVerifyCode = document.getElementById('reg-verify-code')
 let   sendCodeTimer = null
+const sendResetCodeBtn   = document.getElementById('send-reset-code-btn')
+const resetEmailCodeWrap = document.getElementById('reset-email-code-wrap')
+const resetVerifyCode    = document.getElementById('reset-verify-code')
+let   sendResetCodeTimer = null
 
 function getFriendlyRegisterError(errorMessage) {
    if (!errorMessage) return 'Etwas ist schiefgelaufen. Bitte versuche es erneut.'
    if (errorMessage.includes('already registered') || errorMessage.includes('bereits registriert')) return 'Für diese E-Mail existiert bereits ein Konto. Bitte melde dich an oder setze dein Passwort zurück.'
    if (errorMessage.includes('Invalid or expired verification code') || errorMessage.includes('ungültig') || errorMessage.includes('abgelaufen')) return 'Dein Code ist ungültig oder abgelaufen. Bitte klicke erneut auf „Code senden“.'
+   return errorMessage
+}
+
+function getFriendlyResetError(errorMessage) {
+   if (!errorMessage) return 'Etwas ist schiefgelaufen. Bitte versuche es erneut.'
+   if (errorMessage.includes('Benutzer nicht gefunden')) return 'Für diese E-Mail oder diesen Benutzernamen wurde kein Konto gefunden.'
+   if (errorMessage.includes('ungültig') || errorMessage.includes('abgelaufen')) return 'Dein Code ist ungültig oder abgelaufen. Bitte fordere einen neuen an.'
    return errorMessage
 }
 
@@ -930,6 +998,64 @@ sendCodeBtn.addEventListener('click', async () => {
       showMsg('register-message', message, 'error')
       sendCodeBtn.disabled = false
       sendCodeBtn.textContent = 'Code senden'
+   } finally {
+      window.clearTimeout(requestTimeout)
+   }
+})
+
+sendResetCodeBtn.addEventListener('click', async () => {
+   const identifier = document.getElementById('reset-identifier').value.trim()
+   if (!identifier) {
+      return showMsg('reset-password-message', 'Bitte gib zuerst deine E-Mail-Adresse oder deinen Benutzernamen ein.', 'error')
+   }
+
+   clearMsg('reset-password-message')
+   sendResetCodeBtn.disabled = true
+   sendResetCodeBtn.textContent = 'Senden…'
+
+   const controller = new AbortController()
+   const requestTimeout = window.setTimeout(() => controller.abort(), 20000)
+
+   try {
+      const res  = await fetch('/api/auth/send-password-reset-verification', {
+         method:      'POST',
+         credentials: 'include',
+         headers:     { 'Content-Type': 'application/json' },
+         body:        JSON.stringify({ identifier }),
+         signal:      controller.signal
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+         showMsg('reset-password-message', getFriendlyResetError(data.error), 'error')
+         sendResetCodeBtn.disabled = false
+         sendResetCodeBtn.textContent = 'Code senden'
+      } else {
+         showMsg('reset-password-message', data.message, 'success')
+         resetEmailCodeWrap.style.display = 'block'
+         resetVerifyCode.focus()
+
+         if (sendResetCodeTimer) clearInterval(sendResetCodeTimer)
+         let countdown = 60
+         sendResetCodeBtn.textContent = `Erneut senden (${countdown}s)`
+         sendResetCodeTimer = setInterval(() => {
+            countdown--
+            sendResetCodeBtn.textContent = `Erneut senden (${countdown}s)`
+            if (countdown <= 0) {
+               clearInterval(sendResetCodeTimer)
+               sendResetCodeTimer = null
+               sendResetCodeBtn.disabled = false
+               sendResetCodeBtn.textContent = 'Code erneut senden'
+            }
+         }, 1000)
+      }
+   } catch (error) {
+      const message = error?.name === 'AbortError'
+         ? 'Das Senden des Codes hat zu lange gedauert. Bitte versuche es erneut.'
+         : 'Server nicht erreichbar.'
+      showMsg('reset-password-message', message, 'error')
+      sendResetCodeBtn.disabled = false
+      sendResetCodeBtn.textContent = 'Code senden'
    } finally {
       window.clearTimeout(requestTimeout)
    }
@@ -1037,11 +1163,12 @@ document.getElementById('reset-password-form').addEventListener('submit', async 
    clearMsg('reset-password-message')
 
    const identifier       = document.getElementById('reset-identifier').value.trim()
+   const verificationCode = resetVerifyCode.value.trim()
    const newPassword      = document.getElementById('reset-new-password').value
    const confirmPassword  = document.getElementById('reset-confirm-password').value
 
    // Client-side validation
-   if (!identifier || !newPassword || !confirmPassword) {
+   if (!identifier || !verificationCode || !newPassword || !confirmPassword) {
       return showMsg('reset-password-message', 'Alle Felder sind erforderlich.', 'error')
    }
 
@@ -1058,12 +1185,12 @@ document.getElementById('reset-password-form').addEventListener('submit', async 
          method:      'POST',
          credentials: 'include',
          headers:     { 'Content-Type': 'application/json' },
-         body:        JSON.stringify({ identifier, newPassword, confirmPassword })
+         body:        JSON.stringify({ identifier, verificationCode, newPassword, confirmPassword })
       })
       const data = await res.json()
 
       if (!res.ok) {
-         showMsg('reset-password-message', data.error, 'error')
+         showMsg('reset-password-message', getFriendlyResetError(data.error), 'error')
       } else {
          showMsg('reset-password-message', data.message, 'success')
          setTimeout(() => { hideAll(); clearMsg('reset-password-message') }, 1500)

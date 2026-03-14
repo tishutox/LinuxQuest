@@ -25,6 +25,7 @@ db.exec(`
     email       TEXT    NOT NULL UNIQUE COLLATE NOCASE,
     password    TEXT    NOT NULL,
     avatar      TEXT    DEFAULT NULL,
+    accent_color TEXT   DEFAULT NULL,
     created_at  TEXT    DEFAULT (datetime('now')),
     last_active_at TEXT DEFAULT (datetime('now'))
   )
@@ -32,9 +33,14 @@ db.exec(`
 
 const userColumns = db.prepare("PRAGMA table_info(users)").all();
 const hasLastActiveColumn = userColumns.some((column) => column.name === 'last_active_at');
+const hasAccentColorColumn = userColumns.some((column) => column.name === 'accent_color');
 
 if (!hasLastActiveColumn) {
   db.exec('ALTER TABLE users ADD COLUMN last_active_at TEXT');
+}
+
+if (!hasAccentColorColumn) {
+  db.exec('ALTER TABLE users ADD COLUMN accent_color TEXT');
 }
 
 db.exec(`
@@ -45,6 +51,16 @@ db.exec(`
 // Email verification codes (for registration)
 db.exec(`
   CREATE TABLE IF NOT EXISTS email_verifications (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    email      TEXT    NOT NULL,
+    code       TEXT    NOT NULL,
+    expires_at TEXT    NOT NULL,
+    created_at TEXT    DEFAULT (datetime('now'))
+  )
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS password_reset_verifications (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     email      TEXT    NOT NULL,
     code       TEXT    NOT NULL,

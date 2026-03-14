@@ -62,6 +62,7 @@ function deleteAvatarFile(avatarPath) {
 function cleanupInactiveAccounts() {
   try {
     db.exec(`DELETE FROM email_verifications WHERE datetime(expires_at) < datetime('now')`);
+    db.exec(`DELETE FROM password_reset_verifications WHERE datetime(expires_at) < datetime('now')`);
 
     const inactiveUsers = db.prepare(`
       SELECT id, avatar

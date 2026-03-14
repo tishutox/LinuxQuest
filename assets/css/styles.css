@@ -8,6 +8,7 @@
   /*========== Colors ==========*/
   /*Color mode HSL(hue, saturation, lightness)*/
   --first-color: #352C59;
+  --user-accent-color: var(--first-color);
   --title-color: hsl(230, 75%, 15%);
   --text-color: hsl(230, 12%, 40%);
   --body-color: hsl(230, 100%, 98%);
@@ -188,6 +189,14 @@ img {
   color: var(--first-color);
 }
 
+body.user-theme-active :is(.nav__logo, .nav__search, .nav__login, .nav__toggle, .nav__link):hover {
+  color: var(--user-accent-color);
+}
+
+body.user-theme-active .nav__link {
+  color: var(--user-accent-color);
+}
+
 /* Navigation for mobile devices */
 @media screen and (max-width: 1023px) {
   .nav__menu {
@@ -271,6 +280,14 @@ img {
 .footer__link:hover {
   color: var(--first-color);
   text-decoration-color: currentColor;
+}
+
+body.user-theme-active .footer__link {
+  color: var(--user-accent-color);
+}
+
+body.user-theme-active .footer__link:hover {
+  color: var(--user-accent-color);
 }
 
 .footer__link:visited {
@@ -447,6 +464,19 @@ img {
   font-weight: var(--font-medium);
 }
 
+body.user-theme-active .info-modal__body a {
+  color: var(--user-accent-color);
+}
+
+.info-modal__body a:focus-visible {
+  outline: 2px dotted var(--first-color);
+  outline-offset: .2rem;
+}
+
+body.user-theme-active .info-modal__body a:focus-visible {
+  outline-color: var(--user-accent-color);
+}
+
 .info-modal__avatar-wrap {
   display: flex;
   justify-content: center;
@@ -493,6 +523,10 @@ img {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--first-color);
+}
+
+body.user-theme-active .nav__avatar {
+  border-color: var(--user-accent-color);
 }
 
 .nav__username {
@@ -542,8 +576,16 @@ img {
   transition: border-color .3s;
 }
 
+body.user-theme-active .profile__avatar-button {
+  border-color: var(--user-accent-color);
+}
+
 .profile__avatar-button:hover {
   border-color: var(--first-color);
+}
+
+body.user-theme-active .profile__avatar-button:hover {
+  border-color: var(--user-accent-color);
 }
 
 .profile__avatar-button:disabled {
@@ -653,6 +695,27 @@ img {
 .public-profile__action i {
   font-size: 1.05rem;
   line-height: 1;
+}
+
+#public-profile-modal {
+  --public-profile-accent-color: var(--first-color);
+}
+
+#public-profile-modal .info-modal__avatar {
+  border-color: var(--public-profile-accent-color);
+}
+
+#public-profile-modal .public-profile__following-badge {
+  color: var(--public-profile-accent-color);
+  border-color: var(--public-profile-accent-color);
+}
+
+#public-profile-modal .public-profile__action:hover {
+  color: var(--public-profile-accent-color);
+}
+
+#public-profile-modal .public-profile__stat:hover {
+  color: var(--public-profile-accent-color);
 }
 
 .follow-list {

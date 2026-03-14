@@ -221,7 +221,13 @@
             <div class="login__group">
                <div>
                   <label for="reset-identifier" class="login__label">E-Mail oder Benutzername</label>
-                  <input type="text" placeholder="E-Mail oder Benutzernamen eingeben" id="reset-identifier" class="login__input" autocomplete="off">
+                  <div class="email-verify-row">
+                     <input type="text" placeholder="E-Mail oder Benutzernamen eingeben" id="reset-identifier" class="login__input" autocomplete="off">
+                     <button type="button" class="email-verify-btn" id="send-reset-code-btn">Code senden</button>
+                  </div>
+                  <div class="email-code-wrap" id="reset-email-code-wrap" style="display:none;">
+                     <input type="text" placeholder="6-stelliger Code" id="reset-verify-code" class="login__input" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+                  </div>
                </div>
 
                <div>
@@ -280,6 +286,11 @@
                <div>
                   <label for="profile-username-input" class="login__label">Benutzername</label>
                   <input type="text" id="profile-username-input" class="login__input" autocomplete="username">
+               </div>
+
+               <div>
+                  <label for="profile-accent-color-input" class="login__label">Profilfarbe (Links & Profilrahmen)</label>
+                  <input type="color" id="profile-accent-color-input" class="login__input" value="#352C59" autocomplete="off">
                </div>
 
                <div>
