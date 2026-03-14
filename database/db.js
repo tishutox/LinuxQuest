@@ -14,6 +14,7 @@ const db = new DatabaseSync(path.join(dbDir, 'users.db'));
 
 // Enable WAL mode for better performance
 db.exec("PRAGMA journal_mode = WAL");
+db.exec("PRAGMA foreign_keys = ON");
 
 // Create users table
 db.exec(`
@@ -51,5 +52,21 @@ db.exec(`
     created_at TEXT    DEFAULT (datetime('now'))
   )
 `);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS follows (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    follower_id   INTEGER NOT NULL,
+    following_id  INTEGER NOT NULL,
+    created_at    TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE (follower_id, following_id),
+    CHECK (follower_id <> following_id)
+  )
+`);
+
+db.exec('CREATE INDEX IF NOT EXISTS idx_follows_follower_id ON follows(follower_id)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_follows_following_id ON follows(following_id)');
 
 module.exports = db;

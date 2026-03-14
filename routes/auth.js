@@ -106,6 +106,28 @@ function getPublicUserProfileByEmail(email) {
   `).get(normalizeEmail(email));
 }
 
+function getFollowCounts(userId) {
+  const followersCount = db.prepare(
+    'SELECT COUNT(*) AS count FROM follows WHERE following_id = ?'
+  ).get(userId)?.count || 0;
+
+  const followingCount = db.prepare(
+    'SELECT COUNT(*) AS count FROM follows WHERE follower_id = ?'
+  ).get(userId)?.count || 0;
+
+  return { followersCount, followingCount };
+}
+
+function isFollowingUser(followerId, followingId) {
+  if (!followerId || !followingId) return false;
+
+  const row = db.prepare(
+    'SELECT id FROM follows WHERE follower_id = ? AND following_id = ?'
+  ).get(followerId, followingId);
+
+  return Boolean(row);
+}
+
 function getClientIp(req) {
   const forwarded = req.headers['x-forwarded-for'];
   if (typeof forwarded === 'string' && forwarded.length) {
@@ -393,10 +415,148 @@ router.get('/public/:username', (req, res) => {
       return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
     }
 
-    return res.json({ user });
+    const { followersCount, followingCount } = getFollowCounts(user.id);
+    const viewerId = req.session.userId || null;
+    const isOwnProfile = Boolean(viewerId && viewerId === user.id);
+    const isFollowing = isOwnProfile ? false : isFollowingUser(viewerId, user.id);
+
+    return res.json({
+      user,
+      follow: {
+        followersCount,
+        followingCount,
+        isFollowing,
+        isOwnProfile,
+        canFollow: Boolean(viewerId) && !isOwnProfile
+      }
+    });
   } catch (err) {
     console.error('[PUBLIC PROFILE ERROR]', err);
     return res.status(500).json({ error: 'Öffentliches Profil konnte nicht geladen werden.' });
+  }
+});
+
+router.get('/public/:username/followers', (req, res) => {
+  try {
+    const username = req.params.username?.trim();
+
+    if (!username || !USERNAME_REGEX.test(username)) {
+      return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+    }
+
+    const user = db.prepare('SELECT id, username FROM users WHERE username = ?').get(username);
+    if (!user) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    const users = db.prepare(`
+      SELECT u.id, u.username, u.full_name, u.avatar
+      FROM follows f
+      INNER JOIN users u ON u.id = f.follower_id
+      WHERE f.following_id = ?
+      ORDER BY datetime(f.created_at) DESC, u.username COLLATE NOCASE ASC
+    `).all(user.id);
+
+    return res.json({ users });
+  } catch (err) {
+    console.error('[PUBLIC FOLLOWERS ERROR]', err);
+    return res.status(500).json({ error: 'Follower konnten nicht geladen werden.' });
+  }
+});
+
+router.get('/public/:username/following', (req, res) => {
+  try {
+    const username = req.params.username?.trim();
+
+    if (!username || !USERNAME_REGEX.test(username)) {
+      return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+    }
+
+    const user = db.prepare('SELECT id, username FROM users WHERE username = ?').get(username);
+    if (!user) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    const users = db.prepare(`
+      SELECT u.id, u.username, u.full_name, u.avatar
+      FROM follows f
+      INNER JOIN users u ON u.id = f.following_id
+      WHERE f.follower_id = ?
+      ORDER BY datetime(f.created_at) DESC, u.username COLLATE NOCASE ASC
+    `).all(user.id);
+
+    return res.json({ users });
+  } catch (err) {
+    console.error('[PUBLIC FOLLOWING ERROR]', err);
+    return res.status(500).json({ error: 'Gefolgte Profile konnten nicht geladen werden.' });
+  }
+});
+
+router.post('/follow/:username', (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Bitte melde dich an, um zu folgen.' });
+    }
+
+    const username = req.params.username?.trim();
+    if (!username || !USERNAME_REGEX.test(username)) {
+      return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+    }
+
+    const targetUser = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+    if (!targetUser) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    if (targetUser.id === req.session.userId) {
+      return res.status(400).json({ error: 'Du kannst dir nicht selbst folgen.' });
+    }
+
+    const existing = db.prepare(
+      'SELECT id FROM follows WHERE follower_id = ? AND following_id = ?'
+    ).get(req.session.userId, targetUser.id);
+
+    if (existing) {
+      return res.status(409).json({ error: 'Du folgst diesem Profil bereits.' });
+    }
+
+    db.prepare(
+      'INSERT INTO follows (follower_id, following_id) VALUES (?, ?)'
+    ).run(req.session.userId, targetUser.id);
+
+    const counts = getFollowCounts(targetUser.id);
+    return res.json({ message: 'Du folgst diesem Profil jetzt.', follow: counts });
+  } catch (err) {
+    console.error('[FOLLOW USER ERROR]', err);
+    return res.status(500).json({ error: 'Profil konnte nicht gefolgt werden.' });
+  }
+});
+
+router.delete('/follow/:username', (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Bitte melde dich an, um zu entfolgen.' });
+    }
+
+    const username = req.params.username?.trim();
+    if (!username || !USERNAME_REGEX.test(username)) {
+      return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+    }
+
+    const targetUser = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+    if (!targetUser) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    db.prepare(
+      'DELETE FROM follows WHERE follower_id = ? AND following_id = ?'
+    ).run(req.session.userId, targetUser.id);
+
+    const counts = getFollowCounts(targetUser.id);
+    return res.json({ message: 'Du folgst diesem Profil nicht mehr.', follow: counts });
+  } catch (err) {
+    console.error('[UNFOLLOW USER ERROR]', err);
+    return res.status(500).json({ error: 'Profil konnte nicht entfolgt werden.' });
   }
 });
 

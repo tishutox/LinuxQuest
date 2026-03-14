@@ -38,6 +38,7 @@ const loginPanel      = document.getElementById('login'),
       resetPasswordPanel = document.getElementById('reset-password'),
       profileModal    = document.getElementById('profile-modal'),
       publicProfileModal = document.getElementById('public-profile-modal'),
+   followListModal = document.getElementById('follow-list-modal'),
       loginBtn        = document.getElementById('login-btn'),
       loginClose      = document.getElementById('login-close'),
       registerClose   = document.getElementById('register-close'),
@@ -47,7 +48,8 @@ const loginPanel      = document.getElementById('login'),
       resetPasswordClose = document.getElementById('reset-password-close'),
       backToLoginLink = document.getElementById('back-to-login-link'),
       profileClose    = document.getElementById('profile-close'),
-      publicProfileClose = document.getElementById('public-profile-close')
+      publicProfileClose = document.getElementById('public-profile-close'),
+      followListClose = document.getElementById('follow-list-close')
 
 const staticModalTriggers = document.querySelectorAll('[data-modal-target]')
 const staticModalCloseButtons = document.querySelectorAll('[data-modal-close]')
@@ -78,10 +80,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -110,6 +112,7 @@ resetPasswordClose.addEventListener('click', hideAll)
 backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLogin() })
 profileClose.addEventListener('click', hideAll)
 publicProfileClose.addEventListener('click', hideAll)
+followListClose.addEventListener('click', hideAll)
 
 /*=============== AVATAR PREVIEW ===============*/
 const avatarInput       = document.getElementById('avatar-input')
@@ -179,6 +182,15 @@ const publicProfileUsername = document.getElementById('public-profile-username')
 const publicProfileMessage = document.getElementById('public-profile-message')
 const publicProfileCopyBtn = document.getElementById('public-profile-copy-btn')
 const publicProfileEmailLink = document.getElementById('public-profile-email-link')
+const publicProfileFollowingBadge = document.getElementById('public-profile-following-badge')
+const publicProfileFollowersCount = document.getElementById('public-profile-followers-count')
+const publicProfileFollowingCount = document.getElementById('public-profile-following-count')
+const publicProfileFollowersTrigger = document.getElementById('public-profile-followers-trigger')
+const publicProfileFollowingTrigger = document.getElementById('public-profile-following-trigger')
+const publicProfileFollowBtn = document.getElementById('public-profile-follow-btn')
+const followListTitle = document.getElementById('follow-list-title')
+const followListMessage = document.getElementById('follow-list-message')
+const followListContainer = document.getElementById('follow-list-container')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de',
@@ -199,6 +211,13 @@ const messageTimers = new Map()
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
 let currentUser = null
 let currentPublicProfileUser = null
+let currentPublicProfileFollowState = {
+   followersCount: 0,
+   followingCount: 0,
+   isFollowing: false,
+   isOwnProfile: false,
+   canFollow: false
+}
 
 function getDisplayUser(contact, fallback) {
    return contact || fallback
@@ -283,15 +302,57 @@ function updateProfileShareLink(username) {
    profileShareLinkInput.value = buildProfileUrl(username)
 }
 
-function updatePublicProfileView(user) {
+function updateFollowButton() {
+   if (!publicProfileFollowBtn) return
+
+   const { canFollow, isFollowing, isOwnProfile } = currentPublicProfileFollowState
+
+   if (isOwnProfile || !canFollow) {
+      publicProfileFollowBtn.style.display = 'none'
+      publicProfileFollowBtn.disabled = false
+      publicProfileFollowBtn.textContent = 'Folgen'
+      if (publicProfileFollowingBadge) {
+         publicProfileFollowingBadge.style.display = 'none'
+      }
+      return
+   }
+
+   publicProfileFollowBtn.style.display = 'block'
+   publicProfileFollowBtn.disabled = false
+   publicProfileFollowBtn.textContent = isFollowing ? 'Entfolgen' : 'Folgen'
+
+   if (publicProfileFollowingBadge) {
+      publicProfileFollowingBadge.style.display = isFollowing ? 'inline-flex' : 'none'
+   }
+}
+
+function updatePublicFollowStats() {
+   publicProfileFollowersCount.textContent = String(currentPublicProfileFollowState.followersCount || 0)
+   publicProfileFollowingCount.textContent = String(currentPublicProfileFollowState.followingCount || 0)
+}
+
+function updatePublicProfileView(payload) {
+   const user = payload?.user || payload
+   const follow = payload?.follow || {}
+
    if (publicProfileMessage) {
       publicProfileMessage.textContent = ''
       publicProfileMessage.className = 'login__message'
    }
 
    currentPublicProfileUser = user
+   currentPublicProfileFollowState = {
+      followersCount: follow.followersCount || 0,
+      followingCount: follow.followingCount || 0,
+      isFollowing: Boolean(follow.isFollowing),
+      isOwnProfile: Boolean(follow.isOwnProfile),
+      canFollow: Boolean(follow.canFollow)
+   }
+
    publicProfileAvatar.src = getAvatarUrl(user)
    publicProfileUsername.textContent = '@' + user.username
+   updatePublicFollowStats()
+   updateFollowButton()
 
    const normalizedEmail = user.email ? user.email.trim().toLowerCase() : ''
    const showEmailAction = PROTECTED_EMAILS.has(normalizedEmail)
@@ -307,8 +368,17 @@ function showPublicProfileError(message) {
    }
 
    currentPublicProfileUser = null
+   currentPublicProfileFollowState = {
+      followersCount: 0,
+      followingCount: 0,
+      isFollowing: false,
+      isOwnProfile: false,
+      canFollow: false
+   }
    publicProfileAvatar.src = DEFAULT_AVATAR + encodeURIComponent('Unbekannt')
    publicProfileUsername.textContent = '@unbekannt'
+    updatePublicFollowStats()
+    updateFollowButton()
    publicProfileEmailLink.style.display = 'none'
    publicProfileEmailLink.href = '#'
    hideAll()
@@ -361,11 +431,82 @@ async function openPublicProfileByUsername(username) {
          return
       }
 
-      updatePublicProfileView(data.user)
+      updatePublicProfileView(data)
       hideAll()
       publicProfileModal.classList.add('show-login')
    } catch (_) {
       showPublicProfileError('Der Server ist nicht erreichbar. Bitte versuche es später erneut.')
+   }
+}
+
+function renderFollowList(users) {
+   followListContainer.innerHTML = ''
+
+   if (!users.length) {
+      const empty = document.createElement('p')
+      empty.className = 'follow-list__empty'
+      empty.textContent = 'Keine Profile vorhanden.'
+      followListContainer.appendChild(empty)
+      return
+   }
+
+   users.forEach((user) => {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'follow-list__item'
+
+      const avatar = document.createElement('img')
+      avatar.className = 'follow-list__avatar'
+      avatar.src = getAvatarUrl(user)
+      avatar.alt = `Profilbild von ${user.username}`
+
+      const username = document.createElement('span')
+      username.className = 'follow-list__username'
+      username.textContent = '@' + user.username
+
+      button.appendChild(avatar)
+      button.appendChild(username)
+
+      button.addEventListener('click', async () => {
+         await openPublicProfileByUsername(user.username)
+      })
+
+      followListContainer.appendChild(button)
+   })
+}
+
+async function openFollowList(type) {
+   const username = currentPublicProfileUser?.username
+   if (!username) return
+
+   followListTitle.textContent = type === 'followers' ? 'Follower' : 'Gefolgt'
+   followListContainer.innerHTML = ''
+   clearMsg('follow-list-message')
+
+   const loading = document.createElement('p')
+   loading.className = 'follow-list__empty'
+   loading.textContent = 'Lade…'
+   followListContainer.appendChild(loading)
+
+   hideAll()
+   followListModal.classList.add('show-login')
+
+   try {
+      const response = await fetch(`/api/auth/public/${encodeURIComponent(username)}/${type}`, {
+         credentials: 'include'
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+         showMsg('follow-list-message', data.error || 'Liste konnte nicht geladen werden.', 'error')
+         followListContainer.innerHTML = ''
+         return
+      }
+
+      renderFollowList(Array.isArray(data.users) ? data.users : [])
+   } catch (_) {
+      showMsg('follow-list-message', 'Server nicht erreichbar.', 'error')
+      followListContainer.innerHTML = ''
    }
 }
 
@@ -449,6 +590,47 @@ publicProfileCopyBtn.addEventListener('click', async () => {
    } catch (_) {
       showPublicProfileNotice('Link konnte nicht kopiert werden. Bitte manuell kopieren.', 'error', 4000)
    }
+})
+
+publicProfileFollowBtn.addEventListener('click', async () => {
+   if (!currentPublicProfileUser?.username) return
+
+   const username = currentPublicProfileUser.username
+   const willFollow = !currentPublicProfileFollowState.isFollowing
+
+   if (!currentUser) {
+      showPublicProfileNotice('Bitte melde dich an, um Profile zu folgen.', 'error', 4000)
+      return
+   }
+
+   publicProfileFollowBtn.disabled = true
+
+   try {
+      const response = await fetch(`/api/auth/follow/${encodeURIComponent(username)}`, {
+         method: willFollow ? 'POST' : 'DELETE',
+         credentials: 'include'
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+         showPublicProfileNotice(data.error || 'Aktion konnte nicht ausgeführt werden.', 'error', 4000)
+      } else {
+         showPublicProfileNotice(data.message || (willFollow ? 'Gefolgt.' : 'Entfolgt.'), 'success', 2500)
+         await openPublicProfileByUsername(username)
+      }
+   } catch (_) {
+      showPublicProfileNotice('Server nicht erreichbar.', 'error', 4000)
+   } finally {
+      publicProfileFollowBtn.disabled = false
+   }
+})
+
+publicProfileFollowersTrigger.addEventListener('click', async () => {
+   await openFollowList('followers')
+})
+
+publicProfileFollowingTrigger.addEventListener('click', async () => {
+   await openFollowList('following')
 })
 
 async function openSharedProfileFromUrl() {

@@ -310,6 +310,7 @@
 
             <div class="public-profile__username-row">
                <p class="public-profile__username" id="public-profile-username"></p>
+               <span class="public-profile__following-badge" id="public-profile-following-badge" style="display:none;">Gefolgt</span>
                <div class="public-profile__actions">
                   <button type="button" class="public-profile__action" id="public-profile-copy-btn" title="Profil-Link kopieren" aria-label="Profil-Link kopieren">
                      <i class="fi fi-rc-link-alt"></i>
@@ -319,9 +320,35 @@
                   </a>
                </div>
             </div>
+
+            <div class="public-profile__stats" id="public-profile-stats">
+               <button type="button" class="public-profile__stat" id="public-profile-followers-trigger">
+                  <span class="public-profile__stat-count" id="public-profile-followers-count">0</span>
+                  <span class="public-profile__stat-label">Follower</span>
+               </button>
+               <span class="public-profile__divider" aria-hidden="true">|</span>
+               <button type="button" class="public-profile__stat" id="public-profile-following-trigger">
+                  <span class="public-profile__stat-count" id="public-profile-following-count">0</span>
+                  <span class="public-profile__stat-label">Folge ich</span>
+               </button>
+            </div>
+
+            <button type="button" class="login__button" id="public-profile-follow-btn" style="display:none;">Folgen</button>
          </div>
 
          <i class="fi fi-rr-cross-small login__close" id="public-profile-close"></i>
+      </div>
+
+      <div class="login" id="follow-list-modal">
+         <div class="login__form profile__form">
+            <h2 class="login__title" id="follow-list-title">Liste</h2>
+
+            <div class="login__message" id="follow-list-message"></div>
+
+            <div class="follow-list" id="follow-list-container"></div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" id="follow-list-close"></i>
       </div>
 
       <!--==================== MAIN ====================-->
