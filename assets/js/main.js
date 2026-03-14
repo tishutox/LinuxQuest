@@ -169,8 +169,9 @@ const profileSaveBtn       = document.getElementById('profile-save-btn')
 const profileDeleteBtn     = document.getElementById('profile-delete-btn')
 const publicProfileAvatar = document.getElementById('public-profile-avatar')
 const publicProfileUsername = document.getElementById('public-profile-username')
-const publicProfileFullName = document.getElementById('public-profile-full-name')
-const publicProfileLink = document.getElementById('public-profile-link')
+const publicProfileMessage = document.getElementById('public-profile-message')
+const publicProfileCopyBtn = document.getElementById('public-profile-copy-btn')
+const publicProfileEmailLink = document.getElementById('public-profile-email-link')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de',
@@ -179,6 +180,7 @@ const PROTECTED_EMAILS = new Set([
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
 let currentUser = null
+let currentPublicProfileUser = null
 
 function getDisplayUser(contact, fallback) {
    return contact || fallback
@@ -249,10 +251,35 @@ function updateProfileShareLink(username) {
 }
 
 function updatePublicProfileView(user) {
+   if (publicProfileMessage) {
+      publicProfileMessage.textContent = ''
+      publicProfileMessage.className = 'login__message'
+   }
+
+   currentPublicProfileUser = user
    publicProfileAvatar.src = getAvatarUrl(user)
    publicProfileUsername.textContent = '@' + user.username
-   publicProfileFullName.value = user.full_name
-   publicProfileLink.value = buildProfileUrl(user.username)
+
+   const normalizedEmail = user.email ? user.email.trim().toLowerCase() : ''
+   const showEmailAction = PROTECTED_EMAILS.has(normalizedEmail)
+
+   publicProfileEmailLink.style.display = showEmailAction ? 'inline-flex' : 'none'
+   publicProfileEmailLink.href = showEmailAction ? `mailto:${user.email}` : '#'
+}
+
+function showPublicProfileError(message) {
+   if (publicProfileMessage) {
+      publicProfileMessage.textContent = message
+      publicProfileMessage.className = 'login__message error'
+   }
+
+   currentPublicProfileUser = null
+   publicProfileAvatar.src = DEFAULT_AVATAR + encodeURIComponent('Unbekannt')
+   publicProfileUsername.textContent = '@unbekannt'
+   publicProfileEmailLink.style.display = 'none'
+   publicProfileEmailLink.href = '#'
+   hideAll()
+   publicProfileModal.classList.add('show-login')
 }
 
 function updateProfileView(user) {
@@ -326,6 +353,23 @@ profileShareCopyBtn.addEventListener('click', async () => {
    }
 })
 
+publicProfileCopyBtn.addEventListener('click', async () => {
+   if (!currentPublicProfileUser?.username) return
+
+   try {
+      await navigator.clipboard.writeText(buildProfileUrl(currentPublicProfileUser.username))
+      if (publicProfileMessage) {
+         publicProfileMessage.textContent = 'Profil-Link kopiert!'
+         publicProfileMessage.className = 'login__message success'
+      }
+   } catch (_) {
+      if (publicProfileMessage) {
+         publicProfileMessage.textContent = 'Link konnte nicht kopiert werden. Bitte manuell kopieren.'
+         publicProfileMessage.className = 'login__message error'
+      }
+   }
+})
+
 async function openSharedProfileFromUrl() {
    const sharedUsername = getSharedUsernameFromPath()
    if (!sharedUsername) return
@@ -335,16 +379,27 @@ async function openSharedProfileFromUrl() {
          credentials: 'include'
       })
 
-      if (!response.ok) return
+      if (!response.ok) {
+         if (response.status === 404) {
+            showPublicProfileError('Dieses Profil wurde nicht gefunden.')
+            return
+         }
+
+         showPublicProfileError('Das Profil konnte gerade nicht geladen werden.')
+         return
+      }
 
       const data = await response.json()
-      if (!data.user) return
+      if (!data.user) {
+         showPublicProfileError('Dieses Profil wurde nicht gefunden.')
+         return
+      }
 
       updatePublicProfileView(data.user)
       hideAll()
       publicProfileModal.classList.add('show-login')
    } catch (_) {
-      // ignore invalid/unreachable share links silently
+      showPublicProfileError('Der Server ist nicht erreichbar. Bitte versuche es später erneut.')
    }
 }
 

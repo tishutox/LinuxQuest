@@ -599,6 +599,46 @@ img {
   margin-top: -.5rem;
 }
 
+.public-profile__username-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: .6rem;
+}
+
+.public-profile__username-row .info-modal__person-username {
+  margin: 0;
+}
+
+.public-profile__actions {
+  display: inline-flex;
+  align-items: center;
+  column-gap: .35rem;
+}
+
+.public-profile__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  color: var(--text-color);
+  background: transparent;
+  border-radius: 999px;
+  transition: color .3s, background-color .3s;
+  cursor: pointer;
+}
+
+.public-profile__action:hover {
+  color: var(--first-color);
+  background-color: var(--container-color);
+}
+
+.public-profile__action i {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
 .profile__delete-button {
   background-color: transparent;
   color: var(--title-color);

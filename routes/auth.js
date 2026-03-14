@@ -384,7 +384,7 @@ router.get('/public/:username', (req, res) => {
     }
 
     const user = db.prepare(`
-      SELECT id, username, full_name, avatar, created_at
+      SELECT id, username, full_name, email, avatar, created_at
       FROM users
       WHERE username = ?
     `).get(username);
