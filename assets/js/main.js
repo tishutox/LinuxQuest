@@ -11,10 +11,16 @@ const search      = document.getElementById('search'),
       searchBtn   = document.getElementById('search-btn'),
       searchClose = document.getElementById('search-close'),
       searchForm  = document.getElementById('search-form'),
-      searchInput = document.getElementById('search-input')
+   searchInput = document.getElementById('search-input')
+
+const searchResults = document.getElementById('search-results')
+let searchDebounceTimer = null
 
 searchBtn.addEventListener('click',   () => search.classList.add('show-search'))
-searchClose.addEventListener('click', () => search.classList.remove('show-search'))
+searchClose.addEventListener('click', () => {
+   search.classList.remove('show-search')
+   hideSearchResults()
+})
 
 searchForm.addEventListener('submit', (event) => {
    event.preventDefault()
@@ -29,6 +35,98 @@ searchForm.addEventListener('submit', (event) => {
    }
 
    window.location.href = targetUrl.toString()
+})
+
+function hideSearchResults() {
+   searchResults.style.display = 'none'
+   searchResults.innerHTML = ''
+}
+
+function createSearchGroup(title, users, formatter) {
+   const group = document.createElement('section')
+   group.className = 'search-results__group'
+
+   const heading = document.createElement('h3')
+   heading.className = 'search-results__title'
+   heading.textContent = title
+   group.appendChild(heading)
+
+   const list = document.createElement('div')
+   list.className = 'search-results__list'
+
+   if (!Array.isArray(users) || !users.length) {
+      const empty = document.createElement('p')
+      empty.className = 'search-results__empty'
+      empty.textContent = 'Keine Treffer'
+      list.appendChild(empty)
+   } else {
+      users.forEach((user) => {
+         const item = document.createElement('button')
+         item.type = 'button'
+         item.className = 'search-results__item'
+         item.textContent = formatter(user)
+
+         item.addEventListener('click', async () => {
+            if (!user?.username) return
+            hideSearchResults()
+            search.classList.remove('show-search')
+            await openPublicProfileByUsername(user.username)
+         })
+
+         list.appendChild(item)
+      })
+   }
+
+   group.appendChild(list)
+   return group
+}
+
+function renderSearchResults(payload) {
+   const results = payload?.results || {}
+   const displayNames = Array.isArray(results.displayNames) ? results.displayNames : []
+   const usernames = Array.isArray(results.usernames) ? results.usernames : []
+   const fullNames = Array.isArray(results.fullNames) ? results.fullNames : []
+
+   searchResults.innerHTML = ''
+   searchResults.appendChild(createSearchGroup('Anzeigename', displayNames, (user) => user.profile_name || '(kein Anzeigename)'))
+   searchResults.appendChild(createSearchGroup('Username', usernames, (user) => '@' + user.username))
+   searchResults.appendChild(createSearchGroup('Echter Name', fullNames, (user) => user.full_name))
+   searchResults.style.display = 'block'
+}
+
+async function loadSearchResults(query) {
+   const trimmedQuery = query.trim()
+   if (!trimmedQuery) {
+      hideSearchResults()
+      return
+   }
+
+   try {
+      const response = await fetch(`/api/auth/search-users?q=${encodeURIComponent(trimmedQuery)}`, {
+         credentials: 'include'
+      })
+
+      if (!response.ok) {
+         hideSearchResults()
+         return
+      }
+
+      const data = await response.json()
+      if (searchInput.value.trim() !== trimmedQuery) return
+      renderSearchResults(data)
+   } catch (_) {
+      hideSearchResults()
+   }
+}
+
+searchInput.addEventListener('input', () => {
+   if (searchDebounceTimer) {
+      clearTimeout(searchDebounceTimer)
+   }
+
+   searchDebounceTimer = setTimeout(() => {
+      loadSearchResults(searchInput.value)
+   }, 200)
 })
 
 /*=============== LOGIN / REGISTER TOGGLE ===============*/
@@ -242,7 +340,7 @@ let projectContactsLastLoadedAt = 0
 let projectContactsRefreshPromise = null
 const USER_THEME_CLASS = 'user-theme-active'
 const LOCAL_BACKGROUND_STORAGE_PREFIX = 'local-custom-bg:'
-const LOCAL_BACKGROUND_MAX_DATA_URL_LENGTH = 14000000
+const LOCAL_BACKGROUND_MAX_DATA_URL_LENGTH = 36000000
 const mainBackgroundImage = document.querySelector('.main__bg')
 const DEFAULT_MAIN_BACKGROUND_SRC = mainBackgroundImage?.getAttribute('src') || 'assets/img/bg-image.png'
 
@@ -1068,10 +1166,10 @@ profileBackgroundInput.addEventListener('change', () => {
       return showMsg('profile-message', 'Bitte wähle eine Bilddatei aus.', 'error')
    }
 
-   if (backgroundFile.size > 10 * 1024 * 1024) {
+   if (backgroundFile.size > 25 * 1024 * 1024) {
       profileBackgroundInput.value = ''
       setBackgroundFilenameLabel('')
-      return showMsg('profile-message', 'Bild ist zu groß (max. 10 MB).', 'error')
+      return showMsg('profile-message', 'Bild ist zu groß (max. 25 MB).', 'error')
    }
 
    clearMsg('profile-message')

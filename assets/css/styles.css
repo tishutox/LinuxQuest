@@ -317,6 +317,55 @@ img {
   color: var(--text-color);
 }
 
+.search__results {
+  margin-top: .75rem;
+  background-color: var(--container-color);
+  box-shadow: 0 8px 32px hsla(230, 75%, 15%, .2);
+  border-radius: .5rem;
+  padding: .85rem 1rem;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.search-results__group + .search-results__group {
+  margin-top: .85rem;
+  padding-top: .85rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.search-results__title {
+  color: var(--title-color);
+  font-size: .85rem;
+  font-weight: var(--font-semi-bold);
+  margin-bottom: .45rem;
+}
+
+.search-results__list {
+  display: grid;
+  gap: .35rem;
+}
+
+.search-results__item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: var(--text-color);
+  border: 1px solid transparent;
+  border-radius: .4rem;
+  padding: .45rem .55rem;
+  cursor: pointer;
+}
+
+.search-results__item:hover {
+  color: var(--first-color);
+  border-color: var(--border-color);
+}
+
+.search-results__empty {
+  color: var(--text-color);
+  font-size: .85rem;
+}
+
 /* Show search */
 .show-search {
   opacity: 1;

@@ -489,6 +489,65 @@ router.get('/project-contacts', (_req, res) => {
   }
 });
 
+router.get('/search-users', (req, res) => {
+  try {
+    const rawQuery = typeof req.query.q === 'string' ? req.query.q : '';
+    const query = rawQuery.trim();
+
+    if (!query) {
+      return res.json({
+        query: '',
+        results: {
+          displayNames: [],
+          usernames: [],
+          fullNames: []
+        }
+      });
+    }
+
+    const likeQuery = `%${query}%`;
+    const limitPerGroup = 6;
+
+    const displayNames = db.prepare(`
+      SELECT id, username, profile_name, full_name, avatar, accent_color
+      FROM users
+      WHERE profile_name IS NOT NULL
+        AND TRIM(profile_name) != ''
+        AND profile_name LIKE ? COLLATE NOCASE
+      ORDER BY username COLLATE NOCASE ASC
+      LIMIT ?
+    `).all(likeQuery, limitPerGroup);
+
+    const usernames = db.prepare(`
+      SELECT id, username, profile_name, full_name, avatar, accent_color
+      FROM users
+      WHERE username LIKE ? COLLATE NOCASE
+      ORDER BY username COLLATE NOCASE ASC
+      LIMIT ?
+    `).all(likeQuery, limitPerGroup);
+
+    const fullNames = db.prepare(`
+      SELECT id, username, profile_name, full_name, avatar, accent_color
+      FROM users
+      WHERE full_name LIKE ? COLLATE NOCASE
+      ORDER BY full_name COLLATE NOCASE ASC, username COLLATE NOCASE ASC
+      LIMIT ?
+    `).all(likeQuery, limitPerGroup);
+
+    return res.json({
+      query,
+      results: {
+        displayNames,
+        usernames,
+        fullNames
+      }
+    });
+  } catch (err) {
+    console.error('[SEARCH USERS ERROR]', err);
+    return res.status(500).json({ error: 'Suche konnte nicht geladen werden.' });
+  }
+});
+
 router.get('/public/:username', (req, res) => {
   try {
     const username = req.params.username?.trim();
