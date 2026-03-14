@@ -185,11 +185,13 @@ const logoutBtn   = document.getElementById('logout-btn')
 const profileAvatarInput  = document.getElementById('profile-avatar-input')
 const profileAvatarButton = document.getElementById('profile-avatar-button')
 const profileAvatarImage  = document.getElementById('profile-avatar-image')
+const profileDisplayName  = document.getElementById('profile-display-name')
 const profileUsername     = document.getElementById('profile-username')
 const profileShareLinkInput = document.getElementById('profile-share-link')
 const profileShareCopyBtn = document.getElementById('profile-share-copy-btn')
 const profileForm         = document.getElementById('profile-form')
 const profileFullNameInput = document.getElementById('profile-full-name-input')
+const profileDisplayNameInput = document.getElementById('profile-display-name-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
 const profileAccentColorOpen = document.getElementById('profile-accent-color-open')
 const profileAccentColorPreview = document.getElementById('profile-accent-color-preview')
@@ -210,6 +212,7 @@ const profileDeleteNote = document.getElementById('profile-delete-note')
 const profileSaveBtn       = document.getElementById('profile-save-btn')
 const profileDeleteBtn     = document.getElementById('profile-delete-btn')
 const publicProfileAvatar = document.getElementById('public-profile-avatar')
+const publicProfileDisplayName = document.getElementById('public-profile-display-name')
 const publicProfileUsername = document.getElementById('public-profile-username')
 const publicProfileMessage = document.getElementById('public-profile-message')
 const publicProfileCopyBtn = document.getElementById('public-profile-copy-btn')
@@ -239,7 +242,7 @@ let projectContactsLastLoadedAt = 0
 let projectContactsRefreshPromise = null
 const USER_THEME_CLASS = 'user-theme-active'
 const LOCAL_BACKGROUND_STORAGE_PREFIX = 'local-custom-bg:'
-const LOCAL_BACKGROUND_MAX_DATA_URL_LENGTH = 2400000
+const LOCAL_BACKGROUND_MAX_DATA_URL_LENGTH = 14000000
 const mainBackgroundImage = document.querySelector('.main__bg')
 const DEFAULT_MAIN_BACKGROUND_SRC = mainBackgroundImage?.getAttribute('src') || 'assets/img/bg-image.png'
 
@@ -486,6 +489,11 @@ function getAvatarUrl(user) {
       : DEFAULT_AVATAR + encodeURIComponent(user.full_name)
 }
 
+function getProfileDisplayName(user) {
+   if (!user || typeof user.profile_name !== 'string') return ''
+   return user.profile_name.trim()
+}
+
 function buildProfilePath(username) {
    return `/@${encodeURIComponent(username)}`
 }
@@ -624,6 +632,9 @@ function updatePublicProfileView(payload) {
    }
 
    publicProfileAvatar.src = getAvatarUrl(user)
+   const publicDisplayName = getProfileDisplayName(user)
+   publicProfileDisplayName.textContent = publicDisplayName
+   publicProfileDisplayName.style.display = publicDisplayName ? 'block' : 'none'
    publicProfileUsername.textContent = '@' + user.username
    updatePublicFollowStats()
    updateFollowButton()
@@ -651,6 +662,8 @@ function showPublicProfileError(message) {
       canFollow: false
    }
    publicProfileAvatar.src = DEFAULT_AVATAR + encodeURIComponent('Unbekannt')
+   publicProfileDisplayName.textContent = ''
+   publicProfileDisplayName.style.display = 'none'
    publicProfileUsername.textContent = '@unbekannt'
     updatePublicFollowStats()
     updateFollowButton()
@@ -792,9 +805,13 @@ async function openFollowList(type) {
 function updateProfileView(user) {
    profileAvatarImage.src  = getAvatarUrl(user)
    profileFullNameInput.value = user.full_name
+   profileDisplayNameInput.value = getProfileDisplayName(user)
    profileUsernameInput.value = user.username
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
    updateBackgroundControls(user)
+   const displayName = getProfileDisplayName(user)
+   profileDisplayName.textContent = displayName
+   profileDisplayName.style.display = displayName ? 'block' : 'none'
    profileUsername.textContent = '@' + user.username
    updateProfileShareLink(user.username)
 
@@ -833,10 +850,13 @@ function setLoggedOut() {
    navUsername.textContent = ''
    profileAvatarImage.src  = ''
    profileFullNameInput.value = ''
+   profileDisplayNameInput.value = ''
    profileUsernameInput.value = ''
    updateProfileAccentSummary(getDefaultAccentColor())
    profileDeletePasswordInput.value = ''
    profileDeletePasswordInput.disabled = false
+   profileDisplayName.textContent = ''
+   profileDisplayName.style.display = 'none'
    profileUsername.textContent = ''
    profileShareLinkInput.value = ''
    if (profileBackgroundInput) {
@@ -1048,10 +1068,10 @@ profileBackgroundInput.addEventListener('change', () => {
       return showMsg('profile-message', 'Bitte wähle eine Bilddatei aus.', 'error')
    }
 
-   if (backgroundFile.size > 5 * 1024 * 1024) {
+   if (backgroundFile.size > 10 * 1024 * 1024) {
       profileBackgroundInput.value = ''
       setBackgroundFilenameLabel('')
-      return showMsg('profile-message', 'Bild ist zu groß (max. 5 MB).', 'error')
+      return showMsg('profile-message', 'Bild ist zu groß (max. 10 MB).', 'error')
    }
 
    clearMsg('profile-message')
@@ -1112,11 +1132,18 @@ profileUsernameInput.addEventListener('input', () => {
    profileUsername.textContent = value ? '@' + value : '@'
 })
 
+profileDisplayNameInput.addEventListener('input', () => {
+   const value = profileDisplayNameInput.value.trim()
+   profileDisplayName.textContent = value
+   profileDisplayName.style.display = value ? 'block' : 'none'
+})
+
 profileForm.addEventListener('submit', async (e) => {
    e.preventDefault()
    clearMsg('profile-message')
 
    const full_name = profileFullNameInput.value.trim()
+   const profile_name = profileDisplayNameInput.value
    const username  = profileUsernameInput.value.trim()
    const accent_color = normalizeHexColor(profileAccentColorInput.value)
 
@@ -1136,7 +1163,7 @@ profileForm.addEventListener('submit', async (e) => {
          method: 'POST',
          credentials: 'include',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ full_name, username, accent_color })
+         body: JSON.stringify({ full_name, profile_name, username, accent_color })
       })
       const data = await res.json()
 

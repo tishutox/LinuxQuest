@@ -21,6 +21,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     username    TEXT    NOT NULL UNIQUE COLLATE NOCASE,
+    profile_name TEXT   DEFAULT NULL,
     full_name   TEXT    NOT NULL,
     email       TEXT    NOT NULL UNIQUE COLLATE NOCASE,
     password    TEXT    NOT NULL,
@@ -34,6 +35,7 @@ db.exec(`
 const userColumns = db.prepare("PRAGMA table_info(users)").all();
 const hasLastActiveColumn = userColumns.some((column) => column.name === 'last_active_at');
 const hasAccentColorColumn = userColumns.some((column) => column.name === 'accent_color');
+const hasProfileNameColumn = userColumns.some((column) => column.name === 'profile_name');
 
 if (!hasLastActiveColumn) {
   db.exec('ALTER TABLE users ADD COLUMN last_active_at TEXT');
@@ -41,6 +43,10 @@ if (!hasLastActiveColumn) {
 
 if (!hasAccentColorColumn) {
   db.exec('ALTER TABLE users ADD COLUMN accent_color TEXT');
+}
+
+if (!hasProfileNameColumn) {
+  db.exec('ALTER TABLE users ADD COLUMN profile_name TEXT');
 }
 
 db.exec(`

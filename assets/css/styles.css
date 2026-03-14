@@ -694,6 +694,13 @@ body.user-theme-active .profile__avatar-button:hover {
   font-weight: var(--font-semi-bold);
 }
 
+.profile__display-name {
+  color: var(--title-color);
+  font-weight: var(--font-semi-bold);
+  text-align: center;
+  margin-top: -.3rem;
+}
+
 .profile__username {
   color: var(--text-color);
   text-align: center;
@@ -715,7 +722,7 @@ body.user-theme-active .profile__avatar-button:hover {
   padding: .9rem 1rem;
   border-radius: .5rem;
   border: 2px solid var(--border-color);
-  background-color: #fff;
+  background-color: var(--container-color);
   color: var(--title-color);
   font-weight: var(--font-semi-bold);
   cursor: pointer;
@@ -753,7 +760,7 @@ body.user-theme-active .profile__avatar-button:hover {
 .profile-background__pick:disabled,
 .profile-background__reset:disabled {
   opacity: .75;
-  background-color: #fff;
+  background-color: var(--container-color);
   color: var(--text-color);
   border-color: var(--border-color);
   box-shadow: none;

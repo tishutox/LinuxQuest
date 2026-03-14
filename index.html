@@ -267,6 +267,7 @@
                </button>
             </div>
 
+            <p class="profile__display-name" id="profile-display-name"></p>
             <p class="profile__username" id="profile-username"></p>
 
             <div class="login__group">
@@ -281,6 +282,11 @@
                <div>
                   <label for="profile-full-name-input" class="login__label">Vollständiger Name</label>
                   <input type="text" id="profile-full-name-input" class="login__input" autocomplete="name">
+               </div>
+
+               <div>
+                  <label for="profile-display-name-input" class="login__label">Profilname <small>(frei wählbar)</small></label>
+                  <input type="text" id="profile-display-name-input" class="login__input" autocomplete="nickname" maxlength="60" placeholder="z. B. 🐧 Linux Hero ✨">
                </div>
 
                <div>
@@ -327,13 +333,15 @@
       <!--==================== PUBLIC PROFILE ====================-->
       <div class="login" id="public-profile-modal">
          <div class="login__form profile__form">
-            <h2 class="login__title">Öffentliches Profil</h2>
+            <h2 class="login__title">Profil</h2>
 
             <div class="login__message" id="public-profile-message"></div>
 
             <div class="info-modal__avatar-wrap">
                <img src="" alt="Profilbild" class="info-modal__avatar" id="public-profile-avatar">
             </div>
+
+            <p class="profile__display-name" id="public-profile-display-name"></p>
 
             <div class="public-profile__username-row">
                <p class="public-profile__username" id="public-profile-username"></p>

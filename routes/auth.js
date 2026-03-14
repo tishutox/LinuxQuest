@@ -101,7 +101,7 @@ function touchUserActivity(userId) {
 
 function getPublicUserProfileByEmail(email) {
   return db.prepare(`
-    SELECT id, username, full_name, email, avatar, accent_color, created_at
+    SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at
     FROM users
     WHERE email = ?
   `).get(normalizeEmail(email));
@@ -327,7 +327,7 @@ router.post('/send-password-reset-verification', async (req, res) => {
 // ─── REGISTER ─────────────────────────────────────────────────────────────────
 router.post('/register', upload.single('avatar'), async (req, res) => {
   try {
-    const { username, full_name, email, password, confirm_password, verificationCode } = req.body;
+    const { username, profile_name, full_name, email, password, confirm_password, verificationCode } = req.body;
 
     // ── Validation ────────────────────────────────────────────────────────────
     if (!username || !full_name || !email || !password || !confirm_password) {
@@ -371,6 +371,13 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     if (existingEmail)    return res.status(409).json({ error: 'Diese E-Mail-Adresse ist bereits registriert.' });
     if (existingUsername) return res.status(409).json({ error: 'Dieser Benutzername ist bereits vergeben.' });
 
+    const trimmedProfileName = typeof profile_name === 'string' ? profile_name.trim() : '';
+    if (trimmedProfileName.length > 60) {
+      return res.status(400).json({ error: 'Der Profilname darf maximal 60 Zeichen lang sein.' });
+    }
+
+    const normalizedProfileName = trimmedProfileName || null;
+
     // ── Store avatar path (relative) or null ──────────────────────────────────
     const avatarPath = req.file ? 'uploads/' + req.file.filename : null;
 
@@ -378,16 +385,16 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     const hashed = await bcrypt.hash(password, SALT_ROUNDS);
 
     const info = db.prepare(`
-      INSERT INTO users (username, full_name, email, password, avatar, last_active_at)
-      VALUES (?, ?, ?, ?, ?, datetime('now'))
-    `).run(username.trim(), full_name.trim(), normalizeEmail(email), hashed, avatarPath);
+      INSERT INTO users (username, profile_name, full_name, email, password, avatar, last_active_at)
+      VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+    `).run(username.trim(), normalizedProfileName, full_name.trim(), normalizeEmail(email), hashed, avatarPath);
 
     // ── Start session ─────────────────────────────────────────────────────────
     req.session.userId = info.lastInsertRowid;
 
     db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizeEmail(email));
 
-    const user = db.prepare('SELECT id, username, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
                    .get(info.lastInsertRowid);
 
     return res.status(201).json({ message: 'Konto erfolgreich erstellt!', user });
@@ -430,6 +437,7 @@ router.post('/login', async (req, res) => {
       user: {
         id:         user.id,
         username:   user.username,
+        profile_name: user.profile_name,
         full_name:  user.full_name,
         email:      user.email,
         avatar:     user.avatar,
@@ -454,7 +462,7 @@ router.get('/me', (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Nicht authentifiziert.' });
 
   const user = db.prepare(
-    'SELECT id, username, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?'
+    'SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?'
   ).get(req.session.userId);
 
   if (!user) return res.status(401).json({ error: 'Benutzer nicht gefunden.' });
@@ -490,7 +498,7 @@ router.get('/public/:username', (req, res) => {
     }
 
     const user = db.prepare(`
-      SELECT id, username, full_name, email, avatar, accent_color, created_at
+      SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at
       FROM users
       WHERE username = ?
     `).get(username);
@@ -667,7 +675,7 @@ router.post('/update-username', (req, res) => {
     db.prepare("UPDATE users SET username = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(newUsername, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Benutzername aktualisiert!', user });
@@ -703,7 +711,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 
     deleteOldAvatar(currentUser.avatar);
 
-    const user = db.prepare('SELECT id, username, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profilbild aktualisiert!', user });
@@ -716,7 +724,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 // ─── UPDATE PROFILE (NAME + USERNAME) ───────────────────────────────────────
 router.post('/update-profile', (req, res) => {
   try {
-    const { full_name, username, accent_color } = req.body;
+    const { full_name, profile_name, username, accent_color } = req.body;
 
     if (!req.session.userId) {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
@@ -727,10 +735,15 @@ router.post('/update-profile', (req, res) => {
     }
 
     const trimmedName = full_name.trim();
+    const trimmedProfileName = typeof profile_name === 'string' ? profile_name.trim() : '';
     const trimmedUsername = username.trim();
 
     if (!trimmedName) {
       return res.status(400).json({ error: 'Vollständiger Name ist erforderlich.' });
+    }
+
+    if (trimmedProfileName.length > 60) {
+      return res.status(400).json({ error: 'Der Profilname darf maximal 60 Zeichen lang sein.' });
     }
 
     if (!USERNAME_REGEX.test(trimmedUsername)) {
@@ -749,10 +762,10 @@ router.post('/update-profile', (req, res) => {
       return res.status(409).json({ error: 'Dieser Benutzername ist bereits vergeben.' });
     }
 
-    db.prepare("UPDATE users SET full_name = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
-      .run(trimmedName, trimmedUsername, normalizedAccentColor, req.session.userId);
+    db.prepare("UPDATE users SET full_name = ?, profile_name = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
+      .run(trimmedName, trimmedProfileName || null, trimmedUsername, normalizedAccentColor, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profil aktualisiert!', user });
