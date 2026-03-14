@@ -388,9 +388,9 @@ function hexToHsl(hexColor) {
    const saturation = delta === 0 ? 0 : delta / (1 - Math.abs(2 * lightness - 1))
 
    return {
-      hue: Math.round(hue),
-      saturation: Math.round(saturation * 100),
-      lightness: Math.round(lightness * 100)
+      hue,
+      saturation: saturation * 100,
+      lightness: lightness * 100
    }
 }
 
@@ -401,7 +401,7 @@ function updateProfileAccentSummary(hexColor) {
    profileAccentColorValue.textContent = normalizedHex
 }
 
-function syncAccentPickerUi() {
+function syncAccentPickerUi({ hexOverride = null } = {}) {
    const wheelRect = accentColorWheel.getBoundingClientRect()
    const radius = wheelRect.width / 2
    const distance = radius - 8
@@ -415,10 +415,10 @@ function syncAccentPickerUi() {
    accentColorWheel.setAttribute('aria-valuenow', String(Math.round(accentPickerState.hue)))
    accentColorWheel.style.filter = `saturate(${Math.max(0.15, accentPickerState.saturation / 100)}) brightness(${Math.max(0.15, accentPickerState.lightness / 50)})`
 
-   accentBrightnessInput.value = String(accentPickerState.lightness)
-   accentSaturationInput.value = String(accentPickerState.saturation)
+   accentBrightnessInput.value = String(Math.round(accentPickerState.lightness))
+   accentSaturationInput.value = String(Math.round(accentPickerState.saturation))
 
-   const hexColor = hslToHex(accentPickerState.hue, accentPickerState.saturation, accentPickerState.lightness)
+   const hexColor = hexOverride || hslToHex(accentPickerState.hue, accentPickerState.saturation, accentPickerState.lightness)
    accentHexInput.value = hexColor
 }
 
@@ -432,7 +432,7 @@ function setAccentPickerFromHex(hexColor) {
       saturation: hslColor.saturation,
       lightness: hslColor.lightness
    }
-   syncAccentPickerUi()
+   syncAccentPickerUi({ hexOverride: normalizedHex })
 }
 
 function setAccentHueFromClientPosition(clientX, clientY) {
