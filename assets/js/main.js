@@ -420,6 +420,7 @@ function syncAccentPickerUi({ hexOverride = null } = {}) {
 
    const hexColor = hexOverride || hslToHex(accentPickerState.hue, accentPickerState.saturation, accentPickerState.lightness)
    accentHexInput.value = hexColor
+   accentColorModal.style.setProperty('--accent-picker-selected-color', hexColor)
 }
 
 function setAccentPickerFromHex(hexColor) {

@@ -590,6 +590,7 @@ body.user-theme-active .nav__avatar {
 
 .accent-picker__form {
   max-width: 420px;
+  --accent-picker-selected-color: var(--first-color);
 }
 
 .accent-picker__wheel-wrap {
@@ -638,7 +639,11 @@ body.user-theme-active .nav__avatar {
 
 .accent-picker__range {
   width: 100%;
-  accent-color: var(--first-color);
+  accent-color: var(--accent-picker-selected-color);
+}
+
+#accent-color-modal #accent-apply-btn {
+  background-color: var(--accent-picker-selected-color);
 }
 
 .profile__avatar-wrap {
