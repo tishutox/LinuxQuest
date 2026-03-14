@@ -588,9 +588,12 @@ body.user-theme-active .nav__avatar {
   margin-left: auto;
 }
 
+#accent-color-modal {
+  --accent-picker-selected-color: var(--first-color);
+}
+
 .accent-picker__form {
   max-width: 420px;
-  --accent-picker-selected-color: var(--first-color);
 }
 
 .accent-picker__wheel-wrap {
