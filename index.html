@@ -299,7 +299,9 @@
 
                <div>
                   <label for="profile-background-input" class="login__label">Custom Hintergrund <small>(nur lokal)</small></label>
-                  <input type="file" id="profile-background-input" class="login__input" accept="image/*">
+                  <input type="file" id="profile-background-input" accept="image/*" style="display:none;">
+                  <button type="button" class="profile-background__pick" id="profile-background-pick-btn">Bild auswählen</button>
+                  <p class="profile-background__filename" id="profile-background-filename">Kein Bild ausgewählt</p>
                   <p class="profile__local-note">Wird nur in diesem Browser gespeichert und nicht mit dem Konto synchronisiert.</p>
                </div>
 

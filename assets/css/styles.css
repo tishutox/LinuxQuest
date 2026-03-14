@@ -706,6 +706,42 @@ body.user-theme-active .profile__avatar-button:hover {
   color: var(--text-color);
 }
 
+.profile-background__pick,
+.profile-background__reset {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .9rem 1rem;
+  border-radius: .5rem;
+  border: 2px solid var(--border-color);
+  background-color: #fff;
+  color: var(--title-color);
+  font-weight: var(--font-semi-bold);
+  cursor: pointer;
+  transition: border-color .3s, color .3s, box-shadow .3s;
+}
+
+.profile-background__pick:hover,
+.profile-background__reset:hover {
+  border-color: var(--first-color);
+  color: var(--first-color);
+}
+
+.profile-background__pick:focus-visible,
+.profile-background__reset:focus-visible {
+  outline: 2px dotted var(--first-color);
+  outline-offset: .2rem;
+}
+
+.profile-background__filename {
+  margin-top: .5rem;
+  color: var(--text-color);
+  font-size: .82rem;
+  text-align: left;
+  word-break: break-word;
+}
+
 .profile-background__actions {
   display: flex;
 }
@@ -714,8 +750,13 @@ body.user-theme-active .profile__avatar-button:hover {
   margin-top: .15rem;
 }
 
+.profile-background__pick:disabled,
 .profile-background__reset:disabled {
-  opacity: .65;
+  opacity: .75;
+  background-color: #fff;
+  color: var(--text-color);
+  border-color: var(--border-color);
+  box-shadow: none;
   cursor: not-allowed;
 }
 

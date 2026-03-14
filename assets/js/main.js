@@ -196,6 +196,8 @@ const profileAccentColorPreview = document.getElementById('profile-accent-color-
 const profileAccentColorValue = document.getElementById('profile-accent-color-value')
 const profileAccentColorInput = document.getElementById('profile-accent-color-input')
 const profileBackgroundInput = document.getElementById('profile-background-input')
+const profileBackgroundPickBtn = document.getElementById('profile-background-pick-btn')
+const profileBackgroundFilename = document.getElementById('profile-background-filename')
 const profileBackgroundResetBtn = document.getElementById('profile-background-reset-btn')
 const accentColorWheel = document.getElementById('accent-color-wheel')
 const accentColorWheelIndicator = document.getElementById('accent-color-wheel-indicator')
@@ -568,6 +570,11 @@ function updateBackgroundControls(user) {
       : 'Kein eigener Hintergrund'
 }
 
+   function setBackgroundFilenameLabel(fileName = '') {
+      if (!profileBackgroundFilename) return
+      profileBackgroundFilename.textContent = fileName || 'Kein Bild ausgewählt'
+   }
+
 function updateFollowButton() {
    if (!publicProfileFollowBtn) return
 
@@ -835,6 +842,7 @@ function setLoggedOut() {
    if (profileBackgroundInput) {
       profileBackgroundInput.value = ''
    }
+   setBackgroundFilenameLabel('')
    updateBackgroundControls(null)
    profileDeleteBtn.textContent = 'Konto löschen'
    if (profileDeleteNote) {
@@ -1014,27 +1022,41 @@ profileAvatarInput.addEventListener('change', async () => {
    }
 })
 
+profileBackgroundPickBtn.addEventListener('click', () => {
+   if (!currentUser) {
+      return showMsg('profile-message', 'Bitte melde dich an, um einen lokalen Hintergrund zu verwenden.', 'error')
+   }
+
+   clearMsg('profile-message')
+   profileBackgroundInput.click()
+})
+
 profileBackgroundInput.addEventListener('change', () => {
    const backgroundFile = profileBackgroundInput.files[0]
    if (!backgroundFile) return
+   setBackgroundFilenameLabel(backgroundFile.name)
 
    if (!currentUser) {
       profileBackgroundInput.value = ''
+      setBackgroundFilenameLabel('')
       return showMsg('profile-message', 'Bitte melde dich an, um einen lokalen Hintergrund zu verwenden.', 'error')
    }
 
    if (!backgroundFile.type.startsWith('image/')) {
       profileBackgroundInput.value = ''
+      setBackgroundFilenameLabel('')
       return showMsg('profile-message', 'Bitte wähle eine Bilddatei aus.', 'error')
    }
 
-   if (backgroundFile.size > 2 * 1024 * 1024) {
+   if (backgroundFile.size > 5 * 1024 * 1024) {
       profileBackgroundInput.value = ''
-      return showMsg('profile-message', 'Bild ist zu groß (max. 2 MB).', 'error')
+      setBackgroundFilenameLabel('')
+      return showMsg('profile-message', 'Bild ist zu groß (max. 5 MB).', 'error')
    }
 
    clearMsg('profile-message')
    profileBackgroundInput.disabled = true
+   profileBackgroundPickBtn.disabled = true
    profileBackgroundResetBtn.disabled = true
 
    const reader = new FileReader()
@@ -1055,13 +1077,16 @@ profileBackgroundInput.addEventListener('change', () => {
 
       profileBackgroundInput.value = ''
       profileBackgroundInput.disabled = false
+      profileBackgroundPickBtn.disabled = false
       profileBackgroundResetBtn.disabled = false
    }
 
    reader.onerror = () => {
       showMsg('profile-message', 'Bild konnte nicht gelesen werden.', 'error')
       profileBackgroundInput.value = ''
+      setBackgroundFilenameLabel('')
       profileBackgroundInput.disabled = false
+      profileBackgroundPickBtn.disabled = false
       profileBackgroundResetBtn.disabled = false
    }
 
@@ -1077,6 +1102,7 @@ profileBackgroundResetBtn.addEventListener('click', () => {
    }
 
    applyMainBackground(null)
+   setBackgroundFilenameLabel('')
    updateBackgroundControls(currentUser)
    showMsg('profile-message', 'Lokaler Hintergrund entfernt.', 'success')
 })
