@@ -534,7 +534,7 @@ router.get('/public/:username/followers', (req, res) => {
     }
 
     const users = db.prepare(`
-      SELECT u.id, u.username, u.full_name, u.avatar
+      SELECT u.id, u.username, u.full_name, u.avatar, u.accent_color
       FROM follows f
       INNER JOIN users u ON u.id = f.follower_id
       WHERE f.following_id = ?
@@ -562,7 +562,7 @@ router.get('/public/:username/following', (req, res) => {
     }
 
     const users = db.prepare(`
-      SELECT u.id, u.username, u.full_name, u.avatar
+      SELECT u.id, u.username, u.full_name, u.avatar, u.accent_color
       FROM follows f
       INNER JOIN users u ON u.id = f.following_id
       WHERE f.follower_id = ?

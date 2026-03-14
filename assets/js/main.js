@@ -654,6 +654,10 @@ function renderFollowList(users) {
       avatar.className = 'follow-list__avatar'
       avatar.src = getAvatarUrl(user)
       avatar.alt = `Profilbild von ${user.username}`
+      const userAccentColor = normalizeHexColor(user?.accent_color)
+      if (userAccentColor) {
+         avatar.style.borderColor = userAccentColor
+      }
 
       const username = document.createElement('span')
       username.className = 'follow-list__username'

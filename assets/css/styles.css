@@ -407,6 +407,16 @@ body.user-theme-active .footer__link:hover {
   box-shadow: 0 4px 24px hsla(230, 75%, 40%, .4);
 }
 
+body.user-theme-active #profile-modal .login__button {
+  background-color: var(--user-accent-color);
+}
+
+body.user-theme-active #profile-modal .profile__delete-button {
+  background-color: transparent;
+  color: var(--user-accent-color);
+  border-color: var(--user-accent-color);
+}
+
 /* Show login */
 .show-login {
   opacity: 1;
@@ -789,6 +799,14 @@ body.user-theme-active .profile__avatar-button:hover {
 
 #public-profile-modal .public-profile__stat:hover {
   color: var(--public-profile-accent-color);
+}
+
+#public-profile-modal #public-profile-follow-btn {
+  background-color: var(--public-profile-accent-color);
+}
+
+#public-profile-modal #public-profile-follow-btn:hover {
+  box-shadow: 0 4px 24px color-mix(in srgb, var(--public-profile-accent-color) 55%, transparent);
 }
 
 .follow-list {
