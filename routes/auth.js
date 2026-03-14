@@ -372,8 +372,8 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     if (existingUsername) return res.status(409).json({ error: 'Dieser Benutzername ist bereits vergeben.' });
 
     const trimmedProfileName = typeof profile_name === 'string' ? profile_name.trim() : '';
-    if (trimmedProfileName.length > 60) {
-      return res.status(400).json({ error: 'Der Profilname darf maximal 60 Zeichen lang sein.' });
+    if (trimmedProfileName.length > 20) {
+      return res.status(400).json({ error: 'Der Profilname darf maximal 20 Zeichen lang sein.' });
     }
 
     const normalizedProfileName = trimmedProfileName || null;
@@ -742,8 +742,8 @@ router.post('/update-profile', (req, res) => {
       return res.status(400).json({ error: 'Vollständiger Name ist erforderlich.' });
     }
 
-    if (trimmedProfileName.length > 60) {
-      return res.status(400).json({ error: 'Der Profilname darf maximal 60 Zeichen lang sein.' });
+    if (trimmedProfileName.length > 20) {
+      return res.status(400).json({ error: 'Der Profilname darf maximal 20 Zeichen lang sein.' });
     }
 
     if (!USERNAME_REGEX.test(trimmedUsername)) {

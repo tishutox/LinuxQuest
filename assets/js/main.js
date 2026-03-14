@@ -1144,11 +1144,16 @@ profileForm.addEventListener('submit', async (e) => {
 
    const full_name = profileFullNameInput.value.trim()
    const profile_name = profileDisplayNameInput.value
+   const trimmedProfileName = typeof profile_name === 'string' ? profile_name.trim() : ''
    const username  = profileUsernameInput.value.trim()
    const accent_color = normalizeHexColor(profileAccentColorInput.value)
 
    if (!full_name || !username) {
       return showMsg('profile-message', 'Vollständiger Name und Benutzername sind erforderlich.', 'error')
+   }
+
+   if (trimmedProfileName.length > 20) {
+      return showMsg('profile-message', 'Der Profilname darf maximal 20 Zeichen lang sein.', 'error')
    }
 
     if (!accent_color) {
