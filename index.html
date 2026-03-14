@@ -265,6 +265,14 @@
 
             <div class="login__group">
                <div>
+                  <label for="profile-share-link" class="login__label">Profil-Link</label>
+                  <input type="text" id="profile-share-link" class="login__input" readonly>
+               </div>
+               <button type="button" class="login__button" id="profile-share-copy-btn">Link kopieren</button>
+            </div>
+
+            <div class="login__group">
+               <div>
                   <label for="profile-full-name-input" class="login__label">Vollständiger Name</label>
                   <input type="text" id="profile-full-name-input" class="login__input" autocomplete="name">
                </div>
@@ -287,6 +295,33 @@
          </form>
 
          <i class="fi fi-rr-cross-small login__close" id="profile-close"></i>
+      </div>
+
+      <!--==================== PUBLIC PROFILE ====================-->
+      <div class="login" id="public-profile-modal">
+         <div class="login__form profile__form">
+            <h2 class="login__title">Öffentliches Profil</h2>
+
+            <div class="profile__avatar-wrap">
+               <img src="" alt="Profilbild" class="profile__avatar-image" id="public-profile-avatar">
+            </div>
+
+            <p class="profile__username" id="public-profile-username"></p>
+
+            <div class="login__group">
+               <div>
+                  <label class="login__label">Vollständiger Name</label>
+                  <input type="text" id="public-profile-full-name" class="login__input" readonly>
+               </div>
+
+               <div>
+                  <label class="login__label">Profil-Link</label>
+                  <input type="text" id="public-profile-link" class="login__input" readonly>
+               </div>
+            </div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" id="public-profile-close"></i>
       </div>
 
       <!--==================== MAIN ====================-->

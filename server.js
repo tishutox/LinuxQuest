@@ -90,6 +90,10 @@ function cleanupInactiveAccounts() {
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 
+app.get('/@:username', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 cleanupInactiveAccounts();
 const cleanupTimer = setInterval(cleanupInactiveAccounts, CLEANUP_INTERVAL_MS);
 cleanupTimer.unref();

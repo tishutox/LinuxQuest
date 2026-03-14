@@ -375,6 +375,31 @@ router.get('/project-contacts', (_req, res) => {
   }
 });
 
+router.get('/public/:username', (req, res) => {
+  try {
+    const username = req.params.username?.trim();
+
+    if (!username || !USERNAME_REGEX.test(username)) {
+      return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+    }
+
+    const user = db.prepare(`
+      SELECT id, username, full_name, avatar, created_at
+      FROM users
+      WHERE username = ?
+    `).get(username);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    return res.json({ user });
+  } catch (err) {
+    console.error('[PUBLIC PROFILE ERROR]', err);
+    return res.status(500).json({ error: 'Öffentliches Profil konnte nicht geladen werden.' });
+  }
+});
+
 // ─── UPDATE USERNAME ──────────────────────────────────────────────────────────
 router.post('/update-username', (req, res) => {
   try {

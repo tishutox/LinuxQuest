@@ -36,7 +36,8 @@ const loginPanel      = document.getElementById('login'),
       registerPanel   = document.getElementById('register'),
       changeUsernamePanel = document.getElementById('change-username'),
       resetPasswordPanel = document.getElementById('reset-password'),
-   profileModal    = document.getElementById('profile-modal'),
+      profileModal    = document.getElementById('profile-modal'),
+      publicProfileModal = document.getElementById('public-profile-modal'),
       loginBtn        = document.getElementById('login-btn'),
       loginClose      = document.getElementById('login-close'),
       registerClose   = document.getElementById('register-close'),
@@ -44,8 +45,9 @@ const loginPanel      = document.getElementById('login'),
       loginLink       = document.getElementById('login-link'),
       forgotPasswordLink = document.getElementById('forgot-password-link'),
       resetPasswordClose = document.getElementById('reset-password-close'),
-   backToLoginLink = document.getElementById('back-to-login-link'),
-   profileClose    = document.getElementById('profile-close')
+      backToLoginLink = document.getElementById('back-to-login-link'),
+      profileClose    = document.getElementById('profile-close'),
+      publicProfileClose = document.getElementById('public-profile-close')
 
 const staticModalTriggers = document.querySelectorAll('[data-modal-target]')
 const staticModalCloseButtons = document.querySelectorAll('[data-modal-close]')
@@ -84,10 +86,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -115,6 +117,7 @@ forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showRe
 resetPasswordClose.addEventListener('click', hideAll)
 backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLogin() })
 profileClose.addEventListener('click', hideAll)
+publicProfileClose.addEventListener('click', hideAll)
 
 /*=============== AVATAR PREVIEW ===============*/
 const avatarInput       = document.getElementById('avatar-input')
@@ -155,6 +158,8 @@ const profileAvatarInput  = document.getElementById('profile-avatar-input')
 const profileAvatarButton = document.getElementById('profile-avatar-button')
 const profileAvatarImage  = document.getElementById('profile-avatar-image')
 const profileUsername     = document.getElementById('profile-username')
+const profileShareLinkInput = document.getElementById('profile-share-link')
+const profileShareCopyBtn = document.getElementById('profile-share-copy-btn')
 const profileForm         = document.getElementById('profile-form')
 const profileFullNameInput = document.getElementById('profile-full-name-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
@@ -162,6 +167,10 @@ const profileDeletePasswordInput = document.getElementById('profile-delete-passw
 const profileDeleteNote = document.getElementById('profile-delete-note')
 const profileSaveBtn       = document.getElementById('profile-save-btn')
 const profileDeleteBtn     = document.getElementById('profile-delete-btn')
+const publicProfileAvatar = document.getElementById('public-profile-avatar')
+const publicProfileUsername = document.getElementById('public-profile-username')
+const publicProfileFullName = document.getElementById('public-profile-full-name')
+const publicProfileLink = document.getElementById('public-profile-link')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de',
@@ -221,11 +230,37 @@ function getAvatarUrl(user) {
       : DEFAULT_AVATAR + encodeURIComponent(user.full_name)
 }
 
+function buildProfilePath(username) {
+   return `/@${encodeURIComponent(username)}`
+}
+
+function buildProfileUrl(username) {
+   return `${window.location.origin}${buildProfilePath(username)}`
+}
+
+function getSharedUsernameFromPath() {
+   const match = window.location.pathname.match(/^\/@([a-zA-Z0-9_-]+)$/)
+   return match ? decodeURIComponent(match[1]) : null
+}
+
+function updateProfileShareLink(username) {
+   if (!profileShareLinkInput) return
+   profileShareLinkInput.value = buildProfileUrl(username)
+}
+
+function updatePublicProfileView(user) {
+   publicProfileAvatar.src = getAvatarUrl(user)
+   publicProfileUsername.textContent = '@' + user.username
+   publicProfileFullName.value = user.full_name
+   publicProfileLink.value = buildProfileUrl(user.username)
+}
+
 function updateProfileView(user) {
    profileAvatarImage.src  = getAvatarUrl(user)
    profileFullNameInput.value = user.full_name
    profileUsernameInput.value = user.username
    profileUsername.textContent = '@' + user.username
+   updateProfileShareLink(user.username)
 
    const protectedUser = isProtectedUser(user)
    profileDeletePasswordInput.value = ''
@@ -262,6 +297,7 @@ function setLoggedOut() {
    profileDeletePasswordInput.value = ''
    profileDeletePasswordInput.disabled = false
    profileUsername.textContent = ''
+   profileShareLinkInput.value = ''
    profileDeleteBtn.textContent = 'Konto löschen'
    if (profileDeleteNote) {
       profileDeleteNote.textContent = 'Zum Löschen des Kontos ist dein Passwort erforderlich.'
@@ -277,6 +313,39 @@ function showProfileModal() {
    profileDeletePasswordInput.value = ''
    hideAll()
    profileModal.classList.add('show-login')
+}
+
+profileShareCopyBtn.addEventListener('click', async () => {
+   if (!profileShareLinkInput.value) return
+
+   try {
+      await navigator.clipboard.writeText(profileShareLinkInput.value)
+      showMsg('profile-message', 'Profil-Link kopiert!', 'success')
+   } catch (_) {
+      showMsg('profile-message', 'Link konnte nicht kopiert werden. Bitte manuell kopieren.', 'error')
+   }
+})
+
+async function openSharedProfileFromUrl() {
+   const sharedUsername = getSharedUsernameFromPath()
+   if (!sharedUsername) return
+
+   try {
+      const response = await fetch(`/api/auth/public/${encodeURIComponent(sharedUsername)}`, {
+         credentials: 'include'
+      })
+
+      if (!response.ok) return
+
+      const data = await response.json()
+      if (!data.user) return
+
+      updatePublicProfileView(data.user)
+      hideAll()
+      publicProfileModal.classList.add('show-login')
+   } catch (_) {
+      // ignore invalid/unreachable share links silently
+   }
 }
 
 profileBtn.addEventListener('click', showProfileModal)
@@ -440,6 +509,7 @@ async function checkSession() {
    } catch (_) { /* not logged in */ }
 
    refreshProjectContacts()
+   await openSharedProfileFromUrl()
 }
 checkSession()
 
