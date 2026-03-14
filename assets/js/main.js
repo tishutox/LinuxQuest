@@ -55,17 +55,13 @@ const staticModalPanels = Array.from(document.querySelectorAll('.info-modal'))
 const imprintArmandLink = document.getElementById('imprint-armand-link')
 const imprintJostLink = document.getElementById('imprint-jost-link')
 
-const projectContactElements = {
+const projectContactConfig = {
    armand: {
       fallback: {
          full_name: 'Armand Patrick Asztalos',
          username: 'armand',
          email: 'armand.patrick.asztalos@tha.de'
       },
-      avatar: document.getElementById('armand-modal-avatar'),
-      name: document.getElementById('armand-modal-name'),
-      username: document.getElementById('armand-modal-username'),
-      email: document.getElementById('armand-modal-email'),
       imprintLink: imprintArmandLink
    },
    jost: {
@@ -74,10 +70,6 @@ const projectContactElements = {
          username: 'jost',
          email: 'jost.witthauer@tha.de'
       },
-      avatar: document.getElementById('jost-modal-avatar'),
-      name: document.getElementById('jost-modal-name'),
-      username: document.getElementById('jost-modal-username'),
-      email: document.getElementById('jost-modal-email'),
       imprintLink: imprintJostLink
    }
 }
@@ -139,11 +131,26 @@ avatarInput.addEventListener('change', () => {
 /*=============== HELPER – show message in form ===============*/
 function showMsg(id, text, type) {
    const el = document.getElementById(id)
+   if (messageTimers.has(id)) {
+      clearTimeout(messageTimers.get(id))
+      messageTimers.delete(id)
+   }
    el.textContent = text
    el.className = 'login__message ' + type
+
+   if (type === 'success') {
+      const timer = setTimeout(() => {
+         clearMsg(id)
+      }, 3000)
+      messageTimers.set(id, timer)
+   }
 }
 function clearMsg(id) {
    const el = document.getElementById(id)
+   if (messageTimers.has(id)) {
+      clearTimeout(messageTimers.get(id))
+      messageTimers.delete(id)
+   }
    el.textContent = ''
    el.className = 'login__message'
 }
@@ -178,6 +185,17 @@ const PROTECTED_EMAILS = new Set([
    'jost.witthauer@tha.de'
 ])
 
+const projectContactsByKey = {
+   armand: null,
+   jost: null
+}
+
+const PROJECT_CONTACTS_CACHE_MS = 15000
+let projectContactsLastLoadedAt = 0
+let projectContactsRefreshPromise = null
+
+const messageTimers = new Map()
+
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
 let currentUser = null
 let currentPublicProfileUser = null
@@ -194,32 +212,47 @@ function setImprintContactLink(link, contact, fallback) {
 }
 
 function updateProjectContactModal(contactKey, contact) {
-   const elements = projectContactElements[contactKey]
-   if (!elements) return
+   const config = projectContactConfig[contactKey]
+   if (!config) return
 
-   const displayUser = getDisplayUser(contact, elements.fallback)
+   const displayUser = getDisplayUser(contact, config.fallback)
+   projectContactsByKey[contactKey] = displayUser
 
-   elements.avatar.src = getAvatarUrl(displayUser)
-   elements.name.textContent = displayUser.full_name
-   elements.username.textContent = `@${displayUser.username}`
-   elements.email.textContent = displayUser.email
-   elements.email.href = `mailto:${displayUser.email}`
-
-   setImprintContactLink(elements.imprintLink, contact, elements.fallback)
+   setImprintContactLink(config.imprintLink, contact, config.fallback)
 }
 
-async function refreshProjectContacts() {
-   try {
-      const response = await fetch('/api/auth/project-contacts', { credentials: 'include' })
-      if (!response.ok) throw new Error('Kontakte konnten nicht geladen werden')
+async function refreshProjectContacts({ force = false } = {}) {
+   const now = Date.now()
+   const hasFreshCache = projectContactsLastLoadedAt > 0 && (now - projectContactsLastLoadedAt) < PROJECT_CONTACTS_CACHE_MS
 
-      const data = await response.json()
-      updateProjectContactModal('armand', data.contacts?.armand || null)
-      updateProjectContactModal('jost', data.contacts?.jost || null)
-   } catch (_) {
-      updateProjectContactModal('armand', null)
-      updateProjectContactModal('jost', null)
+   if (!force && hasFreshCache) {
+      return
    }
+
+   if (projectContactsRefreshPromise) {
+      return projectContactsRefreshPromise
+   }
+
+   projectContactsRefreshPromise = (async () => {
+      try {
+         const response = await fetch('/api/auth/project-contacts', { credentials: 'include' })
+         if (!response.ok) throw new Error('Kontakte konnten nicht geladen werden')
+
+         const data = await response.json()
+         updateProjectContactModal('armand', data.contacts?.armand || null)
+         updateProjectContactModal('jost', data.contacts?.jost || null)
+         projectContactsLastLoadedAt = Date.now()
+      } catch (_) {
+         if (!projectContactsLastLoadedAt) {
+            updateProjectContactModal('armand', null)
+            updateProjectContactModal('jost', null)
+         }
+      } finally {
+         projectContactsRefreshPromise = null
+      }
+   })()
+
+   return projectContactsRefreshPromise
 }
 
 function isProtectedUser(user) {
@@ -280,6 +313,60 @@ function showPublicProfileError(message) {
    publicProfileEmailLink.href = '#'
    hideAll()
    publicProfileModal.classList.add('show-login')
+}
+
+function showPublicProfileNotice(message, type = 'success', autoHideMs = 3000) {
+   if (!publicProfileMessage) return
+
+   if (messageTimers.has('public-profile-message')) {
+      clearTimeout(messageTimers.get('public-profile-message'))
+      messageTimers.delete('public-profile-message')
+   }
+
+   publicProfileMessage.textContent = message
+   publicProfileMessage.className = `login__message ${type}`
+
+   if (autoHideMs > 0) {
+      const timer = setTimeout(() => {
+         if (publicProfileMessage.classList.contains('error')) return
+         publicProfileMessage.textContent = ''
+         publicProfileMessage.className = 'login__message'
+      }, autoHideMs)
+
+      messageTimers.set('public-profile-message', timer)
+   }
+}
+
+async function openPublicProfileByUsername(username) {
+   if (!username) return
+
+   try {
+      const response = await fetch(`/api/auth/public/${encodeURIComponent(username)}`, {
+         credentials: 'include'
+      })
+
+      if (!response.ok) {
+         if (response.status === 404) {
+            showPublicProfileError('Dieses Profil wurde nicht gefunden.')
+            return
+         }
+
+         showPublicProfileError('Das Profil konnte gerade nicht geladen werden.')
+         return
+      }
+
+      const data = await response.json()
+      if (!data.user) {
+         showPublicProfileError('Dieses Profil wurde nicht gefunden.')
+         return
+      }
+
+      updatePublicProfileView(data.user)
+      hideAll()
+      publicProfileModal.classList.add('show-login')
+   } catch (_) {
+      showPublicProfileError('Der Server ist nicht erreichbar. Bitte versuche es später erneut.')
+   }
 }
 
 function updateProfileView(user) {
@@ -358,15 +445,9 @@ publicProfileCopyBtn.addEventListener('click', async () => {
 
    try {
       await navigator.clipboard.writeText(buildProfileUrl(currentPublicProfileUser.username))
-      if (publicProfileMessage) {
-         publicProfileMessage.textContent = 'Profil-Link kopiert!'
-         publicProfileMessage.className = 'login__message success'
-      }
+      showPublicProfileNotice('Profil-Link kopiert!', 'success', 3000)
    } catch (_) {
-      if (publicProfileMessage) {
-         publicProfileMessage.textContent = 'Link konnte nicht kopiert werden. Bitte manuell kopieren.'
-         publicProfileMessage.className = 'login__message error'
-      }
+      showPublicProfileNotice('Link konnte nicht kopiert werden. Bitte manuell kopieren.', 'error', 4000)
    }
 })
 
@@ -374,33 +455,7 @@ async function openSharedProfileFromUrl() {
    const sharedUsername = getSharedUsernameFromPath()
    if (!sharedUsername) return
 
-   try {
-      const response = await fetch(`/api/auth/public/${encodeURIComponent(sharedUsername)}`, {
-         credentials: 'include'
-      })
-
-      if (!response.ok) {
-         if (response.status === 404) {
-            showPublicProfileError('Dieses Profil wurde nicht gefunden.')
-            return
-         }
-
-         showPublicProfileError('Das Profil konnte gerade nicht geladen werden.')
-         return
-      }
-
-      const data = await response.json()
-      if (!data.user) {
-         showPublicProfileError('Dieses Profil wurde nicht gefunden.')
-         return
-      }
-
-      updatePublicProfileView(data.user)
-      hideAll()
-      publicProfileModal.classList.add('show-login')
-   } catch (_) {
-      showPublicProfileError('Der Server ist nicht erreichbar. Bitte versuche es später erneut.')
-   }
+   await openPublicProfileByUsername(sharedUsername)
 }
 
 profileBtn.addEventListener('click', showProfileModal)
@@ -527,6 +582,21 @@ profileDeleteBtn.addEventListener('click', async () => {
 staticModalTriggers.forEach((trigger) => {
    trigger.addEventListener('click', async (event) => {
       event.preventDefault()
+
+      const publicProfileKey = trigger.dataset.publicProfile
+      if (publicProfileKey) {
+         await refreshProjectContacts()
+         const displayUser = projectContactsByKey[publicProfileKey]
+
+         if (!displayUser?.username) {
+            showPublicProfileError('Dieses Profil wurde nicht gefunden.')
+            return
+         }
+
+         await openPublicProfileByUsername(displayUser.username)
+         return
+      }
+
       await refreshProjectContacts()
       showStaticModal(trigger.dataset.modalTarget)
    })

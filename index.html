@@ -309,7 +309,7 @@
             </div>
 
             <div class="public-profile__username-row">
-               <p class="info-modal__person-username" id="public-profile-username"></p>
+               <p class="public-profile__username" id="public-profile-username"></p>
                <div class="public-profile__actions">
                   <button type="button" class="public-profile__action" id="public-profile-copy-btn" title="Profil-Link kopieren" aria-label="Profil-Link kopieren">
                      <i class="fi fi-rc-link-alt"></i>
@@ -336,8 +336,8 @@
                   <a href="https://showcase.informatik.tha.de" class="footer__link" target="_blank" rel="noopener noreferrer">showcase.informatik.tha.de</a>
                   <a href="#" class="footer__link" data-modal-target="imprint-modal">Impressum</a>
                   <a href="#" class="footer__link" data-modal-target="privacy-modal">Datenschutz</a>
-                  <a href="#" class="footer__link" data-modal-target="armand-modal">Armand</a>
-                  <a href="#" class="footer__link" data-modal-target="jost-modal">Jost</a>
+                  <a href="#" class="footer__link" data-modal-target="armand-modal" data-public-profile="armand">Armand</a>
+                  <a href="#" class="footer__link" data-modal-target="jost-modal" data-public-profile="jost">Jost</a>
             </div>
          </div>
       </footer>
@@ -351,8 +351,8 @@
             <div class="info-modal__body">
                <p>Dies ist eine studentische Projektarbeit im Umfeld der Technischen Hochschule Augsburg.</p>
                <p>Projektverantwortliche Kontakte:</p>
-               <p><a href="#" data-modal-target="armand-modal" id="imprint-armand-link">Armand Patrick Asztalos, armand.patrick.asztalos@tha.de</a></p>
-               <p><a href="#" data-modal-target="jost-modal" id="imprint-jost-link">Jost Witthauer, jost.witthauer@tha.de</a></p>
+               <p><a href="#" data-modal-target="armand-modal" data-public-profile="armand" id="imprint-armand-link">Armand Patrick Asztalos, armand.patrick.asztalos@tha.de</a></p>
+               <p><a href="#" data-modal-target="jost-modal" data-public-profile="jost" id="imprint-jost-link">Jost Witthauer, jost.witthauer@tha.de</a></p>
                <p>Hinweis: Falls für eure Abgabe eine vollständige ladungsfähige Anschrift erforderlich ist, sollte sie hier noch ergänzt werden.</p>
             </div>
          </div>
@@ -378,38 +378,6 @@
          <i class="fi fi-rr-cross-small login__close" data-modal-close="privacy-modal"></i>
       </div>
 
-      <div class="login info-modal" id="armand-modal">
-         <div class="login__form info-modal__form info-modal__form--person">
-            <div class="info-modal__body info-modal__body--person">
-               <div class="info-modal__avatar-wrap">
-                  <img src="" alt="Armand Profilbild" class="info-modal__avatar" id="armand-modal-avatar">
-               </div>
-               <p class="info-modal__person-label">Projektleiter</p>
-               <p class="info-modal__person-name" id="armand-modal-name">Armand Patrick Asztalos</p>
-               <p class="info-modal__person-username" id="armand-modal-username">@armand</p>
-               <p><a href="mailto:armand.patrick.asztalos@tha.de" id="armand-modal-email">armand.patrick.asztalos@tha.de</a></p>
-            </div>
-         </div>
-
-         <i class="fi fi-rr-cross-small login__close" data-modal-close="armand-modal"></i>
-      </div>
-
-      <div class="login info-modal" id="jost-modal">
-         <div class="login__form info-modal__form info-modal__form--person">
-            <div class="info-modal__body info-modal__body--person">
-               <div class="info-modal__avatar-wrap">
-                  <img src="" alt="Jost Profilbild" class="info-modal__avatar" id="jost-modal-avatar">
-               </div>
-               <p class="info-modal__person-label">Projektmitglied</p>
-               <p class="info-modal__person-name" id="jost-modal-name">Jost Witthauer</p>
-               <p class="info-modal__person-username" id="jost-modal-username">@jost</p>
-               <p><a href="mailto:jost.witthauer@tha.de" id="jost-modal-email">jost.witthauer@tha.de</a></p>
-            </div>
-         </div>
-
-         <i class="fi fi-rr-cross-small login__close" data-modal-close="jost-modal"></i>
-      </div>
-      
       <!--=============== MAIN JS ===============-->
       <script src="assets/js/main.js"></script>
    </body>
