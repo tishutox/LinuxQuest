@@ -391,8 +391,8 @@ img {
 }
 
 .admin-user-list__purge {
-  border: 1px solid var(--border-color);
-  background: var(--border-color);
+  border: 1px solid #fff;
+  background: #fff;
   color: var(--text-color);
   border-radius: .4rem;
   padding: .35rem .6rem;
@@ -422,7 +422,7 @@ img {
   color: #fff;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  opacity: 1;
   border-radius: .35rem;
   border: 1px solid transparent;
   background: transparent;
