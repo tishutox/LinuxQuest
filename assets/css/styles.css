@@ -939,6 +939,8 @@ body.user-theme-active .profile-background__reset:disabled {
   font-weight: var(--font-medium);
   margin: 0;
   line-height: .9;
+  display: inline-block;
+  transform: translateY(-1px);
 }
 
 .public-profile__following-badge {
