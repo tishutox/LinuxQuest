@@ -290,6 +290,7 @@ const profileShareCopyBtn = document.getElementById('profile-share-copy-btn')
 const profileForm         = document.getElementById('profile-form')
 const profileFullNameInput = document.getElementById('profile-full-name-input')
 const profileDisplayNameInput = document.getElementById('profile-display-name-input')
+const profileBirthDateInput = document.getElementById('profile-birth-date-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
 const profileAccentColorOpen = document.getElementById('profile-accent-color-open')
 const profileAccentColorPreview = document.getElementById('profile-accent-color-preview')
@@ -314,6 +315,7 @@ const publicProfileDisplayName = document.getElementById('public-profile-display
 const publicProfileUsername = document.getElementById('public-profile-username')
 const publicProfileMessage = document.getElementById('public-profile-message')
 const publicProfileCopyBtn = document.getElementById('public-profile-copy-btn')
+const publicProfileZodiac = document.getElementById('public-profile-zodiac')
 const publicProfileEmailLink = document.getElementById('public-profile-email-link')
 const publicProfileFollowingBadge = document.getElementById('public-profile-following-badge')
 const publicProfileFollowersCount = document.getElementById('public-profile-followers-count')
@@ -432,6 +434,65 @@ function normalizeHexColor(value) {
    if (typeof value !== 'string') return null
    const trimmed = value.trim()
    return /^#[0-9A-Fa-f]{6}$/.test(trimmed) ? trimmed.toUpperCase() : null
+}
+
+function parseBirthDate(value) {
+   if (typeof value !== 'string') return null
+   const trimmed = value.trim()
+   const match = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+   if (!match) return null
+
+   const day = Number(match[1])
+   const month = Number(match[2])
+   const year = Number(match[3])
+
+   if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year)) return null
+   if (year < 1900 || year > 2100) return null
+   if (month < 1 || month > 12) return null
+
+   const maxDay = new Date(year, month, 0).getDate()
+   if (day < 1 || day > maxDay) return null
+
+   return { day, month, year, normalized: `${match[1]}/${match[2]}/${match[3]}` }
+}
+
+function getZodiacSignByBirthDate(value) {
+   const parsed = parseBirthDate(value)
+   if (!parsed) return null
+
+   const monthDay = parsed.month * 100 + parsed.day
+
+   if (monthDay >= 120 && monthDay <= 218) return { name: 'Wassermann', iconClass: 'fi fi-rr-water' }
+   if (monthDay >= 219 && monthDay <= 320) return { name: 'Fische', iconClass: 'fi fi-rr-fish' }
+   if (monthDay >= 321 && monthDay <= 419) return { name: 'Widder', iconClass: 'fi fi-rr-ram' }
+   if (monthDay >= 420 && monthDay <= 520) return { name: 'Stier', iconClass: 'fi fi-rr-skull-cow' }
+   if (monthDay >= 521 && monthDay <= 620) return { name: 'Zwillinge', iconClass: 'fi fi-rr-mirror-user' }
+   if (monthDay >= 621 && monthDay <= 722) return { name: 'Krebs', iconClass: 'fi fi-rr-crab' }
+   if (monthDay >= 723 && monthDay <= 822) return { name: 'Löwe', iconClass: 'fi fi-rr-lion-head' }
+   if (monthDay >= 823 && monthDay <= 922) return { name: 'Jungfrau', iconClass: 'fi fi-rr-angel' }
+   if (monthDay >= 923 && monthDay <= 1022) return { name: 'Waage', iconClass: 'fi fi-rr-equality' }
+   if (monthDay >= 1023 && monthDay <= 1121) return { name: 'Skorpion', iconClass: 'fi fi-rr-scorpion' }
+   if (monthDay >= 1122 && monthDay <= 1221) return { name: 'Schütze', iconClass: 'fi fi-rr-bow-arrow' }
+
+   return { name: 'Steinbock', iconClass: 'fi fi-rr-sheep' }
+}
+
+function updatePublicProfileZodiac(birthDate) {
+   if (!publicProfileZodiac) return
+
+   const zodiacSign = getZodiacSignByBirthDate(birthDate)
+   if (!zodiacSign) {
+      publicProfileZodiac.style.display = 'none'
+      publicProfileZodiac.innerHTML = ''
+      publicProfileZodiac.title = 'Sternzeichen'
+      publicProfileZodiac.setAttribute('aria-label', 'Sternzeichen')
+      return
+   }
+
+   publicProfileZodiac.style.display = 'inline-flex'
+   publicProfileZodiac.innerHTML = `<i class="${zodiacSign.iconClass}"></i>`
+   publicProfileZodiac.title = zodiacSign.name
+   publicProfileZodiac.setAttribute('aria-label', zodiacSign.name)
 }
 
 function hslToHex(h, s, l) {
@@ -734,6 +795,7 @@ function updatePublicProfileView(payload) {
    publicProfileDisplayName.textContent = publicDisplayName
    publicProfileDisplayName.style.display = publicDisplayName ? 'block' : 'none'
    publicProfileUsername.textContent = '@' + user.username
+   updatePublicProfileZodiac(user?.birth_date)
    updatePublicFollowStats()
    updateFollowButton()
 
@@ -763,6 +825,7 @@ function showPublicProfileError(message) {
    publicProfileDisplayName.textContent = ''
    publicProfileDisplayName.style.display = 'none'
    publicProfileUsername.textContent = '@unbekannt'
+   updatePublicProfileZodiac(null)
     updatePublicFollowStats()
     updateFollowButton()
    publicProfileEmailLink.style.display = 'none'
@@ -904,6 +967,7 @@ function updateProfileView(user) {
    profileAvatarImage.src  = getAvatarUrl(user)
    profileFullNameInput.value = user.full_name
    profileDisplayNameInput.value = getProfileDisplayName(user)
+   profileBirthDateInput.value = typeof user.birth_date === 'string' ? user.birth_date : ''
    profileUsernameInput.value = user.username
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
    updateBackgroundControls(user)
@@ -949,6 +1013,7 @@ function setLoggedOut() {
    profileAvatarImage.src  = ''
    profileFullNameInput.value = ''
    profileDisplayNameInput.value = ''
+   profileBirthDateInput.value = ''
    profileUsernameInput.value = ''
    updateProfileAccentSummary(getDefaultAccentColor())
    profileDeletePasswordInput.value = ''
@@ -1242,6 +1307,7 @@ profileForm.addEventListener('submit', async (e) => {
 
    const full_name = profileFullNameInput.value.trim()
    const profile_name = profileDisplayNameInput.value
+   const birth_date = profileBirthDateInput.value.trim()
    const trimmedProfileName = typeof profile_name === 'string' ? profile_name.trim() : ''
    const username  = profileUsernameInput.value.trim()
    const accent_color = normalizeHexColor(profileAccentColorInput.value)
@@ -1252,6 +1318,10 @@ profileForm.addEventListener('submit', async (e) => {
 
    if (trimmedProfileName.length > 20) {
       return showMsg('profile-message', 'Der Profilname darf maximal 20 Zeichen lang sein.', 'error')
+   }
+
+   if (birth_date && !parseBirthDate(birth_date)) {
+      return showMsg('profile-message', 'Das Geburtsdatum muss im Format dd/mm/yyyy sein.', 'error')
    }
 
     if (!accent_color) {
@@ -1266,7 +1336,7 @@ profileForm.addEventListener('submit', async (e) => {
          method: 'POST',
          credentials: 'include',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ full_name, profile_name, username, accent_color })
+         body: JSON.stringify({ full_name, profile_name, birth_date, username, accent_color })
       })
       const data = await res.json()
 

@@ -17,6 +17,8 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 	- Frei wählbar (inkl. Sonderzeichen/Emoji)
 	- Maximal 20 Zeichen
 	- Optional (leer = keine Anzeige)
+- Optionales Geburtsdatum speichern (`dd/mm/yyyy`)
+- Sternzeichen-Icon im öffentlichen Profil anzeigen (wenn Geburtsdatum gesetzt ist)
 - Akzentfarbe fürs Profil auswählen
 - Konto löschen (mit Passwort-Bestätigung)
 - Geschützte Projektkonten können nicht gelöscht werden

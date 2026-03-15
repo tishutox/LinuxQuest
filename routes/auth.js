@@ -38,6 +38,7 @@ const upload = multer({
 const THA_REGEX      = /^[^\s@]+@tha\.de$/i;
 const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;  // Only letters, numbers, underscore, hyphen
 const HEX_COLOR_REGEX = /^#[0-9a-fA-F]{6}$/;
+const BIRTH_DATE_REGEX = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 const SALT_ROUNDS    = 12;
 const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
 const VERIFY_IP_MAX_REQUESTS = 6;
@@ -101,7 +102,7 @@ function touchUserActivity(userId) {
 
 function getPublicUserProfileByEmail(email) {
   return db.prepare(`
-    SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at
+    SELECT id, username, profile_name, full_name, email, avatar, birth_date, accent_color, created_at
     FROM users
     WHERE email = ?
   `).get(normalizeEmail(email));
@@ -113,6 +114,29 @@ function normalizeAccentColor(colorValue) {
   if (!trimmedColor) return null;
   if (!HEX_COLOR_REGEX.test(trimmedColor)) return null;
   return trimmedColor.toUpperCase();
+}
+
+function normalizeBirthDate(birthDateValue) {
+  if (typeof birthDateValue !== 'string') return null;
+
+  const trimmedDate = birthDateValue.trim();
+  if (!trimmedDate) return null;
+
+  const match = trimmedDate.match(BIRTH_DATE_REGEX);
+  if (!match) return null;
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+
+  if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year)) return null;
+  if (year < 1900 || year > 2100) return null;
+  if (month < 1 || month > 12) return null;
+
+  const maxDay = new Date(year, month, 0).getDate();
+  if (day < 1 || day > maxDay) return null;
+
+  return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
 }
 
 function getFollowCounts(userId) {
@@ -394,7 +418,7 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
 
     db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizeEmail(email));
 
-    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, birth_date, accent_color, created_at FROM users WHERE id = ?')
                    .get(info.lastInsertRowid);
 
     return res.status(201).json({ message: 'Konto erfolgreich erstellt!', user });
@@ -441,6 +465,7 @@ router.post('/login', async (req, res) => {
         full_name:  user.full_name,
         email:      user.email,
         avatar:     user.avatar,
+        birth_date: user.birth_date,
         accent_color: user.accent_color,
         created_at: user.created_at
       }
@@ -462,7 +487,7 @@ router.get('/me', (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Nicht authentifiziert.' });
 
   const user = db.prepare(
-    'SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?'
+    'SELECT id, username, profile_name, full_name, email, avatar, birth_date, accent_color, created_at FROM users WHERE id = ?'
   ).get(req.session.userId);
 
   if (!user) return res.status(401).json({ error: 'Benutzer nicht gefunden.' });
@@ -557,7 +582,7 @@ router.get('/public/:username', (req, res) => {
     }
 
     const user = db.prepare(`
-      SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at
+      SELECT id, username, profile_name, full_name, email, avatar, birth_date, accent_color, created_at
       FROM users
       WHERE username = ?
     `).get(username);
@@ -734,7 +759,7 @@ router.post('/update-username', (req, res) => {
     db.prepare("UPDATE users SET username = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(newUsername, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, birth_date, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Benutzername aktualisiert!', user });
@@ -770,7 +795,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 
     deleteOldAvatar(currentUser.avatar);
 
-    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, birth_date, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profilbild aktualisiert!', user });
@@ -783,7 +808,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 // ─── UPDATE PROFILE (NAME + USERNAME) ───────────────────────────────────────
 router.post('/update-profile', (req, res) => {
   try {
-    const { full_name, profile_name, username, accent_color } = req.body;
+    const { full_name, profile_name, birth_date, username, accent_color } = req.body;
 
     if (!req.session.userId) {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
@@ -795,6 +820,7 @@ router.post('/update-profile', (req, res) => {
 
     const trimmedName = full_name.trim();
     const trimmedProfileName = typeof profile_name === 'string' ? profile_name.trim() : '';
+    const trimmedBirthDate = typeof birth_date === 'string' ? birth_date.trim() : '';
     const trimmedUsername = username.trim();
 
     if (!trimmedName) {
@@ -814,6 +840,11 @@ router.post('/update-profile', (req, res) => {
       return res.status(400).json({ error: 'Die Profilfarbe muss ein gültiger Hex-Farbwert sein (z. B. #352C59).' });
     }
 
+    const normalizedBirthDate = normalizeBirthDate(trimmedBirthDate);
+    if (trimmedBirthDate && !normalizedBirthDate) {
+      return res.status(400).json({ error: 'Das Geburtsdatum muss im Format dd/mm/yyyy angegeben werden.' });
+    }
+
     const existing = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?')
                        .get(trimmedUsername, req.session.userId);
 
@@ -821,10 +852,10 @@ router.post('/update-profile', (req, res) => {
       return res.status(409).json({ error: 'Dieser Benutzername ist bereits vergeben.' });
     }
 
-    db.prepare("UPDATE users SET full_name = ?, profile_name = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
-      .run(trimmedName, trimmedProfileName || null, trimmedUsername, normalizedAccentColor, req.session.userId);
+    db.prepare("UPDATE users SET full_name = ?, profile_name = ?, birth_date = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
+      .run(trimmedName, trimmedProfileName || null, normalizedBirthDate, trimmedUsername, normalizedAccentColor, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, full_name, email, avatar, birth_date, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profil aktualisiert!', user });

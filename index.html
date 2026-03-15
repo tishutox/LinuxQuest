@@ -290,6 +290,11 @@
                </div>
 
                <div>
+                  <label for="profile-birth-date-input" class="login__label">Geburtsdatum <small>(optional, dd/mm/yyyy)</small></label>
+                  <input type="text" id="profile-birth-date-input" class="login__input" autocomplete="bday" maxlength="10" placeholder="dd/mm/yyyy">
+               </div>
+
+               <div>
                   <label for="profile-username-input" class="login__label">Benutzername</label>
                   <input type="text" id="profile-username-input" class="login__input" autocomplete="username">
                </div>
@@ -348,6 +353,7 @@
                   <button type="button" class="public-profile__action" id="public-profile-copy-btn" title="Profil-Link kopieren" aria-label="Profil-Link kopieren">
                      <i class="fi fi-rc-link-alt"></i>
                   </button>
+                  <span class="public-profile__action public-profile__zodiac" id="public-profile-zodiac" title="Sternzeichen" aria-label="Sternzeichen" style="display:none;"></span>
                   <a href="#" class="public-profile__action" id="public-profile-email-link" title="E-Mail schreiben" aria-label="E-Mail schreiben" style="display:none;">
                      <i class="fi fi-rc-envelope"></i>
                   </a>

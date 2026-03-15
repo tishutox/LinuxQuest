@@ -908,6 +908,15 @@ body.user-theme-active .profile__avatar-button:hover {
   line-height: 1;
 }
 
+.public-profile__zodiac {
+  cursor: default;
+}
+
+.public-profile__zodiac:hover {
+  color: var(--text-color);
+  background: transparent;
+}
+
 #public-profile-modal {
   --public-profile-accent-color: var(--first-color);
 }
