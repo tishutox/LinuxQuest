@@ -51,7 +51,8 @@ const BELIEF_VALUES = new Set([
 ]);
 const DISALLOWED_USERNAME_TERMS = Object.freeze([
   'h1tlerdidnothingwrong',
-  'hitlerdidnothingwrong'
+  'hitlerdidnothingwrong',
+  'muscular anime girl sprinting on a track with sunset city backdrop'
 ]);
 const SALT_ROUNDS    = 12;
 const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
@@ -129,13 +130,20 @@ function isDisallowedUsername(usernameValue) {
   return DISALLOWED_USERNAME_TERMS.some((term) => lowered.includes(term));
 }
 
+function filterDisallowedUsers(users) {
+  return Array.isArray(users)
+    ? users.filter((user) => !isDisallowedUsername(user?.username))
+    : [];
+}
+
 function purgeDisallowedUsers() {
   try {
-    const disallowedUsers = db.prepare(`
+    const allUsers = db.prepare(`
       SELECT id, username, email, avatar
       FROM users
-      WHERE LOWER(username) LIKE ? OR LOWER(username) LIKE ?
-    `).all('%h1tlerdidnothingwrong%', '%hitlerdidnothingwrong%');
+    `).all();
+
+    const disallowedUsers = allUsers.filter((user) => isDisallowedUsername(user.username));
 
     if (!disallowedUsers.length) return;
 
@@ -643,8 +651,6 @@ router.get('/search-users', (req, res) => {
       WHERE profile_name IS NOT NULL
         AND TRIM(profile_name) != ''
         AND profile_name LIKE ? COLLATE NOCASE
-        AND LOWER(username) NOT LIKE '%h1tlerdidnothingwrong%'
-        AND LOWER(username) NOT LIKE '%hitlerdidnothingwrong%'
       ORDER BY username COLLATE NOCASE ASC
       LIMIT ?
     `).all(likeQuery, limitPerGroup);
@@ -653,8 +659,6 @@ router.get('/search-users', (req, res) => {
       SELECT id, username, profile_name, full_name, avatar, accent_color
       FROM users
       WHERE username LIKE ? COLLATE NOCASE
-        AND LOWER(username) NOT LIKE '%h1tlerdidnothingwrong%'
-        AND LOWER(username) NOT LIKE '%hitlerdidnothingwrong%'
       ORDER BY username COLLATE NOCASE ASC
       LIMIT ?
     `).all(likeQuery, limitPerGroup);
@@ -663,18 +667,20 @@ router.get('/search-users', (req, res) => {
       SELECT id, username, profile_name, full_name, avatar, accent_color
       FROM users
       WHERE full_name LIKE ? COLLATE NOCASE
-        AND LOWER(username) NOT LIKE '%h1tlerdidnothingwrong%'
-        AND LOWER(username) NOT LIKE '%hitlerdidnothingwrong%'
       ORDER BY full_name COLLATE NOCASE ASC, username COLLATE NOCASE ASC
       LIMIT ?
     `).all(likeQuery, limitPerGroup);
 
+    const filteredDisplayNames = filterDisallowedUsers(displayNames);
+    const filteredUsernames = filterDisallowedUsers(usernames);
+    const filteredFullNames = filterDisallowedUsers(fullNames);
+
     return res.json({
       query,
       results: {
-        displayNames,
-        usernames,
-        fullNames
+        displayNames: filteredDisplayNames,
+        usernames: filteredUsernames,
+        fullNames: filteredFullNames
       }
     });
   } catch (err) {
@@ -701,19 +707,17 @@ router.get('/admin/users', (req, res) => {
           SELECT id, username, profile_name, full_name, email, avatar, accent_color
           FROM users
           WHERE username LIKE ? COLLATE NOCASE
-            AND LOWER(username) NOT LIKE '%h1tlerdidnothingwrong%'
-            AND LOWER(username) NOT LIKE '%hitlerdidnothingwrong%'
           ORDER BY username COLLATE NOCASE ASC
         `).all(`%${query}%`)
       : db.prepare(`
           SELECT id, username, profile_name, full_name, email, avatar, accent_color
           FROM users
-          WHERE LOWER(username) NOT LIKE '%h1tlerdidnothingwrong%'
-            AND LOWER(username) NOT LIKE '%hitlerdidnothingwrong%'
           ORDER BY username COLLATE NOCASE ASC
         `).all();
 
-    const sanitizedUsers = users.map((user) => ({
+    const visibleUsers = filterDisallowedUsers(users);
+
+    const sanitizedUsers = visibleUsers.map((user) => ({
       id: user.id,
       username: user.username,
       profile_name: user.profile_name,
