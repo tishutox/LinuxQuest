@@ -774,6 +774,12 @@ body.user-theme-active .profile__avatar-button:hover {
   color: hsl(0, 75%, 56%);
 }
 
+.profile__bio-input {
+  min-height: 5.25rem;
+  resize: vertical;
+  line-height: 1.35;
+}
+
 .profile-background__pick,
 .profile-background__reset {
   width: 100%;
@@ -893,6 +899,24 @@ body.user-theme-active .profile__avatar-button:hover {
   margin-top: -.8rem;
 }
 
+.public-profile__bio-box {
+  width: 100%;
+  margin-top: -.45rem;
+  padding: .65rem .8rem;
+  border: 1px solid var(--border-color);
+  border-radius: .6rem;
+  background-color: var(--container-color);
+}
+
+.public-profile__bio-text {
+  margin: 0;
+  color: var(--text-color);
+  font-size: .88rem;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .public-profile__stat {
   display: inline-flex;
   align-items: center;
@@ -922,8 +946,8 @@ body.user-theme-active .profile__avatar-button:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.8rem;
-  height: 1.8rem;
+  width: 1.55rem;
+  height: 1.55rem;
   color: var(--text-color);
   background: transparent;
   border-radius: 999px;
@@ -937,7 +961,7 @@ body.user-theme-active .profile__avatar-button:hover {
 }
 
 .public-profile__action i {
-  font-size: 1.05rem;
+  font-size: .98rem;
   line-height: 1;
 }
 

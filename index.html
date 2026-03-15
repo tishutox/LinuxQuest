@@ -296,6 +296,11 @@
                </div>
 
                <div>
+                  <label for="profile-bio-input" class="login__label">Bio <small>(optional, max. 200 Zeichen, Zeilenumbrüche erlaubt)</small></label>
+                  <textarea id="profile-bio-input" class="login__input profile__bio-input" maxlength="200" placeholder="Erzähle kurz etwas über dich..."></textarea>
+               </div>
+
+               <div>
                   <label for="profile-birth-date-input" class="login__label">Geburtsdatum <small>(optional, dd/mm/yyyy)</small></label>
                   <input type="text" id="profile-birth-date-input" class="login__input" autocomplete="bday" maxlength="10" placeholder="dd/mm/yyyy">
                </div>
@@ -379,6 +384,10 @@
                   <span class="public-profile__stat-count" id="public-profile-following-count">0</span>
                   <span class="public-profile__stat-label">Folge ich</span>
                </button>
+            </div>
+
+            <div class="public-profile__bio-box" id="public-profile-bio-box" style="display:none;">
+               <p class="public-profile__bio-text" id="public-profile-bio-text"></p>
             </div>
 
             <button type="button" class="login__button" id="public-profile-follow-btn" style="display:none;">Folgen</button>

@@ -19,10 +19,12 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 	- Optional (leer = keine Anzeige)
 - Optionale Pronomen speichern (max. 30 Zeichen)
 	- Live-Zeichenzähler (`0/30`) direkt unter dem Eingabefeld
+- Optionale Bio speichern (max. 200 Zeichen, Zeilenumbrüche erlaubt)
 - Optionales Geburtsdatum speichern (`dd/mm/yyyy`)
 - Sternzeichen-Icon im öffentlichen Profil anzeigen (wenn Geburtsdatum gesetzt ist)
 	- Klick auf das Sternzeichen-Icon öffnet den passenden Wikipedia-Artikel
-- Im öffentlichen Usermodal steht der Profilname linksbündig, Pronomen stehen rechts daneben in hellerer Darstellung
+- Im öffentlichen Usermodal stehen Profilname und Pronomen zentriert nebeneinander, Pronomen in hellerer Darstellung
+- Im öffentlichen Usermodal erscheint die Bio in einer Box unter „Follower | Folge ich“
 - Akzentfarbe fürs Profil auswählen
 - Konto löschen (mit Passwort-Bestätigung)
 - Geschützte Projektkonten können nicht gelöscht werden

@@ -292,6 +292,7 @@ const profileFullNameInput = document.getElementById('profile-full-name-input')
 const profileDisplayNameInput = document.getElementById('profile-display-name-input')
 const profilePronounsInput = document.getElementById('profile-pronouns-input')
 const profilePronounsCounter = document.getElementById('profile-pronouns-counter')
+const profileBioInput = document.getElementById('profile-bio-input')
 const profileBirthDateInput = document.getElementById('profile-birth-date-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
 const profileAccentColorOpen = document.getElementById('profile-accent-color-open')
@@ -327,6 +328,8 @@ const publicProfileFollowingCount = document.getElementById('public-profile-foll
 const publicProfileFollowersTrigger = document.getElementById('public-profile-followers-trigger')
 const publicProfileFollowingTrigger = document.getElementById('public-profile-following-trigger')
 const publicProfileFollowBtn = document.getElementById('public-profile-follow-btn')
+const publicProfileBioBox = document.getElementById('public-profile-bio-box')
+const publicProfileBioText = document.getElementById('public-profile-bio-text')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
 const followListContainer = document.getElementById('follow-list-container')
@@ -463,6 +466,11 @@ function parseBirthDate(value) {
 function normalizePronouns(value) {
    if (typeof value !== 'string') return ''
    return value.replace(/\s+/g, ' ').trim()
+}
+
+function normalizeBio(value) {
+   if (typeof value !== 'string') return ''
+   return value.replace(/\r\n?/g, '\n').trim()
 }
 
 function updatePronounsCounter(value = '') {
@@ -810,8 +818,10 @@ function updatePublicProfileView(payload) {
    publicProfileAvatar.src = getAvatarUrl(user)
    const publicDisplayName = getProfileDisplayName(user)
    const publicPronouns = normalizePronouns(user?.pronouns)
+   const publicBio = normalizeBio(user?.bio)
    const hasDisplayName = Boolean(publicDisplayName)
    const hasPronouns = Boolean(publicPronouns)
+   const hasBio = Boolean(publicBio)
 
    publicProfileDisplayName.textContent = publicDisplayName
    publicProfileDisplayName.style.display = hasDisplayName ? 'block' : 'none'
@@ -820,6 +830,8 @@ function updatePublicProfileView(payload) {
    publicProfileNameRow.style.display = (hasDisplayName || hasPronouns) ? 'flex' : 'none'
    publicProfileUsername.textContent = '@' + user.username
    updatePublicProfileZodiac(user?.birth_date)
+   publicProfileBioText.textContent = hasBio ? publicBio : ''
+   publicProfileBioBox.style.display = hasBio ? 'block' : 'none'
    updatePublicFollowStats()
    updateFollowButton()
 
@@ -853,6 +865,8 @@ function showPublicProfileError(message) {
    publicProfileNameRow.style.display = 'none'
    publicProfileUsername.textContent = '@unbekannt'
    updatePublicProfileZodiac(null)
+   publicProfileBioText.textContent = ''
+   publicProfileBioBox.style.display = 'none'
     updatePublicFollowStats()
     updateFollowButton()
    publicProfileEmailLink.style.display = 'none'
@@ -996,6 +1010,7 @@ function updateProfileView(user) {
    profileDisplayNameInput.value = getProfileDisplayName(user)
    profilePronounsInput.value = normalizePronouns(user?.pronouns)
    updatePronounsCounter(profilePronounsInput.value)
+   profileBioInput.value = normalizeBio(user?.bio)
    profileBirthDateInput.value = typeof user.birth_date === 'string' ? user.birth_date : ''
    profileUsernameInput.value = user.username
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
@@ -1044,6 +1059,7 @@ function setLoggedOut() {
    profileDisplayNameInput.value = ''
    profilePronounsInput.value = ''
    updatePronounsCounter('')
+   profileBioInput.value = ''
    profileBirthDateInput.value = ''
    profileUsernameInput.value = ''
    updateProfileAccentSummary(getDefaultAccentColor())
@@ -1343,6 +1359,7 @@ profileForm.addEventListener('submit', async (e) => {
    const full_name = profileFullNameInput.value.trim()
    const profile_name = profileDisplayNameInput.value
    const pronouns = normalizePronouns(profilePronounsInput.value)
+   const bio = normalizeBio(profileBioInput.value)
    const birth_date = profileBirthDateInput.value.trim()
    const trimmedProfileName = typeof profile_name === 'string' ? profile_name.trim() : ''
    const username  = profileUsernameInput.value.trim()
@@ -1358,6 +1375,10 @@ profileForm.addEventListener('submit', async (e) => {
 
    if (pronouns.length > 30) {
       return showMsg('profile-message', 'Die Pronomen dürfen maximal 30 Zeichen lang sein.', 'error')
+   }
+
+   if (bio.length > 200) {
+      return showMsg('profile-message', 'Die Bio darf maximal 200 Zeichen lang sein.', 'error')
    }
 
    if (birth_date && !parseBirthDate(birth_date)) {
@@ -1376,7 +1397,7 @@ profileForm.addEventListener('submit', async (e) => {
          method: 'POST',
          credentials: 'include',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ full_name, profile_name, pronouns, birth_date, username, accent_color })
+         body: JSON.stringify({ full_name, profile_name, pronouns, bio, birth_date, username, accent_color })
       })
       const data = await res.json()
 

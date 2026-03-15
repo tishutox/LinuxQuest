@@ -23,6 +23,7 @@ db.exec(`
     username    TEXT    NOT NULL UNIQUE COLLATE NOCASE,
     profile_name TEXT   DEFAULT NULL,
     pronouns    TEXT    DEFAULT NULL,
+    bio         TEXT    DEFAULT NULL,
     full_name   TEXT    NOT NULL,
     email       TEXT    NOT NULL UNIQUE COLLATE NOCASE,
     password    TEXT    NOT NULL,
@@ -39,6 +40,7 @@ const hasLastActiveColumn = userColumns.some((column) => column.name === 'last_a
 const hasAccentColorColumn = userColumns.some((column) => column.name === 'accent_color');
 const hasProfileNameColumn = userColumns.some((column) => column.name === 'profile_name');
 const hasPronounsColumn = userColumns.some((column) => column.name === 'pronouns');
+const hasBioColumn = userColumns.some((column) => column.name === 'bio');
 const hasBirthDateColumn = userColumns.some((column) => column.name === 'birth_date');
 
 if (!hasLastActiveColumn) {
@@ -55,6 +57,10 @@ if (!hasProfileNameColumn) {
 
 if (!hasPronounsColumn) {
   db.exec('ALTER TABLE users ADD COLUMN pronouns TEXT');
+}
+
+if (!hasBioColumn) {
+  db.exec('ALTER TABLE users ADD COLUMN bio TEXT');
 }
 
 if (!hasBirthDateColumn) {
