@@ -839,14 +839,14 @@ body.user-theme-active .profile__avatar-button:hover {
   width: 100%;
   display: flex;
   align-items: baseline;
-  justify-content: flex-start;
+  justify-content: center;
   column-gap: .5rem;
   margin-top: -.2rem;
 }
 
 #public-profile-modal .profile__display-name {
   margin: 0;
-  text-align: left;
+  text-align: center;
 }
 
 .public-profile__pronouns {
