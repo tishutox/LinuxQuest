@@ -882,7 +882,7 @@ body.user-theme-active .profile__avatar-button:hover {
 .public-profile__actions {
   display: inline-flex;
   align-items: center;
-  column-gap: .35rem;
+  column-gap: .18rem;
 }
 
 .public-profile__stats {
