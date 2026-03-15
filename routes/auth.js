@@ -49,6 +49,10 @@ const BELIEF_VALUES = new Set([
   'Daoismus',
   'Shintoismus'
 ]);
+const DISALLOWED_USERNAME_TERMS = Object.freeze([
+  'h1tlerdidnothingwrong',
+  'hitlerdidnothingwrong'
+]);
 const SALT_ROUNDS    = 12;
 const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
 const VERIFY_IP_MAX_REQUESTS = 6;
@@ -116,6 +120,47 @@ function getPublicUserProfileByEmail(email) {
     FROM users
     WHERE email = ?
   `).get(normalizeEmail(email));
+}
+
+function isDisallowedUsername(usernameValue) {
+  if (typeof usernameValue !== 'string') return false;
+  const lowered = usernameValue.trim().toLowerCase();
+  if (!lowered) return false;
+  return DISALLOWED_USERNAME_TERMS.some((term) => lowered.includes(term));
+}
+
+function purgeDisallowedUsers() {
+  try {
+    const disallowedUsers = db.prepare(`
+      SELECT id, username, email, avatar
+      FROM users
+      WHERE LOWER(username) LIKE ? OR LOWER(username) LIKE ?
+    `).all('%h1tlerdidnothingwrong%', '%hitlerdidnothingwrong%');
+
+    if (!disallowedUsers.length) return;
+
+    const purgeTransaction = db.transaction((users) => {
+      const deleteEmailVerificationsByEmail = db.prepare('DELETE FROM email_verifications WHERE LOWER(email) = LOWER(?)');
+      const deletePasswordResetByEmail = db.prepare('DELETE FROM password_reset_verifications WHERE LOWER(email) = LOWER(?)');
+      const deleteUserFollows = db.prepare('DELETE FROM follows WHERE follower_id = ? OR following_id = ?');
+      const deleteUserById = db.prepare('DELETE FROM users WHERE id = ?');
+
+      users.forEach((user) => {
+        if (user.email) {
+          deleteEmailVerificationsByEmail.run(user.email);
+          deletePasswordResetByEmail.run(user.email);
+        }
+        deleteUserFollows.run(user.id, user.id);
+        deleteUserById.run(user.id);
+      });
+    });
+
+    purgeTransaction(disallowedUsers);
+    disallowedUsers.forEach((user) => deleteOldAvatar(user.avatar));
+    console.log(`[MODERATION] Purged ${disallowedUsers.length} disallowed user(s).`);
+  } catch (err) {
+    console.error('[MODERATION PURGE ERROR]', err);
+  }
 }
 
 function isAdminSessionUser(req) {
@@ -414,6 +459,10 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
       return res.status(400).json({ error: 'Der Benutzername darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten.' });
     }
 
+    if (isDisallowedUsername(username)) {
+      return res.status(400).json({ error: 'Dieser Benutzername ist nicht erlaubt.' });
+    }
+
     if (username.length > 20) {
       return res.status(400).json({ error: 'Der Benutzername darf maximal 20 Zeichen lang sein.' });
     }
@@ -594,6 +643,8 @@ router.get('/search-users', (req, res) => {
       WHERE profile_name IS NOT NULL
         AND TRIM(profile_name) != ''
         AND profile_name LIKE ? COLLATE NOCASE
+        AND LOWER(username) NOT LIKE '%h1tlerdidnothingwrong%'
+        AND LOWER(username) NOT LIKE '%hitlerdidnothingwrong%'
       ORDER BY username COLLATE NOCASE ASC
       LIMIT ?
     `).all(likeQuery, limitPerGroup);
@@ -602,6 +653,8 @@ router.get('/search-users', (req, res) => {
       SELECT id, username, profile_name, full_name, avatar, accent_color
       FROM users
       WHERE username LIKE ? COLLATE NOCASE
+        AND LOWER(username) NOT LIKE '%h1tlerdidnothingwrong%'
+        AND LOWER(username) NOT LIKE '%hitlerdidnothingwrong%'
       ORDER BY username COLLATE NOCASE ASC
       LIMIT ?
     `).all(likeQuery, limitPerGroup);
@@ -610,6 +663,8 @@ router.get('/search-users', (req, res) => {
       SELECT id, username, profile_name, full_name, avatar, accent_color
       FROM users
       WHERE full_name LIKE ? COLLATE NOCASE
+        AND LOWER(username) NOT LIKE '%h1tlerdidnothingwrong%'
+        AND LOWER(username) NOT LIKE '%hitlerdidnothingwrong%'
       ORDER BY full_name COLLATE NOCASE ASC, username COLLATE NOCASE ASC
       LIMIT ?
     `).all(likeQuery, limitPerGroup);
@@ -646,11 +701,15 @@ router.get('/admin/users', (req, res) => {
           SELECT id, username, profile_name, full_name, email, avatar, accent_color
           FROM users
           WHERE username LIKE ? COLLATE NOCASE
+            AND LOWER(username) NOT LIKE '%h1tlerdidnothingwrong%'
+            AND LOWER(username) NOT LIKE '%hitlerdidnothingwrong%'
           ORDER BY username COLLATE NOCASE ASC
         `).all(`%${query}%`)
       : db.prepare(`
           SELECT id, username, profile_name, full_name, email, avatar, accent_color
           FROM users
+          WHERE LOWER(username) NOT LIKE '%h1tlerdidnothingwrong%'
+            AND LOWER(username) NOT LIKE '%hitlerdidnothingwrong%'
           ORDER BY username COLLATE NOCASE ASC
         `).all();
 
@@ -735,6 +794,10 @@ router.get('/public/:username', (req, res) => {
       return res.status(400).json({ error: 'Ungültiger Benutzername.' });
     }
 
+    if (isDisallowedUsername(username)) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
     const user = db.prepare(`
       SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at
       FROM users
@@ -774,6 +837,10 @@ router.get('/public/:username/followers', (req, res) => {
       return res.status(400).json({ error: 'Ungültiger Benutzername.' });
     }
 
+    if (isDisallowedUsername(username)) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
     const user = db.prepare('SELECT id, username FROM users WHERE username = ?').get(username);
     if (!user) {
       return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
@@ -800,6 +867,10 @@ router.get('/public/:username/following', (req, res) => {
 
     if (!username || !USERNAME_REGEX.test(username)) {
       return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+    }
+
+    if (isDisallowedUsername(username)) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
     }
 
     const user = db.prepare('SELECT id, username FROM users WHERE username = ?').get(username);
@@ -831,6 +902,10 @@ router.post('/follow/:username', (req, res) => {
     const username = req.params.username?.trim();
     if (!username || !USERNAME_REGEX.test(username)) {
       return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+    }
+
+    if (isDisallowedUsername(username)) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
     }
 
     const targetUser = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
@@ -873,6 +948,10 @@ router.delete('/follow/:username', (req, res) => {
       return res.status(400).json({ error: 'Ungültiger Benutzername.' });
     }
 
+    if (isDisallowedUsername(username)) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
     const targetUser = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
     if (!targetUser) {
       return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
@@ -901,6 +980,10 @@ router.post('/update-username', (req, res) => {
 
     if (!newUsername || !USERNAME_REGEX.test(newUsername)) {
       return res.status(400).json({ error: 'Der Benutzername darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten.' });
+    }
+
+    if (isDisallowedUsername(newUsername)) {
+      return res.status(400).json({ error: 'Dieser Benutzername ist nicht erlaubt.' });
     }
 
     if (newUsername.length > 20) {
@@ -994,6 +1077,10 @@ router.post('/update-profile', (req, res) => {
 
     if (!USERNAME_REGEX.test(trimmedUsername)) {
       return res.status(400).json({ error: 'Der Benutzername darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten.' });
+    }
+
+    if (isDisallowedUsername(trimmedUsername)) {
+      return res.status(400).json({ error: 'Dieser Benutzername ist nicht erlaubt.' });
     }
 
     if (trimmedUsername.length > 20) {
@@ -1145,6 +1232,8 @@ router.post('/reset-password', async (req, res) => {
 });
 
 module.exports = router;
+
+purgeDisallowedUsers();
 
 
 
