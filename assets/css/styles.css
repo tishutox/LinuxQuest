@@ -867,42 +867,24 @@ body.user-theme-active .profile-background__reset:disabled {
 .public-profile__username-row {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   column-gap: .6rem;
-  margin-top: .15rem;
-}
-
-.public-profile__header {
-  width: 100%;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: start;
-  column-gap: .95rem;
-}
-
-.public-profile__avatar-wrap {
-  justify-content: flex-start;
-  margin-bottom: 0;
-}
-
-.public-profile__meta {
-  display: grid;
-  row-gap: .35rem;
+  margin-top: -.7rem;
 }
 
 .public-profile__name-row {
   width: 100%;
   display: flex;
   align-items: baseline;
-  justify-content: flex-start;
+  justify-content: center;
   column-gap: .4rem;
-  margin-top: 0;
+  margin-top: -.7rem;
 }
 
 #public-profile-modal .profile__display-name {
   margin: 0;
-  text-align: left;
-  line-height: 1;
+  text-align: center;
+  line-height: .9;
 }
 
 .public-profile__pronouns {
@@ -936,15 +918,15 @@ body.user-theme-active .profile-background__reset:disabled {
 .public-profile__actions {
   display: inline-flex;
   align-items: center;
-  column-gap: .08rem;
+  column-gap: .04rem;
 }
 
 .public-profile__stats {
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  column-gap: 1rem;
-  margin-top: .05rem;
+  align-items: center;
+  justify-content: center;
+  column-gap: .65rem;
+  margin-top: -.8rem;
 }
 
 .public-profile__bio-box {
@@ -967,13 +949,11 @@ body.user-theme-active .profile-background__reset:disabled {
 
 .public-profile__stat {
   display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: .08rem;
+  align-items: center;
+  gap: .35rem;
   background: transparent;
   color: var(--text-color);
   cursor: pointer;
-  line-height: 1;
 }
 
 .public-profile__stat:hover {
@@ -982,16 +962,14 @@ body.user-theme-active .profile-background__reset:disabled {
 
 .public-profile__stat-count {
   font-weight: var(--font-semi-bold);
-  font-size: 1.35rem;
 }
 
 .public-profile__stat-label {
-  font-size: .78rem;
+  font-size: .85rem;
 }
 
 .public-profile__divider {
   color: var(--border-color);
-  display: none;
 }
 
 .public-profile__action {
