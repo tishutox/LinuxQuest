@@ -14,8 +14,8 @@ const authRoutes  = require('./routes/auth');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-const INACTIVE_DAYS = 28;
-const CLEANUP_INTERVAL_MS = 12 * 60 * 60 * 1000;
+const INACTIVE_DAYS = 0;
+const CLEANUP_INTERVAL_MS = 2 * 60 * 1000;
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({ origin: true, credentials: true }));
@@ -69,7 +69,7 @@ function cleanupInactiveAccounts() {
       FROM users
       WHERE datetime(COALESCE(last_active_at, created_at)) <= datetime('now', ?)
         AND email NOT IN (${PROTECTED_EMAILS.map(() => '?').join(', ')})
-    `).all(`-${INACTIVE_DAYS} days`, ...PROTECTED_EMAILS);
+    `).all(`-${INACTIVE_DAYS} seconds`, ...PROTECTED_EMAILS);
 
     if (!inactiveUsers.length) return;
 
