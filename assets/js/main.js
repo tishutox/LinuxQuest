@@ -138,6 +138,7 @@ const loginPanel      = document.getElementById('login'),
       accentColorModal = document.getElementById('accent-color-modal'),
       publicProfileModal = document.getElementById('public-profile-modal'),
    followListModal = document.getElementById('follow-list-modal'),
+   adminUserListModal = document.getElementById('admin-user-list-modal'),
       loginBtn        = document.getElementById('login-btn'),
       loginClose      = document.getElementById('login-close'),
       registerClose   = document.getElementById('register-close'),
@@ -149,7 +150,8 @@ const loginPanel      = document.getElementById('login'),
       profileClose    = document.getElementById('profile-close'),
       accentColorClose = document.getElementById('accent-color-close'),
       publicProfileClose = document.getElementById('public-profile-close'),
-      followListClose = document.getElementById('follow-list-close')
+      followListClose = document.getElementById('follow-list-close'),
+      adminUserListClose = document.getElementById('admin-user-list-close')
 
 const staticModalTriggers = document.querySelectorAll('[data-modal-target]')
 const staticModalCloseButtons = document.querySelectorAll('[data-modal-close]')
@@ -180,10 +182,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-login') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-login') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-login') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-login'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -229,6 +231,7 @@ profileClose.addEventListener('click', hideAll)
 accentColorClose.addEventListener('click', () => accentColorModal.classList.remove('show-login'))
 publicProfileClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
+adminUserListClose.addEventListener('click', hideAll)
 
 /*=============== AVATAR PREVIEW ===============*/
 const avatarInput       = document.getElementById('avatar-input')
@@ -338,6 +341,9 @@ const publicProfileBioText = document.getElementById('public-profile-bio-text')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
 const followListContainer = document.getElementById('follow-list-container')
+const adminUserListSearch = document.getElementById('admin-user-list-search')
+const adminUserListMessage = document.getElementById('admin-user-list-message')
+const adminUserListResults = document.getElementById('admin-user-list-results')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de',
@@ -369,6 +375,7 @@ let accentPickerState = {
    lightness: 26
 }
 let currentPublicProfileUser = null
+let adminUserListDebounceTimer = null
 let currentPublicProfileFollowState = {
    followersCount: 0,
    followingCount: 0,
@@ -434,6 +441,10 @@ async function refreshProjectContacts({ force = false } = {}) {
 
 function isProtectedUser(user) {
    return Boolean(user?.email) && PROTECTED_EMAILS.has(user.email.trim().toLowerCase())
+}
+
+function isAdminUser(user) {
+   return isProtectedUser(user)
 }
 
 function getDefaultAccentColor() {
@@ -949,10 +960,24 @@ function updatePublicProfileView(payload) {
    updateFollowButton()
 
    const normalizedEmail = user.email ? user.email.trim().toLowerCase() : ''
-   const showEmailAction = PROTECTED_EMAILS.has(normalizedEmail)
+   const viewedIsAdmin = PROTECTED_EMAILS.has(normalizedEmail)
+   const viewerIsAdmin = isAdminUser(currentUser)
 
-   publicProfileEmailLink.style.display = showEmailAction ? 'inline-flex' : 'none'
-   publicProfileEmailLink.href = showEmailAction ? `mailto:${user.email}` : '#'
+   if (viewedIsAdmin) {
+      publicProfileEmailLink.style.display = 'inline-flex'
+      publicProfileEmailLink.href = '#'
+      publicProfileEmailLink.innerHTML = '<i class="fi fi-rc-shield"></i>'
+      publicProfileEmailLink.dataset.action = viewerIsAdmin ? 'open-admin-list' : 'admin-label'
+      publicProfileEmailLink.title = viewerIsAdmin ? 'Admin-Bereich öffnen' : 'Admin'
+      publicProfileEmailLink.setAttribute('aria-label', viewerIsAdmin ? 'Admin-Bereich öffnen' : 'Admin')
+   } else {
+      publicProfileEmailLink.style.display = 'none'
+      publicProfileEmailLink.href = '#'
+      publicProfileEmailLink.innerHTML = '<i class="fi fi-rc-envelope"></i>'
+      publicProfileEmailLink.dataset.action = ''
+      publicProfileEmailLink.title = 'E-Mail schreiben'
+      publicProfileEmailLink.setAttribute('aria-label', 'E-Mail schreiben')
+   }
 }
 
 function showPublicProfileError(message) {
@@ -985,6 +1010,10 @@ function showPublicProfileError(message) {
     updateFollowButton()
    publicProfileEmailLink.style.display = 'none'
    publicProfileEmailLink.href = '#'
+   publicProfileEmailLink.innerHTML = '<i class="fi fi-rc-envelope"></i>'
+   publicProfileEmailLink.dataset.action = ''
+   publicProfileEmailLink.title = 'E-Mail schreiben'
+   publicProfileEmailLink.setAttribute('aria-label', 'E-Mail schreiben')
    hideAll()
    publicProfileModal.classList.add('show-login')
 }
@@ -1081,6 +1110,90 @@ function renderFollowList(users) {
 
       followListContainer.appendChild(button)
    })
+}
+
+function renderAdminUserList(users) {
+   adminUserListResults.innerHTML = ''
+
+   const group = document.createElement('section')
+   group.className = 'search-results__group'
+
+   const heading = document.createElement('h3')
+   heading.className = 'search-results__title'
+   heading.textContent = 'Usernames'
+   group.appendChild(heading)
+
+   const list = document.createElement('div')
+   list.className = 'search-results__list'
+
+   if (!users.length) {
+      const empty = document.createElement('p')
+      empty.className = 'search-results__empty'
+      empty.textContent = 'Keine User gefunden.'
+      list.appendChild(empty)
+   } else {
+      users.forEach((user) => {
+         const item = document.createElement('button')
+         item.type = 'button'
+         item.className = 'search-results__item'
+         item.textContent = '@' + user.username
+
+         item.addEventListener('click', async () => {
+            await openPublicProfileByUsername(user.username)
+         })
+
+         list.appendChild(item)
+      })
+   }
+
+   group.appendChild(list)
+   adminUserListResults.appendChild(group)
+}
+
+async function loadAdminUserList(query = '') {
+   if (!isAdminUser(currentUser)) {
+      return showMsg('admin-user-list-message', 'Kein Zugriff auf den Admin-Bereich.', 'error')
+   }
+
+   const trimmedQuery = typeof query === 'string' ? query.trim() : ''
+
+   try {
+      const targetUrl = trimmedQuery
+         ? `/api/auth/admin/users?q=${encodeURIComponent(trimmedQuery)}`
+         : '/api/auth/admin/users'
+
+      const response = await fetch(targetUrl, {
+         credentials: 'include'
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+         showMsg('admin-user-list-message', data.error || 'Userliste konnte nicht geladen werden.', 'error')
+         renderAdminUserList([])
+         return
+      }
+
+      clearMsg('admin-user-list-message')
+      renderAdminUserList(Array.isArray(data.users) ? data.users : [])
+   } catch (_) {
+      showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
+      renderAdminUserList([])
+   }
+}
+
+async function openAdminUserListModal() {
+   if (!isAdminUser(currentUser)) {
+      return showPublicProfileNotice('Kein Zugriff auf den Admin-Bereich.', 'error', 3000)
+   }
+
+   adminUserListSearch.value = ''
+   clearMsg('admin-user-list-message')
+   renderAdminUserList([])
+
+   hideAll()
+   adminUserListModal.classList.add('show-login')
+   await loadAdminUserList('')
+   adminUserListSearch.focus()
 }
 
 async function openFollowList(type) {
@@ -1274,6 +1387,26 @@ publicProfileFollowersTrigger.addEventListener('click', async () => {
 
 publicProfileFollowingTrigger.addEventListener('click', async () => {
    await openFollowList('following')
+})
+
+publicProfileEmailLink.addEventListener('click', async (event) => {
+   if (publicProfileEmailLink.dataset.action !== 'open-admin-list') {
+      event.preventDefault()
+      return
+   }
+
+   event.preventDefault()
+   await openAdminUserListModal()
+})
+
+adminUserListSearch.addEventListener('input', () => {
+   if (adminUserListDebounceTimer) {
+      clearTimeout(adminUserListDebounceTimer)
+   }
+
+   adminUserListDebounceTimer = setTimeout(() => {
+      loadAdminUserList(adminUserListSearch.value)
+   }, 200)
 })
 
 async function openSharedProfileFromUrl() {

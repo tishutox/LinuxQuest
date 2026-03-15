@@ -118,6 +118,13 @@ function getPublicUserProfileByEmail(email) {
   `).get(normalizeEmail(email));
 }
 
+function isAdminSessionUser(req) {
+  if (!req.session.userId) return false;
+
+  const user = db.prepare('SELECT email FROM users WHERE id = ?').get(req.session.userId);
+  return Boolean(user?.email) && isProtectedEmail(user.email);
+}
+
 function normalizeAccentColor(colorValue) {
   if (typeof colorValue !== 'string') return null;
   const trimmedColor = colorValue.trim();
@@ -618,6 +625,39 @@ router.get('/search-users', (req, res) => {
   } catch (err) {
     console.error('[SEARCH USERS ERROR]', err);
     return res.status(500).json({ error: 'Suche konnte nicht geladen werden.' });
+  }
+});
+
+router.get('/admin/users', (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    if (!isAdminSessionUser(req)) {
+      return res.status(403).json({ error: 'Kein Zugriff auf den Admin-Bereich.' });
+    }
+
+    const rawQuery = typeof req.query.q === 'string' ? req.query.q : '';
+    const query = rawQuery.trim();
+
+    const users = query
+      ? db.prepare(`
+          SELECT id, username, profile_name, full_name, avatar, accent_color
+          FROM users
+          WHERE username LIKE ? COLLATE NOCASE
+          ORDER BY username COLLATE NOCASE ASC
+        `).all(`%${query}%`)
+      : db.prepare(`
+          SELECT id, username, profile_name, full_name, avatar, accent_color
+          FROM users
+          ORDER BY username COLLATE NOCASE ASC
+        `).all();
+
+    return res.json({ query, users });
+  } catch (err) {
+    console.error('[ADMIN USER LIST ERROR]', err);
+    return res.status(500).json({ error: 'Admin-Userliste konnte nicht geladen werden.' });
   }
 });
 

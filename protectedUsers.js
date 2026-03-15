@@ -3,11 +3,6 @@ const PROTECTED_EMAILS = Object.freeze([
   'jost.witthauer@tha.de'
 ]);
 
-const PROTECTED_KEYWORDS = Object.freeze([
-  'armand',
-  'jost'
-]);
-
 function normalizeEmail(email) {
   return typeof email === 'string' ? email.trim().toLowerCase() : '';
 }
@@ -18,7 +13,6 @@ function isProtectedEmail(email) {
 
 module.exports = {
   PROTECTED_EMAILS,
-  PROTECTED_KEYWORDS,
   isProtectedEmail,
   normalizeEmail
 };

@@ -3,19 +3,14 @@ const express  = require('express');
 const session  = require('express-session');
 const cors     = require('cors');
 const path     = require('path');
-const fs       = require('fs');
 const createSqliteStore = require('./database/sessionStore');
-const db       = require('./database/db');
 const { verifyMailTransport, getMailConfig } = require('./services/mailer');
-const { PROTECTED_EMAILS, PROTECTED_KEYWORDS } = require('./protectedUsers');
 
 const SqliteStore = createSqliteStore(session);
 const authRoutes  = require('./routes/auth');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-const INACTIVE_DAYS = 0;
-const CLEANUP_INTERVAL_MS = 30 * 1000;
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({ origin: true, credentials: true }));
@@ -44,75 +39,12 @@ const uploadsDir = process.env.DATA_DIR
   : path.join(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadsDir));
 
-function deleteAvatarFile(avatarPath) {
-  if (!avatarPath || !avatarPath.startsWith('uploads/')) return;
-
-  const avatarFileName = path.basename(avatarPath);
-  const avatarFilePath = path.join(uploadsDir, avatarFileName);
-
-  try {
-    if (fs.existsSync(avatarFilePath)) {
-      fs.unlinkSync(avatarFilePath);
-    }
-  } catch (err) {
-    console.error('[CLEANUP AVATAR DELETE ERROR]', err);
-  }
-}
-
-function cleanupInactiveAccounts() {
-  try {
-    db.exec(`DELETE FROM email_verifications WHERE datetime(expires_at) < datetime('now')`);
-    db.exec(`DELETE FROM password_reset_verifications WHERE datetime(expires_at) < datetime('now')`);
-
-    const normalizedProtectedEmails = PROTECTED_EMAILS.map((email) => String(email).trim().toLowerCase());
-    const protectedEmailPlaceholders = normalizedProtectedEmails.map(() => '?').join(', ');
-    const protectedKeywordLikeClauses = PROTECTED_KEYWORDS.map(() => `LOWER(COALESCE(full_name, '')) LIKE ? OR LOWER(COALESCE(username, '')) LIKE ?`).join(' OR ');
-    const protectedKeywordLikeValues = PROTECTED_KEYWORDS.flatMap((keyword) => {
-      const value = `%${String(keyword).trim().toLowerCase()}%`;
-      return [value, value];
-    });
-    const exclusionSql = `LOWER(TRIM(COALESCE(email, ''))) NOT IN (${protectedEmailPlaceholders})${protectedKeywordLikeClauses ? ` AND NOT (${protectedKeywordLikeClauses})` : ''}`;
-
-    const inactiveUsers = INACTIVE_DAYS === 0
-      ? db.prepare(`
-          SELECT id, avatar FROM users
-          WHERE ${exclusionSql}
-        `).all(...normalizedProtectedEmails, ...protectedKeywordLikeValues)
-      : db.prepare(`
-          SELECT id, avatar FROM users
-          WHERE datetime(COALESCE(last_active_at, created_at)) <= datetime('now', ?)
-            AND ${exclusionSql}
-        `).all(`-${INACTIVE_DAYS} days`, ...normalizedProtectedEmails, ...protectedKeywordLikeValues);
-
-    console.log(`[CLEANUP] Run complete. Candidates=${inactiveUsers.length}, IntervalMs=${CLEANUP_INTERVAL_MS}, ThresholdDays=${INACTIVE_DAYS}`);
-
-    if (!inactiveUsers.length) return;
-
-    const deleteUserById = db.prepare('DELETE FROM users WHERE id = ?');
-    const deleteUsersTransaction = db.transaction((users) => {
-      for (const user of users) {
-        deleteUserById.run(user.id);
-        deleteAvatarFile(user.avatar);
-      }
-    });
-
-    deleteUsersTransaction(inactiveUsers);
-    console.log(`[CLEANUP] Deleted ${inactiveUsers.length} inactive account(s).`);
-  } catch (err) {
-    console.error('[INACTIVE ACCOUNT CLEANUP ERROR]', err);
-  }
-}
-
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 
 app.get('/@:username', (_req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
-
-cleanupInactiveAccounts();
-const cleanupTimer = setInterval(cleanupInactiveAccounts, CLEANUP_INTERVAL_MS);
-cleanupTimer.unref();
 
 async function logMailStatus() {
   const mailConfig = getMailConfig();
