@@ -773,10 +773,13 @@ body.user-theme-active .profile__avatar-button:hover {
   min-height: 5.25rem;
   resize: vertical;
   line-height: 1.35;
+  font-family: var(--body-font);
+  font-size: var(--normal-font-size);
 }
 
 .profile__bio-input::placeholder {
-  font-family: inherit;
+  font-family: var(--body-font);
+  font-size: var(--normal-font-size);
   font-style: normal;
 }
 
@@ -799,6 +802,21 @@ body.user-theme-active .profile__avatar-button:hover {
 .profile-background__pick:hover,
 .profile-background__reset:hover {
   border-color: var(--first-color);
+  background-color: var(--first-color);
+  color: #fff;
+}
+
+body.user-theme-active .profile-background__pick,
+body.user-theme-active .profile-background__reset {
+  border-color: var(--user-accent-color);
+  background-color: var(--user-accent-color);
+  color: #fff;
+}
+
+body.user-theme-active .profile-background__pick:hover,
+body.user-theme-active .profile-background__reset:hover {
+  border-color: var(--user-accent-color);
+  background-color: var(--user-accent-color);
   color: #fff;
 }
 
@@ -806,6 +824,11 @@ body.user-theme-active .profile__avatar-button:hover {
 .profile-background__reset:focus-visible {
   outline: 2px dotted var(--first-color);
   outline-offset: .2rem;
+}
+
+body.user-theme-active .profile-background__pick:focus-visible,
+body.user-theme-active .profile-background__reset:focus-visible {
+  outline-color: var(--user-accent-color);
 }
 
 .profile-background__filename {
@@ -826,12 +849,19 @@ body.user-theme-active .profile__avatar-button:hover {
 
 .profile-background__pick:disabled,
 .profile-background__reset:disabled {
-  opacity: .75;
-  background-color: var(--container-color);
-  color: var(--text-color);
-  border-color: var(--border-color);
+  opacity: 1;
+  background-color: var(--first-color);
+  color: #fff;
+  border-color: var(--first-color);
   box-shadow: none;
   cursor: not-allowed;
+}
+
+body.user-theme-active .profile-background__pick:disabled,
+body.user-theme-active .profile-background__reset:disabled {
+  background-color: var(--user-accent-color);
+  color: #fff;
+  border-color: var(--user-accent-color);
 }
 
 .public-profile__username-row {
