@@ -7,7 +7,7 @@ const fs       = require('fs');
 const createSqliteStore = require('./database/sessionStore');
 const db       = require('./database/db');
 const { verifyMailTransport, getMailConfig } = require('./services/mailer');
-const { PROTECTED_EMAILS } = require('./protectedUsers');
+const { PROTECTED_EMAILS, PROTECTED_KEYWORDS } = require('./protectedUsers');
 
 const SqliteStore = createSqliteStore(session);
 const authRoutes  = require('./routes/auth');
@@ -64,16 +64,27 @@ function cleanupInactiveAccounts() {
     db.exec(`DELETE FROM email_verifications WHERE datetime(expires_at) < datetime('now')`);
     db.exec(`DELETE FROM password_reset_verifications WHERE datetime(expires_at) < datetime('now')`);
 
+    const normalizedProtectedEmails = PROTECTED_EMAILS.map((email) => String(email).trim().toLowerCase());
+    const protectedEmailPlaceholders = normalizedProtectedEmails.map(() => '?').join(', ');
+    const protectedKeywordLikeClauses = PROTECTED_KEYWORDS.map(() => `LOWER(COALESCE(full_name, '')) LIKE ? OR LOWER(COALESCE(username, '')) LIKE ?`).join(' OR ');
+    const protectedKeywordLikeValues = PROTECTED_KEYWORDS.flatMap((keyword) => {
+      const value = `%${String(keyword).trim().toLowerCase()}%`;
+      return [value, value];
+    });
+    const exclusionSql = `LOWER(TRIM(COALESCE(email, ''))) NOT IN (${protectedEmailPlaceholders})${protectedKeywordLikeClauses ? ` AND NOT (${protectedKeywordLikeClauses})` : ''}`;
+
     const inactiveUsers = INACTIVE_DAYS === 0
       ? db.prepare(`
           SELECT id, avatar FROM users
-          WHERE email NOT IN (${PROTECTED_EMAILS.map(() => '?').join(', ')})
-        `).all(...PROTECTED_EMAILS)
+          WHERE ${exclusionSql}
+        `).all(...normalizedProtectedEmails, ...protectedKeywordLikeValues)
       : db.prepare(`
           SELECT id, avatar FROM users
           WHERE datetime(COALESCE(last_active_at, created_at)) <= datetime('now', ?)
-            AND email NOT IN (${PROTECTED_EMAILS.map(() => '?').join(', ')})
-        `).all(`-${INACTIVE_DAYS} days`, ...PROTECTED_EMAILS);
+            AND ${exclusionSql}
+        `).all(`-${INACTIVE_DAYS} days`, ...normalizedProtectedEmails, ...protectedKeywordLikeValues);
+
+    console.log(`[CLEANUP] Run complete. Candidates=${inactiveUsers.length}, IntervalMs=${CLEANUP_INTERVAL_MS}, ThresholdDays=${INACTIVE_DAYS}`);
 
     if (!inactiveUsers.length) return;
 
