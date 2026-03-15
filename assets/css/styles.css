@@ -743,11 +743,6 @@ body.user-theme-active .profile__avatar-button:hover {
   object-fit: cover;
 }
 
-.profile__full-name {
-  color: var(--title-color);
-  font-weight: var(--font-semi-bold);
-}
-
 .profile__display-name {
   color: var(--title-color);
   font-weight: var(--font-semi-bold);
