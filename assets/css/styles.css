@@ -964,7 +964,7 @@ body.user-theme-active .profile-background__reset:disabled {
   align-items: center;
   justify-content: center;
   column-gap: .65rem;
-  margin-top: -.92rem;
+  margin-top: -1.25rem;
 }
 
 .public-profile__bio-box {
@@ -1014,8 +1014,8 @@ body.user-theme-active .profile-background__reset:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.55rem;
-  height: 1.55rem;
+  width: 1.28rem;
+  height: 1.28rem;
   color: var(--text-color);
   background: transparent;
   border-radius: 999px;
