@@ -293,6 +293,7 @@ const profileDisplayNameInput = document.getElementById('profile-display-name-in
 const profilePronounsInput = document.getElementById('profile-pronouns-input')
 const profilePronounsCounter = document.getElementById('profile-pronouns-counter')
 const profileBioInput = document.getElementById('profile-bio-input')
+const profileBioCounter = document.getElementById('profile-bio-counter')
 const profileBirthDateInput = document.getElementById('profile-birth-date-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
 const profileAccentColorOpen = document.getElementById('profile-accent-color-open')
@@ -477,6 +478,12 @@ function updatePronounsCounter(value = '') {
    if (!profilePronounsCounter) return
    const inputValue = typeof value === 'string' ? value : ''
    profilePronounsCounter.textContent = `${inputValue.length}/30`
+}
+
+function updateBioCounter(value = '') {
+   if (!profileBioCounter) return
+   const inputValue = typeof value === 'string' ? value : ''
+   profileBioCounter.textContent = `${inputValue.length}/200`
 }
 
 function getZodiacSignByBirthDate(value) {
@@ -1011,6 +1018,7 @@ function updateProfileView(user) {
    profilePronounsInput.value = normalizePronouns(user?.pronouns)
    updatePronounsCounter(profilePronounsInput.value)
    profileBioInput.value = normalizeBio(user?.bio)
+   updateBioCounter(profileBioInput.value)
    profileBirthDateInput.value = typeof user.birth_date === 'string' ? user.birth_date : ''
    profileUsernameInput.value = user.username
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
@@ -1060,6 +1068,7 @@ function setLoggedOut() {
    profilePronounsInput.value = ''
    updatePronounsCounter('')
    profileBioInput.value = ''
+   updateBioCounter('')
    profileBirthDateInput.value = ''
    profileUsernameInput.value = ''
    updateProfileAccentSummary(getDefaultAccentColor())
@@ -1350,6 +1359,10 @@ profileDisplayNameInput.addEventListener('input', () => {
 
 profilePronounsInput.addEventListener('input', () => {
    updatePronounsCounter(profilePronounsInput.value)
+})
+
+profileBioInput.addEventListener('input', () => {
+   updateBioCounter(profileBioInput.value)
 })
 
 profileForm.addEventListener('submit', async (e) => {

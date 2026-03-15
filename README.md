@@ -20,6 +20,7 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 - Optionale Pronomen speichern (max. 30 Zeichen)
 	- Live-Zeichenzähler (`0/30`) direkt unter dem Eingabefeld
 - Optionale Bio speichern (max. 200 Zeichen, Zeilenumbrüche erlaubt)
+	- Live-Zeichenzähler (`0/200`) direkt unter dem Eingabefeld
 - Optionales Geburtsdatum speichern (`dd/mm/yyyy`)
 - Sternzeichen-Icon im öffentlichen Profil anzeigen (wenn Geburtsdatum gesetzt ist)
 	- Klick auf das Sternzeichen-Icon öffnet den passenden Wikipedia-Artikel
