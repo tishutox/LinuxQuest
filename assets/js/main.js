@@ -290,6 +290,7 @@ const profileShareCopyBtn = document.getElementById('profile-share-copy-btn')
 const profileForm         = document.getElementById('profile-form')
 const profileFullNameInput = document.getElementById('profile-full-name-input')
 const profileDisplayNameInput = document.getElementById('profile-display-name-input')
+const profilePronounsInput = document.getElementById('profile-pronouns-input')
 const profileBirthDateInput = document.getElementById('profile-birth-date-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
 const profileAccentColorOpen = document.getElementById('profile-accent-color-open')
@@ -311,7 +312,9 @@ const profileDeleteNote = document.getElementById('profile-delete-note')
 const profileSaveBtn       = document.getElementById('profile-save-btn')
 const profileDeleteBtn     = document.getElementById('profile-delete-btn')
 const publicProfileAvatar = document.getElementById('public-profile-avatar')
+const publicProfileNameRow = document.getElementById('public-profile-name-row')
 const publicProfileDisplayName = document.getElementById('public-profile-display-name')
+const publicProfilePronouns = document.getElementById('public-profile-pronouns')
 const publicProfileUsername = document.getElementById('public-profile-username')
 const publicProfileMessage = document.getElementById('public-profile-message')
 const publicProfileCopyBtn = document.getElementById('public-profile-copy-btn')
@@ -454,6 +457,11 @@ function parseBirthDate(value) {
    if (day < 1 || day > maxDay) return null
 
    return { day, month, year, normalized: `${match[1]}/${match[2]}/${match[3]}` }
+}
+
+function normalizePronouns(value) {
+   if (typeof value !== 'string') return ''
+   return value.replace(/\s+/g, ' ').trim()
 }
 
 function getZodiacSignByBirthDate(value) {
@@ -794,8 +802,15 @@ function updatePublicProfileView(payload) {
 
    publicProfileAvatar.src = getAvatarUrl(user)
    const publicDisplayName = getProfileDisplayName(user)
+   const publicPronouns = normalizePronouns(user?.pronouns)
+   const hasDisplayName = Boolean(publicDisplayName)
+   const hasPronouns = Boolean(publicPronouns)
+
    publicProfileDisplayName.textContent = publicDisplayName
-   publicProfileDisplayName.style.display = publicDisplayName ? 'block' : 'none'
+   publicProfileDisplayName.style.display = hasDisplayName ? 'block' : 'none'
+   publicProfilePronouns.textContent = hasPronouns ? publicPronouns : ''
+   publicProfilePronouns.style.display = hasPronouns ? 'inline' : 'none'
+   publicProfileNameRow.style.display = (hasDisplayName || hasPronouns) ? 'flex' : 'none'
    publicProfileUsername.textContent = '@' + user.username
    updatePublicProfileZodiac(user?.birth_date)
    updatePublicFollowStats()
@@ -826,6 +841,9 @@ function showPublicProfileError(message) {
    publicProfileAvatar.src = DEFAULT_AVATAR + encodeURIComponent('Unbekannt')
    publicProfileDisplayName.textContent = ''
    publicProfileDisplayName.style.display = 'none'
+   publicProfilePronouns.textContent = ''
+   publicProfilePronouns.style.display = 'none'
+   publicProfileNameRow.style.display = 'none'
    publicProfileUsername.textContent = '@unbekannt'
    updatePublicProfileZodiac(null)
     updatePublicFollowStats()
@@ -969,6 +987,7 @@ function updateProfileView(user) {
    profileAvatarImage.src  = getAvatarUrl(user)
    profileFullNameInput.value = user.full_name
    profileDisplayNameInput.value = getProfileDisplayName(user)
+   profilePronounsInput.value = normalizePronouns(user?.pronouns)
    profileBirthDateInput.value = typeof user.birth_date === 'string' ? user.birth_date : ''
    profileUsernameInput.value = user.username
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
@@ -1015,6 +1034,7 @@ function setLoggedOut() {
    profileAvatarImage.src  = ''
    profileFullNameInput.value = ''
    profileDisplayNameInput.value = ''
+   profilePronounsInput.value = ''
    profileBirthDateInput.value = ''
    profileUsernameInput.value = ''
    updateProfileAccentSummary(getDefaultAccentColor())
@@ -1309,6 +1329,7 @@ profileForm.addEventListener('submit', async (e) => {
 
    const full_name = profileFullNameInput.value.trim()
    const profile_name = profileDisplayNameInput.value
+   const pronouns = normalizePronouns(profilePronounsInput.value)
    const birth_date = profileBirthDateInput.value.trim()
    const trimmedProfileName = typeof profile_name === 'string' ? profile_name.trim() : ''
    const username  = profileUsernameInput.value.trim()
@@ -1320,6 +1341,10 @@ profileForm.addEventListener('submit', async (e) => {
 
    if (trimmedProfileName.length > 20) {
       return showMsg('profile-message', 'Der Profilname darf maximal 20 Zeichen lang sein.', 'error')
+   }
+
+   if (pronouns.length > 30) {
+      return showMsg('profile-message', 'Die Pronomen dürfen maximal 30 Zeichen lang sein.', 'error')
    }
 
    if (birth_date && !parseBirthDate(birth_date)) {
@@ -1338,7 +1363,7 @@ profileForm.addEventListener('submit', async (e) => {
          method: 'POST',
          credentials: 'include',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ full_name, profile_name, birth_date, username, accent_color })
+         body: JSON.stringify({ full_name, profile_name, pronouns, birth_date, username, accent_color })
       })
       const data = await res.json()
 

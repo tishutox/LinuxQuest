@@ -290,6 +290,11 @@
                </div>
 
                <div>
+                  <label for="profile-pronouns-input" class="login__label">Pronomen <small>(optional)</small></label>
+                  <input type="text" id="profile-pronouns-input" class="login__input" autocomplete="off" maxlength="30" placeholder="z. B. sie/ihr, he/him, they/them">
+               </div>
+
+               <div>
                   <label for="profile-birth-date-input" class="login__label">Geburtsdatum <small>(optional, dd/mm/yyyy)</small></label>
                   <input type="text" id="profile-birth-date-input" class="login__input" autocomplete="bday" maxlength="10" placeholder="dd/mm/yyyy">
                </div>
@@ -344,7 +349,10 @@
                <img src="" alt="Profilbild" class="info-modal__avatar" id="public-profile-avatar">
             </div>
 
-            <p class="profile__display-name" id="public-profile-display-name"></p>
+            <div class="public-profile__name-row" id="public-profile-name-row">
+               <p class="profile__display-name" id="public-profile-display-name"></p>
+               <span class="public-profile__pronouns" id="public-profile-pronouns" style="display:none;"></span>
+            </div>
 
             <div class="public-profile__username-row">
                <p class="public-profile__username" id="public-profile-username"></p>

@@ -828,6 +828,28 @@ body.user-theme-active .profile__avatar-button:hover {
   column-gap: .6rem;
 }
 
+.public-profile__name-row {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  column-gap: .5rem;
+  margin-top: -.2rem;
+}
+
+#public-profile-modal .profile__display-name {
+  margin: 0;
+  text-align: left;
+}
+
+.public-profile__pronouns {
+  color: var(--text-color);
+  opacity: .75;
+  font-size: .88rem;
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+}
+
 .public-profile__username {
   color: var(--text-color);
   font-weight: var(--font-medium);

@@ -17,9 +17,11 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 	- Frei wählbar (inkl. Sonderzeichen/Emoji)
 	- Maximal 20 Zeichen
 	- Optional (leer = keine Anzeige)
+- Optionale Pronomen speichern (max. 30 Zeichen)
 - Optionales Geburtsdatum speichern (`dd/mm/yyyy`)
 - Sternzeichen-Icon im öffentlichen Profil anzeigen (wenn Geburtsdatum gesetzt ist)
 	- Klick auf das Sternzeichen-Icon öffnet den passenden Wikipedia-Artikel
+- Im öffentlichen Usermodal steht der Profilname linksbündig, Pronomen stehen rechts daneben in hellerer Darstellung
 - Akzentfarbe fürs Profil auswählen
 - Konto löschen (mit Passwort-Bestätigung)
 - Geschützte Projektkonten können nicht gelöscht werden
@@ -38,6 +40,20 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 | `15/08/1999` | Löwe |
 | `05/12/2001` | Schütze |
 | `10/01/1998` | Steinbock |
+
+#### Sternzeichen-Grenzwerte (dd/mm)
+- Wassermann: `20/01`–`18/02`
+- Fische: `19/02`–`20/03`
+- Widder: `21/03`–`19/04`
+- Stier: `20/04`–`20/05`
+- Zwillinge: `21/05`–`20/06`
+- Krebs: `21/06`–`22/07`
+- Löwe: `23/07`–`22/08`
+- Jungfrau: `23/08`–`22/09`
+- Waage: `23/09`–`22/10`
+- Skorpion: `23/10`–`21/11`
+- Schütze: `22/11`–`21/12`
+- Steinbock: `22/12`–`19/01`
 
 ### Öffentliche Profile & Social
 - Öffentliche Profilansicht für alle Accounts
