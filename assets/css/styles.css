@@ -369,11 +369,12 @@ img {
 }
 
 .admin-user-list__form {
-  transform: none;
-  margin-top: .1rem;
+  margin-inline: auto;
 }
 
 .admin-user-list__results {
+  width: min(44rem, 92vw);
+  margin-inline: auto;
   margin-top: .55rem;
 }
 
@@ -408,8 +409,14 @@ img {
 }
 
 .admin-user-list__username {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
   text-align: left;
   color: inherit;
+  cursor: pointer;
 }
 
 .admin-user-list__item-wrap {

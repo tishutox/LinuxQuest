@@ -182,10 +182,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-login') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-login') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-login') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-login'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -1182,6 +1182,11 @@ function renderAdminUserList(users) {
 
                   const data = await response.json()
                   if (!response.ok) {
+                     if (response.status === 404) {
+                        showMsg('admin-user-list-message', `Nutzer @${user.username} war bereits entfernt.`, 'success')
+                        await loadAdminUserList(adminUserListSearch.value)
+                        return
+                     }
                      showMsg('admin-user-list-message', data.error || 'Nutzer konnte nicht gelöscht werden.', 'error')
                      return
                   }
@@ -1256,7 +1261,7 @@ async function openAdminUserListModal() {
    renderAdminUserList([])
 
    hideAll()
-   adminUserListModal.classList.add('show-login')
+   adminUserListModal.classList.add('show-search')
    await loadAdminUserList('')
    adminUserListSearch.focus()
 }

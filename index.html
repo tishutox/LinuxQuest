@@ -458,21 +458,16 @@
          <i class="fi fi-rr-cross-small login__close" id="follow-list-close"></i>
       </div>
 
-      <div class="login" id="admin-user-list-modal">
-         <div class="login__form profile__form">
-            <h2 class="login__title">Admin: Userliste</h2>
+      <div class="search" id="admin-user-list-modal">
+         <form class="search__form admin-user-list__form" id="admin-user-list-form">
+            <i class="fi fi-rc-shield search__icon"></i>
+            <input type="search" id="admin-user-list-search" class="search__input" placeholder="Welchen Nutzer möchtest du verwalten?" autocomplete="off">
+         </form>
 
-            <div class="login__message" id="admin-user-list-message"></div>
+         <div class="login__message" id="admin-user-list-message"></div>
+         <div class="search__results admin-user-list__results" id="admin-user-list-results"></div>
 
-            <form class="search__form admin-user-list__form" id="admin-user-list-form">
-               <i class="fi fi-rc-shield search__icon"></i>
-               <input type="search" id="admin-user-list-search" class="search__input" placeholder="Welchen Nutzer möchtest du verwalten?" autocomplete="off">
-            </form>
-
-            <div class="search__results admin-user-list__results" id="admin-user-list-results"></div>
-         </div>
-
-         <i class="fi fi-rr-cross-small login__close" id="admin-user-list-close"></i>
+         <i class="fi fi-rr-cross-small search__close" id="admin-user-list-close"></i>
       </div>
 
       <!--==================== MAIN ====================-->

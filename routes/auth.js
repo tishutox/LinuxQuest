@@ -682,34 +682,45 @@ router.delete('/admin/users/:username', (req, res) => {
     }
 
     const username = typeof req.params.username === 'string' ? req.params.username.trim() : '';
-    if (!username || !USERNAME_REGEX.test(username)) {
+    if (!username) {
       return res.status(400).json({ error: 'Ungültiger Benutzername.' });
     }
 
-    const user = db.prepare(`
+    const usersToDelete = db.prepare(`
       SELECT id, username, email, avatar
       FROM users
-      WHERE username = ?
-    `).get(username);
+      WHERE username = ? COLLATE NOCASE
+    `).all(username);
 
-    if (!user) {
-      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
-    }
-
-    if (isProtectedEmail(user.email)) {
+    const hasProtectedUser = usersToDelete.some((user) => isProtectedEmail(user.email));
+    if (hasProtectedUser) {
       return res.status(403).json({ error: 'Dieser Nutzer ist geschützt und kann nicht gelöscht werden.' });
     }
 
+    if (!usersToDelete.length) {
+      return res.json({ message: `Nutzer @${username} war bereits entfernt.` });
+    }
+
     const deleteUserTransaction = db.transaction(() => {
-      db.prepare('DELETE FROM email_verifications WHERE LOWER(email) = LOWER(?)').run(user.email);
-      db.prepare('DELETE FROM password_reset_verifications WHERE LOWER(email) = LOWER(?)').run(user.email);
-      db.prepare('DELETE FROM users WHERE id = ?').run(user.id);
+      const deleteEmailVerificationsByEmail = db.prepare('DELETE FROM email_verifications WHERE LOWER(email) = LOWER(?)');
+      const deletePasswordResetByEmail = db.prepare('DELETE FROM password_reset_verifications WHERE LOWER(email) = LOWER(?)');
+      const deleteUserFollows = db.prepare('DELETE FROM follows WHERE follower_id = ? OR following_id = ?');
+      const deleteUserById = db.prepare('DELETE FROM users WHERE id = ?');
+
+      usersToDelete.forEach((user) => {
+        if (user.email) {
+          deleteEmailVerificationsByEmail.run(user.email);
+          deletePasswordResetByEmail.run(user.email);
+        }
+        deleteUserFollows.run(user.id, user.id);
+        deleteUserById.run(user.id);
+      });
     });
 
     deleteUserTransaction();
-    deleteOldAvatar(user.avatar);
+    usersToDelete.forEach((user) => deleteOldAvatar(user.avatar));
 
-    return res.json({ message: `Nutzer @${user.username} wurde gelöscht.` });
+    return res.json({ message: `Nutzer @${usersToDelete[0].username} wurde gelöscht.` });
   } catch (err) {
     console.error('[ADMIN DELETE USER ERROR]', err);
     return res.status(500).json({ error: 'Nutzer konnte nicht gelöscht werden.' });
