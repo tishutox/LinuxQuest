@@ -15,7 +15,7 @@ const authRoutes  = require('./routes/auth');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 const INACTIVE_DAYS = 0;
-const CLEANUP_INTERVAL_MS = 2 * 60 * 1000;
+const CLEANUP_INTERVAL_MS = 30 * 1000;
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({ origin: true, credentials: true }));
@@ -64,12 +64,16 @@ function cleanupInactiveAccounts() {
     db.exec(`DELETE FROM email_verifications WHERE datetime(expires_at) < datetime('now')`);
     db.exec(`DELETE FROM password_reset_verifications WHERE datetime(expires_at) < datetime('now')`);
 
-    const inactiveUsers = db.prepare(`
-      SELECT id, avatar
-      FROM users
-      WHERE datetime(COALESCE(last_active_at, created_at)) <= datetime('now', ?)
-        AND email NOT IN (${PROTECTED_EMAILS.map(() => '?').join(', ')})
-    `).all(`-${INACTIVE_DAYS} seconds`, ...PROTECTED_EMAILS);
+    const inactiveUsers = INACTIVE_DAYS === 0
+      ? db.prepare(`
+          SELECT id, avatar FROM users
+          WHERE email NOT IN (${PROTECTED_EMAILS.map(() => '?').join(', ')})
+        `).all(...PROTECTED_EMAILS)
+      : db.prepare(`
+          SELECT id, avatar FROM users
+          WHERE datetime(COALESCE(last_active_at, created_at)) <= datetime('now', ?)
+            AND email NOT IN (${PROTECTED_EMAILS.map(() => '?').join(', ')})
+        `).all(`-${INACTIVE_DAYS} days`, ...PROTECTED_EMAILS);
 
     if (!inactiveUsers.length) return;
 
