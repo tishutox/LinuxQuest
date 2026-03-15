@@ -780,6 +780,11 @@ body.user-theme-active .profile__avatar-button:hover {
   line-height: 1.35;
 }
 
+.profile__bio-input::placeholder {
+  font-family: inherit;
+  font-style: normal;
+}
+
 .profile-background__pick,
 .profile-background__reset {
   width: 100%;
@@ -788,9 +793,9 @@ body.user-theme-active .profile__avatar-button:hover {
   justify-content: center;
   padding: .9rem 1rem;
   border-radius: .5rem;
-  border: 2px solid var(--border-color);
-  background-color: var(--container-color);
-  color: var(--title-color);
+  border: 2px solid var(--first-color);
+  background-color: var(--first-color);
+  color: #fff;
   font-weight: var(--font-semi-bold);
   cursor: pointer;
   transition: border-color .3s, color .3s, box-shadow .3s;
@@ -799,7 +804,7 @@ body.user-theme-active .profile__avatar-button:hover {
 .profile-background__pick:hover,
 .profile-background__reset:hover {
   border-color: var(--first-color);
-  color: var(--first-color);
+  color: #fff;
 }
 
 .profile-background__pick:focus-visible,
