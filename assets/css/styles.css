@@ -706,11 +706,19 @@ body.user-theme-active .nav__avatar {
 .profile__avatar-wrap {
   display: flex;
   justify-content: center;
-  margin-bottom: .55rem;
+  margin-bottom: 1rem;
 }
 
 .profile__bio-group {
-  margin-top: .45rem;
+  margin-top: .9rem;
+}
+
+#profile-modal .profile__display-name {
+  margin-top: .1rem;
+}
+
+#profile-modal .profile__username {
+  margin-top: .1rem;
 }
 
 .profile__avatar-button {
