@@ -955,8 +955,9 @@ body.user-theme-active .profile-background__reset:disabled {
 
 .public-profile__actions {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   column-gap: 0;
+  transform: translateY(1px);
 }
 
 .public-profile__stats {
@@ -1031,6 +1032,8 @@ body.user-theme-active .profile-background__reset:disabled {
 .public-profile__action i {
   font-size: .82rem;
   line-height: 1;
+  display: block;
+  transform: translateY(1px);
 }
 
 #public-profile-modal {
