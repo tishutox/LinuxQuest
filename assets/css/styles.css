@@ -833,6 +833,7 @@ body.user-theme-active .profile__avatar-button:hover {
   align-items: center;
   justify-content: center;
   column-gap: .6rem;
+  margin-top: -.25rem;
 }
 
 .public-profile__name-row {
@@ -841,12 +842,13 @@ body.user-theme-active .profile__avatar-button:hover {
   align-items: baseline;
   justify-content: center;
   column-gap: .5rem;
-  margin-top: -.2rem;
+  margin-top: -.3rem;
 }
 
 #public-profile-modal .profile__display-name {
   margin: 0;
   text-align: center;
+  line-height: 1.1;
 }
 
 .public-profile__pronouns {
@@ -861,6 +863,7 @@ body.user-theme-active .profile__avatar-button:hover {
   color: var(--text-color);
   font-weight: var(--font-medium);
   margin: 0;
+  line-height: 1.1;
 }
 
 .public-profile__following-badge {
@@ -886,7 +889,7 @@ body.user-theme-active .profile__avatar-button:hover {
   align-items: center;
   justify-content: center;
   column-gap: .65rem;
-  margin-top: -.25rem;
+  margin-top: -.35rem;
 }
 
 .public-profile__stat {
