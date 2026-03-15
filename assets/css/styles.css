@@ -392,7 +392,7 @@ img {
 
 .admin-user-list__purge {
   border: 1px solid var(--border-color);
-  background: transparent;
+  background: var(--border-color);
   color: var(--text-color);
   border-radius: .4rem;
   padding: .35rem .6rem;
@@ -419,7 +419,7 @@ img {
 
 .admin-user-list__menu {
   width: 1.65rem;
-  height: 1.65rem;
+  color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
