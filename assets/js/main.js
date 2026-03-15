@@ -376,6 +376,7 @@ let accentPickerState = {
 }
 let currentPublicProfileUser = null
 let adminUserListDebounceTimer = null
+let activePublicProfileTooltip = null
 let currentPublicProfileFollowState = {
    followersCount: 0,
    followingCount: 0,
@@ -640,20 +641,76 @@ function updatePublicProfileBelief(belief) {
    publicProfileBelief.setAttribute('aria-label', `${beliefInfo.value} auf Wikipedia öffnen`)
 }
 
+function clearPublicProfileTooltipHideTimer(element) {
+   if (!element?._tooltipHideTimer) return
+   clearTimeout(element._tooltipHideTimer)
+   element._tooltipHideTimer = null
+}
+
+function hidePublicProfileTooltip(element) {
+   if (!element) return
+   clearPublicProfileTooltipHideTimer(element)
+   element.classList.remove('is-tooltip-visible')
+   if (activePublicProfileTooltip === element) {
+      activePublicProfileTooltip = null
+   }
+}
+
+function hideAllPublicProfileTooltips(exceptElement = null) {
+   ;[publicProfileEmailLink, publicProfileEarlySupporter].forEach((element) => {
+      if (!element || element === exceptElement) return
+      hidePublicProfileTooltip(element)
+   })
+}
+
+function showPublicProfileTooltip(element, { autoHide = false, delay = 1600 } = {}) {
+   if (!element?.dataset.tooltip) return
+
+   hideAllPublicProfileTooltips(element)
+   clearPublicProfileTooltipHideTimer(element)
+   element.classList.add('is-tooltip-visible')
+   activePublicProfileTooltip = element
+
+   if (autoHide) {
+      element._tooltipHideTimer = setTimeout(() => {
+         hidePublicProfileTooltip(element)
+      }, delay)
+   }
+}
+
+function hasTouchTooltipInteraction() {
+   return window.matchMedia('(hover: none), (pointer: coarse)').matches
+}
+
+function setPublicProfileTooltip(element, text) {
+   if (!element) return
+
+   const tooltipText = typeof text === 'string' ? text.trim() : ''
+   if (!tooltipText) {
+      delete element.dataset.tooltip
+      element.removeAttribute('title')
+      hidePublicProfileTooltip(element)
+      return
+   }
+
+   element.dataset.tooltip = tooltipText
+   element.removeAttribute('title')
+}
+
 function updatePublicProfileEarlySupporter(isEarlySupporter) {
    if (!publicProfileEarlySupporter) return
 
    if (!isEarlySupporter) {
       publicProfileEarlySupporter.style.display = 'none'
       publicProfileEarlySupporter.innerHTML = ''
-      publicProfileEarlySupporter.title = 'Early Supporter'
+      setPublicProfileTooltip(publicProfileEarlySupporter, '')
       publicProfileEarlySupporter.setAttribute('aria-label', 'Early Supporter')
       return
    }
 
    publicProfileEarlySupporter.style.display = 'inline-flex'
    publicProfileEarlySupporter.innerHTML = '<i class="fi fi-rc-seedling"></i>'
-   publicProfileEarlySupporter.title = 'Early Supporter'
+   setPublicProfileTooltip(publicProfileEarlySupporter, 'Early Supporter')
    publicProfileEarlySupporter.setAttribute('aria-label', 'Early Supporter')
 }
 
@@ -986,9 +1043,10 @@ function updatePublicProfileView(payload) {
       publicProfileEmailLink.href = '#'
       publicProfileEmailLink.innerHTML = '<i class="fi fi-rc-shield"></i>'
       publicProfileEmailLink.dataset.action = viewerIsAdmin ? 'open-admin-list' : 'admin-label'
-      publicProfileEmailLink.title = viewerIsAdmin ? 'Admin-Bereich öffnen' : 'Admin'
+      setPublicProfileTooltip(publicProfileEmailLink, 'Admin')
       publicProfileEmailLink.setAttribute('aria-label', viewerIsAdmin ? 'Admin-Bereich öffnen' : 'Admin')
    } else {
+      hidePublicProfileTooltip(publicProfileEmailLink)
       publicProfileEmailLink.style.display = 'none'
       publicProfileEmailLink.href = '#'
       publicProfileEmailLink.innerHTML = '<i class="fi fi-rc-envelope"></i>'
@@ -1023,6 +1081,7 @@ function showPublicProfileError(message) {
    updatePublicProfileZodiac(null)
    updatePublicProfileBelief(null)
    updatePublicProfileEarlySupporter(false)
+   hideAllPublicProfileTooltips()
    publicProfileBioText.textContent = ''
    publicProfileBioBox.style.display = 'none'
     updatePublicFollowStats()
@@ -1477,7 +1536,46 @@ publicProfileFollowingTrigger.addEventListener('click', async () => {
    await openFollowList('following')
 })
 
+publicProfileEmailLink.addEventListener('mouseenter', () => {
+   if (!publicProfileEmailLink.dataset.tooltip) return
+   showPublicProfileTooltip(publicProfileEmailLink)
+})
+
+publicProfileEmailLink.addEventListener('mouseleave', () => {
+   hidePublicProfileTooltip(publicProfileEmailLink)
+})
+
+publicProfileEarlySupporter.addEventListener('mouseenter', () => {
+   if (!publicProfileEarlySupporter.dataset.tooltip) return
+   showPublicProfileTooltip(publicProfileEarlySupporter)
+})
+
+publicProfileEarlySupporter.addEventListener('mouseleave', () => {
+   hidePublicProfileTooltip(publicProfileEarlySupporter)
+})
+
 publicProfileEmailLink.addEventListener('click', async (event) => {
+   const canOpenAdminList = publicProfileEmailLink.dataset.action === 'open-admin-list'
+
+   if (hasTouchTooltipInteraction()) {
+      event.preventDefault()
+
+      const tooltipVisible = publicProfileEmailLink.classList.contains('is-tooltip-visible')
+      if (!tooltipVisible) {
+         showPublicProfileTooltip(publicProfileEmailLink, { autoHide: !canOpenAdminList })
+         return
+      }
+
+      if (!canOpenAdminList) {
+         showPublicProfileTooltip(publicProfileEmailLink, { autoHide: true })
+         return
+      }
+
+      hidePublicProfileTooltip(publicProfileEmailLink)
+      await openAdminUserListModal()
+      return
+   }
+
    if (publicProfileEmailLink.dataset.action !== 'open-admin-list') {
       event.preventDefault()
       return
@@ -1485,6 +1583,22 @@ publicProfileEmailLink.addEventListener('click', async (event) => {
 
    event.preventDefault()
    await openAdminUserListModal()
+})
+
+publicProfileEarlySupporter.addEventListener('click', (event) => {
+   event.preventDefault()
+   showPublicProfileTooltip(publicProfileEarlySupporter, { autoHide: hasTouchTooltipInteraction() })
+})
+
+document.addEventListener('click', (event) => {
+   if (!activePublicProfileTooltip) return
+
+   const tooltipOwner = activePublicProfileTooltip
+   if (tooltipOwner === event.target || tooltipOwner.contains(event.target)) {
+      return
+   }
+
+   hideAllPublicProfileTooltips()
 })
 
 adminUserListSearch.addEventListener('input', () => {

@@ -1101,6 +1101,7 @@ body.user-theme-active .profile-background__reset:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   width: 1.28rem;
   height: 1.28rem;
   color: var(--text-color);
@@ -1124,6 +1125,58 @@ body.user-theme-active .profile-background__reset:disabled {
 
 .public-profile__action--badge {
   cursor: help;
+}
+
+.public-profile__action[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + .45rem);
+  transform: translateX(-50%) translateY(.2rem);
+  padding: .28rem .5rem;
+  border-radius: .45rem;
+  background: rgba(17, 20, 31, .94);
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .22);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 10;
+}
+
+.public-profile__action[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + .12rem);
+  width: .48rem;
+  height: .48rem;
+  background: rgba(17, 20, 31, .94);
+  transform: translateX(-50%) rotate(45deg) translateY(.2rem);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 9;
+}
+
+.public-profile__action[data-tooltip]:hover::after,
+.public-profile__action[data-tooltip]:hover::before,
+.public-profile__action.is-tooltip-visible::after,
+.public-profile__action.is-tooltip-visible::before,
+.public-profile__action[data-tooltip]:focus-visible::after,
+.public-profile__action[data-tooltip]:focus-visible::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.public-profile__action[data-tooltip]:hover::before,
+.public-profile__action.is-tooltip-visible::before,
+.public-profile__action[data-tooltip]:focus-visible::before {
+  transform: translateX(-50%) rotate(45deg);
 }
 
 #public-profile-modal {
