@@ -378,6 +378,33 @@ img {
   margin-top: .55rem;
 }
 
+.admin-user-list__toolbar {
+  width: min(44rem, 92vw);
+  margin: .5rem auto 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.admin-user-list__purge {
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-color);
+  border-radius: .4rem;
+  padding: .35rem .6rem;
+  font-size: .8rem;
+  cursor: pointer;
+}
+
+.admin-user-list__purge:hover {
+  color: var(--first-color);
+  border-color: var(--first-color);
+}
+
+.admin-user-list__purge:disabled {
+  opacity: .65;
+  cursor: not-allowed;
+}
+
 .admin-user-list__item {
   display: grid;
   grid-template-columns: auto 1fr;

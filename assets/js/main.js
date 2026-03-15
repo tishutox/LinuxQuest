@@ -345,6 +345,7 @@ const adminUserListSearch = document.getElementById('admin-user-list-search')
 const adminUserListMessage = document.getElementById('admin-user-list-message')
 const adminUserListResults = document.getElementById('admin-user-list-results')
 const adminUserListForm = document.getElementById('admin-user-list-form')
+const adminUserListPurgeBtn = document.getElementById('admin-user-list-purge-btn')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de',
@@ -1482,6 +1483,34 @@ adminUserListSearch.addEventListener('input', () => {
 adminUserListForm.addEventListener('submit', (event) => {
    event.preventDefault()
    loadAdminUserList(adminUserListSearch.value)
+})
+
+adminUserListPurgeBtn.addEventListener('click', async () => {
+   if (!isAdminUser(currentUser)) {
+      return showMsg('admin-user-list-message', 'Kein Zugriff auf den Admin-Bereich.', 'error')
+   }
+
+   adminUserListPurgeBtn.disabled = true
+
+   try {
+      const response = await fetch('/api/auth/admin/purge-disallowed', {
+         method: 'POST',
+         credentials: 'include'
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+         showMsg('admin-user-list-message', data.error || 'Purge konnte nicht ausgeführt werden.', 'error')
+         return
+      }
+
+      showMsg('admin-user-list-message', data.message || 'Purge ausgeführt.', 'success')
+      await loadAdminUserList(adminUserListSearch.value)
+   } catch (_) {
+      showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
+   } finally {
+      adminUserListPurgeBtn.disabled = false
+   }
 })
 
 async function openSharedProfileFromUrl() {
