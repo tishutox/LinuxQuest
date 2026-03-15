@@ -344,6 +344,7 @@ const followListContainer = document.getElementById('follow-list-container')
 const adminUserListSearch = document.getElementById('admin-user-list-search')
 const adminUserListMessage = document.getElementById('admin-user-list-message')
 const adminUserListResults = document.getElementById('admin-user-list-results')
+const adminUserListForm = document.getElementById('admin-user-list-form')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de',
@@ -1133,16 +1134,80 @@ function renderAdminUserList(users) {
       list.appendChild(empty)
    } else {
       users.forEach((user) => {
-         const item = document.createElement('button')
-         item.type = 'button'
-         item.className = 'search-results__item'
-         item.textContent = '@' + user.username
+         const wrap = document.createElement('div')
+         wrap.className = 'admin-user-list__item-wrap'
 
-         item.addEventListener('click', async () => {
+         const item = document.createElement('div')
+         item.className = 'search-results__item admin-user-list__item'
+
+         const menuButton = document.createElement('button')
+         menuButton.type = 'button'
+         menuButton.className = 'admin-user-list__menu'
+         menuButton.innerHTML = '<i class="fi fi-rr-menu-dots-vertical"></i>'
+         menuButton.title = 'Aktionen'
+         menuButton.setAttribute('aria-label', `Aktionen für @${user.username}`)
+
+         const usernameButton = document.createElement('button')
+         usernameButton.type = 'button'
+         usernameButton.className = 'admin-user-list__username'
+         usernameButton.textContent = '@' + user.username
+
+         usernameButton.addEventListener('click', async () => {
             await openPublicProfileByUsername(user.username)
          })
 
-         list.appendChild(item)
+         const actions = document.createElement('div')
+         actions.className = 'admin-user-list__actions'
+
+         if (user.isProtected) {
+            const protectedLabel = document.createElement('span')
+            protectedLabel.className = 'admin-user-list__protected'
+            protectedLabel.textContent = 'Geschützter Admin-Nutzer'
+            actions.appendChild(protectedLabel)
+         } else {
+            const deleteButton = document.createElement('button')
+            deleteButton.type = 'button'
+            deleteButton.className = 'admin-user-list__delete'
+            deleteButton.textContent = 'Nutzer löschen'
+
+            deleteButton.addEventListener('click', async () => {
+               const confirmed = window.confirm(`Willst du @${user.username} wirklich löschen?`)
+               if (!confirmed) return
+
+               try {
+                  const response = await fetch(`/api/auth/admin/users/${encodeURIComponent(user.username)}`, {
+                     method: 'DELETE',
+                     credentials: 'include'
+                  })
+
+                  const data = await response.json()
+                  if (!response.ok) {
+                     showMsg('admin-user-list-message', data.error || 'Nutzer konnte nicht gelöscht werden.', 'error')
+                     return
+                  }
+
+                  showMsg('admin-user-list-message', data.message || 'Nutzer gelöscht.', 'success')
+                  await loadAdminUserList(adminUserListSearch.value)
+               } catch (_) {
+                  showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
+               }
+            })
+
+            actions.appendChild(deleteButton)
+         }
+
+         menuButton.addEventListener('click', () => {
+            adminUserListResults.querySelectorAll('.admin-user-list__actions').forEach((el) => {
+               if (el !== actions) el.classList.remove('is-open')
+            })
+            actions.classList.toggle('is-open')
+         })
+
+         item.appendChild(menuButton)
+         item.appendChild(usernameButton)
+         wrap.appendChild(item)
+         wrap.appendChild(actions)
+         list.appendChild(wrap)
       })
    }
 
@@ -1407,6 +1472,11 @@ adminUserListSearch.addEventListener('input', () => {
    adminUserListDebounceTimer = setTimeout(() => {
       loadAdminUserList(adminUserListSearch.value)
    }, 200)
+})
+
+adminUserListForm.addEventListener('submit', (event) => {
+   event.preventDefault()
+   loadAdminUserList(adminUserListSearch.value)
 })
 
 async function openSharedProfileFromUrl() {

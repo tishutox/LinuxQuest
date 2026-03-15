@@ -643,21 +643,76 @@ router.get('/admin/users', (req, res) => {
 
     const users = query
       ? db.prepare(`
-          SELECT id, username, profile_name, full_name, avatar, accent_color
+          SELECT id, username, profile_name, full_name, email, avatar, accent_color
           FROM users
           WHERE username LIKE ? COLLATE NOCASE
           ORDER BY username COLLATE NOCASE ASC
         `).all(`%${query}%`)
       : db.prepare(`
-          SELECT id, username, profile_name, full_name, avatar, accent_color
+          SELECT id, username, profile_name, full_name, email, avatar, accent_color
           FROM users
           ORDER BY username COLLATE NOCASE ASC
         `).all();
 
-    return res.json({ query, users });
+    const sanitizedUsers = users.map((user) => ({
+      id: user.id,
+      username: user.username,
+      profile_name: user.profile_name,
+      full_name: user.full_name,
+      avatar: user.avatar,
+      accent_color: user.accent_color,
+      isProtected: isProtectedEmail(user.email)
+    }));
+
+    return res.json({ query, users: sanitizedUsers });
   } catch (err) {
     console.error('[ADMIN USER LIST ERROR]', err);
     return res.status(500).json({ error: 'Admin-Userliste konnte nicht geladen werden.' });
+  }
+});
+
+router.delete('/admin/users/:username', (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    if (!isAdminSessionUser(req)) {
+      return res.status(403).json({ error: 'Kein Zugriff auf den Admin-Bereich.' });
+    }
+
+    const username = typeof req.params.username === 'string' ? req.params.username.trim() : '';
+    if (!username || !USERNAME_REGEX.test(username)) {
+      return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+    }
+
+    const user = db.prepare(`
+      SELECT id, username, email, avatar
+      FROM users
+      WHERE username = ?
+    `).get(username);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    if (isProtectedEmail(user.email)) {
+      return res.status(403).json({ error: 'Dieser Nutzer ist geschützt und kann nicht gelöscht werden.' });
+    }
+
+    const deleteUserTransaction = db.transaction(() => {
+      db.prepare('DELETE FROM email_verifications WHERE LOWER(email) = LOWER(?)').run(user.email);
+      db.prepare('DELETE FROM password_reset_verifications WHERE LOWER(email) = LOWER(?)').run(user.email);
+      db.prepare('DELETE FROM users WHERE id = ?').run(user.id);
+    });
+
+    deleteUserTransaction();
+    deleteOldAvatar(user.avatar);
+
+    return res.json({ message: `Nutzer @${user.username} wurde gelöscht.` });
+  } catch (err) {
+    console.error('[ADMIN DELETE USER ERROR]', err);
+    return res.status(500).json({ error: 'Nutzer konnte nicht gelöscht werden.' });
   }
 });
 
