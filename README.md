@@ -24,6 +24,9 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 - Optionales Geburtsdatum speichern (`dd/mm/yyyy`)
 - Sternzeichen-Icon im öffentlichen Profil anzeigen (wenn Geburtsdatum gesetzt ist)
 	- Klick auf das Sternzeichen-Icon öffnet den passenden Wikipedia-Artikel
+- Optionalen Glauben speichern (Atheismus, Christentum, Islam, Judentum, Hinduismus, Buddhismus, Daoismus, Shintoismus)
+	- Im öffentlichen Profil erscheint ein passendes Glaubens-Icon
+	- Klick auf das Glaubens-Icon öffnet den passenden Wikipedia-Artikel
 - Im öffentlichen Usermodal stehen Profilname und Pronomen zentriert nebeneinander, Pronomen in hellerer Darstellung
 - Im öffentlichen Usermodal erscheint die Bio in einer Box unter „Follower | Folge ich“
 - Akzentfarbe fürs Profil auswählen
@@ -35,7 +38,9 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 2. Im Feld „Geburtsdatum“ einen Wert im Format `dd/mm/yyyy` eintragen (z. B. `21/03/2000`) und speichern.
 3. Das öffentliche Profil des Accounts öffnen.
 4. In der Username-Zeile prüfen: Direkt nach dem Link-Icon erscheint das Sternzeichen-Icon passend zum Datum.
-5. Negativtest: Ungültiges Datum wie `31/02/2000` oder falsches Format wie `2000-03-21` speichern → Validierungsfehler sollte angezeigt werden.
+5. Optional im Feld „Glaube“ einen Eintrag auswählen und speichern.
+6. Im öffentlichen Profil prüfen: Das Glaubens-Icon erscheint nach dem Sternzeichen-Icon (oder nach dem Link-Icon, falls kein Geburtsdatum gesetzt ist) und öffnet beim Klick Wikipedia.
+7. Negativtest: Ungültiges Datum wie `31/02/2000` oder falsches Format wie `2000-03-21` speichern → Validierungsfehler sollte angezeigt werden.
 
 #### QA-Beispiele (Datum → Sternzeichen)
 | Geburtsdatum | Erwartetes Sternzeichen |

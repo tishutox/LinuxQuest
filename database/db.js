@@ -29,6 +29,7 @@ db.exec(`
     password    TEXT    NOT NULL,
     avatar      TEXT    DEFAULT NULL,
     birth_date  TEXT    DEFAULT NULL,
+    belief      TEXT    DEFAULT NULL,
     accent_color TEXT   DEFAULT NULL,
     created_at  TEXT    DEFAULT (datetime('now')),
     last_active_at TEXT DEFAULT (datetime('now'))
@@ -42,6 +43,7 @@ const hasProfileNameColumn = userColumns.some((column) => column.name === 'profi
 const hasPronounsColumn = userColumns.some((column) => column.name === 'pronouns');
 const hasBioColumn = userColumns.some((column) => column.name === 'bio');
 const hasBirthDateColumn = userColumns.some((column) => column.name === 'birth_date');
+const hasBeliefColumn = userColumns.some((column) => column.name === 'belief');
 
 if (!hasLastActiveColumn) {
   db.exec('ALTER TABLE users ADD COLUMN last_active_at TEXT');
@@ -65,6 +67,10 @@ if (!hasBioColumn) {
 
 if (!hasBirthDateColumn) {
   db.exec('ALTER TABLE users ADD COLUMN birth_date TEXT');
+}
+
+if (!hasBeliefColumn) {
+  db.exec('ALTER TABLE users ADD COLUMN belief TEXT');
 }
 
 db.exec(`

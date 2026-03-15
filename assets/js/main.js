@@ -295,6 +295,7 @@ const profilePronounsCounter = document.getElementById('profile-pronouns-counter
 const profileBioInput = document.getElementById('profile-bio-input')
 const profileBioCounter = document.getElementById('profile-bio-counter')
 const profileBirthDateInput = document.getElementById('profile-birth-date-input')
+const profileBeliefInput = document.getElementById('profile-belief-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
 const profileAccentColorOpen = document.getElementById('profile-accent-color-open')
 const profileAccentColorPreview = document.getElementById('profile-accent-color-preview')
@@ -322,6 +323,7 @@ const publicProfileUsername = document.getElementById('public-profile-username')
 const publicProfileMessage = document.getElementById('public-profile-message')
 const publicProfileCopyBtn = document.getElementById('public-profile-copy-btn')
 const publicProfileZodiac = document.getElementById('public-profile-zodiac')
+const publicProfileBelief = document.getElementById('public-profile-belief')
 const publicProfileEmailLink = document.getElementById('public-profile-email-link')
 const publicProfileFollowingBadge = document.getElementById('public-profile-following-badge')
 const publicProfileFollowersCount = document.getElementById('public-profile-followers-count')
@@ -507,6 +509,56 @@ function getZodiacSignByBirthDate(value) {
    return { name: 'Steinbock', iconClass: 'fi fi-rr-sheep', wikiUrl: 'https://de.wikipedia.org/wiki/Steinbock_(Tierkreiszeichen)' }
 }
 
+const BELIEF_INFO_BY_VALUE = {
+   Atheismus: {
+      value: 'Atheismus',
+      iconClass: 'fi fi-rc-physics',
+      wikiUrl: 'https://de.wikipedia.org/wiki/Atheismus'
+   },
+   Christentum: {
+      value: 'Christentum',
+      iconClass: 'fi fi-rc-cross-religion',
+      wikiUrl: 'https://de.wikipedia.org/wiki/Christentum'
+   },
+   Islam: {
+      value: 'Islam',
+      iconClass: 'fi fi-rc-star-and-crescent',
+      wikiUrl: 'https://de.wikipedia.org/wiki/Islam'
+   },
+   Judentum: {
+      value: 'Judentum',
+      iconClass: 'fi fi-rc-star-of-david',
+      wikiUrl: 'https://de.wikipedia.org/wiki/Judentum'
+   },
+   Hinduismus: {
+      value: 'Hinduismus',
+      iconClass: 'fi fi-rc-om',
+      wikiUrl: 'https://de.wikipedia.org/wiki/Hinduismus'
+   },
+   Buddhismus: {
+      value: 'Buddhismus',
+      iconClass: 'fi fi-rr-dharmachakra',
+      wikiUrl: 'https://de.wikipedia.org/wiki/Buddhismus'
+   },
+   Daoismus: {
+      value: 'Daoismus',
+      iconClass: 'fi fi-rc-yin-yang',
+      wikiUrl: 'https://de.wikipedia.org/wiki/Daoismus'
+   },
+   Shintoismus: {
+      value: 'Shintoismus',
+      iconClass: 'fi fi-rc-torii-gate',
+      wikiUrl: 'https://de.wikipedia.org/wiki/Shint%C5%8D'
+   }
+}
+
+function getBeliefInfo(value) {
+   if (typeof value !== 'string') return null
+   const trimmedValue = value.trim()
+   if (!trimmedValue) return null
+   return BELIEF_INFO_BY_VALUE[trimmedValue] || null
+}
+
 function updatePublicProfileZodiac(birthDate) {
    if (!publicProfileZodiac) return
 
@@ -525,6 +577,26 @@ function updatePublicProfileZodiac(birthDate) {
    publicProfileZodiac.href = zodiacSign.wikiUrl
    publicProfileZodiac.title = zodiacSign.name
    publicProfileZodiac.setAttribute('aria-label', `${zodiacSign.name} auf Wikipedia öffnen`)
+}
+
+function updatePublicProfileBelief(belief) {
+   if (!publicProfileBelief) return
+
+   const beliefInfo = getBeliefInfo(belief)
+   if (!beliefInfo) {
+      publicProfileBelief.style.display = 'none'
+      publicProfileBelief.innerHTML = ''
+      publicProfileBelief.href = '#'
+      publicProfileBelief.title = 'Glaube'
+      publicProfileBelief.setAttribute('aria-label', 'Glaube')
+      return
+   }
+
+   publicProfileBelief.style.display = 'inline-flex'
+   publicProfileBelief.innerHTML = `<i class="${beliefInfo.iconClass}"></i>`
+   publicProfileBelief.href = beliefInfo.wikiUrl
+   publicProfileBelief.title = beliefInfo.value
+   publicProfileBelief.setAttribute('aria-label', `${beliefInfo.value} auf Wikipedia öffnen`)
 }
 
 function hslToHex(h, s, l) {
@@ -837,6 +909,7 @@ function updatePublicProfileView(payload) {
    publicProfileNameRow.style.display = (hasDisplayName || hasPronouns) ? 'flex' : 'none'
    publicProfileUsername.textContent = '@' + user.username
    updatePublicProfileZodiac(user?.birth_date)
+   updatePublicProfileBelief(user?.belief)
    publicProfileBioText.textContent = hasBio ? publicBio : ''
    publicProfileBioBox.style.display = hasBio ? 'block' : 'none'
    updatePublicFollowStats()
@@ -872,6 +945,7 @@ function showPublicProfileError(message) {
    publicProfileNameRow.style.display = 'none'
    publicProfileUsername.textContent = '@unbekannt'
    updatePublicProfileZodiac(null)
+   updatePublicProfileBelief(null)
    publicProfileBioText.textContent = ''
    publicProfileBioBox.style.display = 'none'
     updatePublicFollowStats()
@@ -1020,6 +1094,7 @@ function updateProfileView(user) {
    profileBioInput.value = normalizeBio(user?.bio)
    updateBioCounter(profileBioInput.value)
    profileBirthDateInput.value = typeof user.birth_date === 'string' ? user.birth_date : ''
+   profileBeliefInput.value = getBeliefInfo(user?.belief)?.value || ''
    profileUsernameInput.value = user.username
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
    updateBackgroundControls(user)
@@ -1070,6 +1145,7 @@ function setLoggedOut() {
    profileBioInput.value = ''
    updateBioCounter('')
    profileBirthDateInput.value = ''
+   profileBeliefInput.value = ''
    profileUsernameInput.value = ''
    updateProfileAccentSummary(getDefaultAccentColor())
    profileDeletePasswordInput.value = ''
@@ -1374,6 +1450,7 @@ profileForm.addEventListener('submit', async (e) => {
    const pronouns = normalizePronouns(profilePronounsInput.value)
    const bio = normalizeBio(profileBioInput.value)
    const birth_date = profileBirthDateInput.value.trim()
+   const belief = profileBeliefInput.value.trim()
    const trimmedProfileName = typeof profile_name === 'string' ? profile_name.trim() : ''
    const username  = profileUsernameInput.value.trim()
    const accent_color = normalizeHexColor(profileAccentColorInput.value)
@@ -1398,6 +1475,10 @@ profileForm.addEventListener('submit', async (e) => {
       return showMsg('profile-message', 'Das Geburtsdatum muss im Format dd/mm/yyyy sein.', 'error')
    }
 
+   if (belief && !getBeliefInfo(belief)) {
+      return showMsg('profile-message', 'Bitte wähle einen gültigen Glauben aus der Liste aus.', 'error')
+   }
+
     if (!accent_color) {
       return showMsg('profile-message', 'Bitte wähle eine gültige Profilfarbe.', 'error')
    }
@@ -1410,7 +1491,7 @@ profileForm.addEventListener('submit', async (e) => {
          method: 'POST',
          credentials: 'include',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ full_name, profile_name, pronouns, bio, birth_date, username, accent_color })
+         body: JSON.stringify({ full_name, profile_name, pronouns, bio, birth_date, belief, username, accent_color })
       })
       const data = await res.json()
 

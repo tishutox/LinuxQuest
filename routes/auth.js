@@ -39,6 +39,16 @@ const THA_REGEX      = /^[^\s@]+@tha\.de$/i;
 const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;  // Only letters, numbers, underscore, hyphen
 const HEX_COLOR_REGEX = /^#[0-9a-fA-F]{6}$/;
 const BIRTH_DATE_REGEX = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+const BELIEF_VALUES = new Set([
+  'Atheismus',
+  'Christentum',
+  'Islam',
+  'Judentum',
+  'Hinduismus',
+  'Buddhismus',
+  'Daoismus',
+  'Shintoismus'
+]);
 const SALT_ROUNDS    = 12;
 const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
 const VERIFY_IP_MAX_REQUESTS = 6;
@@ -102,7 +112,7 @@ function touchUserActivity(userId) {
 
 function getPublicUserProfileByEmail(email) {
   return db.prepare(`
-    SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, accent_color, created_at
+    SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at
     FROM users
     WHERE email = ?
   `).get(normalizeEmail(email));
@@ -137,6 +147,17 @@ function normalizeBirthDate(birthDateValue) {
   if (day < 1 || day > maxDay) return null;
 
   return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+}
+
+function normalizeBelief(beliefValue) {
+  if (typeof beliefValue !== 'string') return null;
+
+  const trimmedBelief = beliefValue.trim();
+  if (!trimmedBelief) return null;
+
+  if (!BELIEF_VALUES.has(trimmedBelief)) return null;
+
+  return trimmedBelief;
 }
 
 function normalizePronouns(pronounsValue) {
@@ -438,7 +459,7 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
 
     db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizeEmail(email));
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at FROM users WHERE id = ?')
                    .get(info.lastInsertRowid);
 
     return res.status(201).json({ message: 'Konto erfolgreich erstellt!', user });
@@ -488,6 +509,7 @@ router.post('/login', async (req, res) => {
         email:      user.email,
         avatar:     user.avatar,
         birth_date: user.birth_date,
+        belief: user.belief,
         accent_color: user.accent_color,
         created_at: user.created_at
       }
@@ -509,7 +531,7 @@ router.get('/me', (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Nicht authentifiziert.' });
 
   const user = db.prepare(
-    'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, accent_color, created_at FROM users WHERE id = ?'
+    'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at FROM users WHERE id = ?'
   ).get(req.session.userId);
 
   if (!user) return res.status(401).json({ error: 'Benutzer nicht gefunden.' });
@@ -604,7 +626,7 @@ router.get('/public/:username', (req, res) => {
     }
 
     const user = db.prepare(`
-      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, accent_color, created_at
+      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at
       FROM users
       WHERE username = ?
     `).get(username);
@@ -781,7 +803,7 @@ router.post('/update-username', (req, res) => {
     db.prepare("UPDATE users SET username = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(newUsername, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Benutzername aktualisiert!', user });
@@ -817,7 +839,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 
     deleteOldAvatar(currentUser.avatar);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profilbild aktualisiert!', user });
@@ -830,7 +852,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 // ─── UPDATE PROFILE (NAME + USERNAME) ───────────────────────────────────────
 router.post('/update-profile', (req, res) => {
   try {
-    const { full_name, profile_name, pronouns, bio, birth_date, username, accent_color } = req.body;
+    const { full_name, profile_name, pronouns, bio, birth_date, belief, username, accent_color } = req.body;
 
     if (!req.session.userId) {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
@@ -845,6 +867,7 @@ router.post('/update-profile', (req, res) => {
     const trimmedPronouns = typeof pronouns === 'string' ? pronouns.trim() : '';
     const rawBio = typeof bio === 'string' ? bio : '';
     const trimmedBirthDate = typeof birth_date === 'string' ? birth_date.trim() : '';
+    const trimmedBelief = typeof belief === 'string' ? belief.trim() : '';
     const trimmedUsername = username.trim();
 
     if (!trimmedName) {
@@ -869,6 +892,11 @@ router.post('/update-profile', (req, res) => {
       return res.status(400).json({ error: 'Das Geburtsdatum muss im Format dd/mm/yyyy angegeben werden.' });
     }
 
+    const normalizedBelief = normalizeBelief(trimmedBelief);
+    if (trimmedBelief && !normalizedBelief) {
+      return res.status(400).json({ error: 'Bitte wähle einen gültigen Glauben aus der Liste aus.' });
+    }
+
     const normalizedPronouns = normalizePronouns(trimmedPronouns);
     if (trimmedPronouns && !normalizedPronouns) {
       return res.status(400).json({ error: 'Die Pronomen dürfen maximal 30 Zeichen lang sein.' });
@@ -886,10 +914,10 @@ router.post('/update-profile', (req, res) => {
       return res.status(409).json({ error: 'Dieser Benutzername ist bereits vergeben.' });
     }
 
-    db.prepare("UPDATE users SET full_name = ?, profile_name = ?, pronouns = ?, bio = ?, birth_date = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
-      .run(trimmedName, trimmedProfileName || null, normalizedPronouns, normalizedBio, normalizedBirthDate, trimmedUsername, normalizedAccentColor, req.session.userId);
+    db.prepare("UPDATE users SET full_name = ?, profile_name = ?, pronouns = ?, bio = ?, birth_date = ?, belief = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
+      .run(trimmedName, trimmedProfileName || null, normalizedPronouns, normalizedBio, normalizedBirthDate, normalizedBelief, trimmedUsername, normalizedAccentColor, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profil aktualisiert!', user });
