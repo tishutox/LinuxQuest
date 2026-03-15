@@ -906,7 +906,7 @@ body.user-theme-active .profile-background__reset:disabled {
   align-items: center;
   justify-content: center;
   column-gap: .6rem;
-  margin-top: -.7rem;
+  margin-top: -.82rem;
 }
 
 .public-profile__name-row {
@@ -915,7 +915,7 @@ body.user-theme-active .profile-background__reset:disabled {
   align-items: baseline;
   justify-content: center;
   column-gap: .4rem;
-  margin-top: -.7rem;
+  margin-top: -.78rem;
 }
 
 #public-profile-modal .profile__display-name {
@@ -956,7 +956,7 @@ body.user-theme-active .profile-background__reset:disabled {
 .public-profile__actions {
   display: inline-flex;
   align-items: center;
-  column-gap: .04rem;
+  column-gap: 0;
 }
 
 .public-profile__stats {
@@ -964,7 +964,7 @@ body.user-theme-active .profile-background__reset:disabled {
   align-items: center;
   justify-content: center;
   column-gap: .65rem;
-  margin-top: -.8rem;
+  margin-top: -.92rem;
 }
 
 .public-profile__bio-box {
