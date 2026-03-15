@@ -98,6 +98,7 @@ const SALT_ROUNDS    = 12;
 const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
 const VERIFY_IP_MAX_REQUESTS = 6;
 const verificationIpRequests = new Map();
+const EARLY_SUPPORTER_CUTOFF = '2026-06-18 00:00:00';
 
 function getMailErrorMessage(error) {
   const message = typeof error?.message === 'string' ? error.message : '';
@@ -157,7 +158,7 @@ function touchUserActivity(userId) {
 
 function getPublicUserProfileByEmail(email) {
   return db.prepare(`
-    SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at
+    SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at
     FROM users
     WHERE email = ?
   `).get(normalizeEmail(email));
@@ -193,43 +194,6 @@ function filterDisallowedUsers(users) {
   return Array.isArray(users)
     ? users.filter((user) => !isDisallowedUsername(user?.username))
     : [];
-}
-
-function purgeDisallowedUsers() {
-  try {
-    const allUsers = db.prepare(`
-      SELECT id, username, email, avatar
-      FROM users
-    `).all();
-
-    const disallowedUsers = allUsers.filter((user) => isDisallowedUsername(user.username));
-
-    if (!disallowedUsers.length) return 0;
-
-    const purgeTransaction = db.transaction((users) => {
-      const deleteEmailVerificationsByEmail = db.prepare('DELETE FROM email_verifications WHERE LOWER(email) = LOWER(?)');
-      const deletePasswordResetByEmail = db.prepare('DELETE FROM password_reset_verifications WHERE LOWER(email) = LOWER(?)');
-      const deleteUserFollows = db.prepare('DELETE FROM follows WHERE follower_id = ? OR following_id = ?');
-      const deleteUserById = db.prepare('DELETE FROM users WHERE id = ?');
-
-      users.forEach((user) => {
-        if (user.email) {
-          deleteEmailVerificationsByEmail.run(user.email);
-          deletePasswordResetByEmail.run(user.email);
-        }
-        deleteUserFollows.run(user.id, user.id);
-        deleteUserById.run(user.id);
-      });
-    });
-
-    purgeTransaction(disallowedUsers);
-    disallowedUsers.forEach((user) => deleteOldAvatar(user.avatar));
-    console.log(`[MODERATION] Purged ${disallowedUsers.length} disallowed user(s).`);
-    return disallowedUsers.length;
-  } catch (err) {
-    console.error('[MODERATION PURGE ERROR]', err);
-    return 0;
-  }
 }
 
 function isAdminSessionUser(req) {
@@ -299,6 +263,29 @@ function normalizeBio(bioValue) {
   if (normalizedBio.length > 200) return null;
 
   return normalizedBio;
+}
+
+function shouldGrantEarlySupporterNow() {
+  return Date.now() < new Date('2026-06-18T00:00:00').getTime();
+}
+
+function grantEarlySupporterStatus(userId) {
+  if (!userId) return;
+
+  try {
+    db.prepare(`
+      UPDATE users
+      SET early_supporter = 1
+      WHERE id = ?
+        AND COALESCE(early_supporter, 0) = 0
+        AND (
+          datetime(created_at) < datetime(?)
+          OR datetime('now') < datetime(?)
+        )
+    `).run(userId, EARLY_SUPPORTER_CUTOFF, EARLY_SUPPORTER_CUTOFF);
+  } catch (err) {
+    console.error('[EARLY SUPPORTER UPDATE ERROR]', err);
+  }
 }
 
 function getFollowCounts(userId) {
@@ -579,16 +566,16 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
     const hashed = await bcrypt.hash(password, SALT_ROUNDS);
 
     const info = db.prepare(`
-      INSERT INTO users (username, profile_name, full_name, email, password, avatar, last_active_at)
-      VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-    `).run(username.trim(), normalizedProfileName, full_name.trim(), normalizeEmail(email), hashed, avatarPath);
+      INSERT INTO users (username, profile_name, full_name, email, password, avatar, last_active_at, early_supporter)
+      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), ?)
+    `).run(username.trim(), normalizedProfileName, full_name.trim(), normalizeEmail(email), hashed, avatarPath, shouldGrantEarlySupporterNow() ? 1 : 0);
 
     // ── Start session ─────────────────────────────────────────────────────────
     req.session.userId = info.lastInsertRowid;
 
     db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizeEmail(email));
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at FROM users WHERE id = ?')
                    .get(info.lastInsertRowid);
 
     return res.status(201).json({ message: 'Konto erfolgreich erstellt!', user });
@@ -623,24 +610,32 @@ router.post('/login', async (req, res) => {
     }
 
     touchUserActivity(user.id);
+    grantEarlySupporterStatus(user.id);
+
+    const refreshedUser = db.prepare(`
+      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at
+      FROM users
+      WHERE id = ?
+    `).get(user.id);
 
     req.session.userId = user.id;
 
     return res.json({
       message: 'Erfolgreich angemeldet!',
       user: {
-        id:         user.id,
-        username:   user.username,
-        profile_name: user.profile_name,
-        pronouns: user.pronouns,
-        bio: user.bio,
-        full_name:  user.full_name,
-        email:      user.email,
-        avatar:     user.avatar,
-        birth_date: user.birth_date,
-        belief: user.belief,
-        accent_color: user.accent_color,
-        created_at: user.created_at
+        id: refreshedUser.id,
+        username: refreshedUser.username,
+        profile_name: refreshedUser.profile_name,
+        pronouns: refreshedUser.pronouns,
+        bio: refreshedUser.bio,
+        full_name: refreshedUser.full_name,
+        email: refreshedUser.email,
+        avatar: refreshedUser.avatar,
+        birth_date: refreshedUser.birth_date,
+        belief: refreshedUser.belief,
+        accent_color: refreshedUser.accent_color,
+        early_supporter: refreshedUser.early_supporter,
+        created_at: refreshedUser.created_at
       }
     });
 
@@ -660,7 +655,7 @@ router.get('/me', (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Nicht authentifiziert.' });
 
   const user = db.prepare(
-    'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at FROM users WHERE id = ?'
+    'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at FROM users WHERE id = ?'
   ).get(req.session.userId);
 
   if (!user) return res.status(401).json({ error: 'Benutzer nicht gefunden.' });
@@ -697,8 +692,7 @@ router.get('/search-users', (req, res) => {
         query: '',
         results: {
           displayNames: [],
-          usernames: [],
-          fullNames: []
+          usernames: []
         }
       });
     }
@@ -724,24 +718,14 @@ router.get('/search-users', (req, res) => {
       LIMIT ?
     `).all(likeQuery, limitPerGroup);
 
-    const fullNames = db.prepare(`
-      SELECT id, username, profile_name, full_name, avatar, accent_color
-      FROM users
-      WHERE full_name LIKE ? COLLATE NOCASE
-      ORDER BY full_name COLLATE NOCASE ASC, username COLLATE NOCASE ASC
-      LIMIT ?
-    `).all(likeQuery, limitPerGroup);
-
     const filteredDisplayNames = filterDisallowedUsers(displayNames);
     const filteredUsernames = filterDisallowedUsers(usernames);
-    const filteredFullNames = filterDisallowedUsers(fullNames);
 
     return res.json({
       query,
       results: {
         displayNames: filteredDisplayNames,
-        usernames: filteredUsernames,
-        fullNames: filteredFullNames
+        usernames: filteredUsernames
       }
     });
   } catch (err) {
@@ -792,29 +776,6 @@ router.get('/admin/users', (req, res) => {
   } catch (err) {
     console.error('[ADMIN USER LIST ERROR]', err);
     return res.status(500).json({ error: 'Admin-Userliste konnte nicht geladen werden.' });
-  }
-});
-
-router.post('/admin/purge-disallowed', (req, res) => {
-  try {
-    if (!req.session.userId) {
-      return res.status(401).json({ error: 'Nicht authentifiziert.' });
-    }
-
-    if (!isAdminSessionUser(req)) {
-      return res.status(403).json({ error: 'Kein Zugriff auf den Admin-Bereich.' });
-    }
-
-    const removedCount = purgeDisallowedUsers();
-    return res.json({
-      message: removedCount
-        ? `${removedCount} disallowed Nutzer wurden entfernt.`
-        : 'Keine disallowed Nutzer gefunden.',
-      removedCount
-    });
-  } catch (err) {
-    console.error('[ADMIN PURGE DISALLOWED ERROR]', err);
-    return res.status(500).json({ error: 'Disallowed-Purge konnte nicht ausgeführt werden.' });
   }
 });
 
@@ -887,7 +848,7 @@ router.get('/public/:username', (req, res) => {
     }
 
     const user = db.prepare(`
-      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at
+      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at
       FROM users
       WHERE username = ?
     `).get(username);
@@ -1088,7 +1049,7 @@ router.post('/update-username', (req, res) => {
     db.prepare("UPDATE users SET username = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(newUsername, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Benutzername aktualisiert!', user });
@@ -1124,7 +1085,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 
     deleteOldAvatar(currentUser.avatar);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profilbild aktualisiert!', user });
@@ -1210,7 +1171,7 @@ router.post('/update-profile', (req, res) => {
     db.prepare("UPDATE users SET full_name = ?, profile_name = ?, pronouns = ?, bio = ?, birth_date = ?, belief = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(trimmedName, trimmedProfileName || null, normalizedPronouns, normalizedBio, normalizedBirthDate, normalizedBelief, trimmedUsername, normalizedAccentColor, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profil aktualisiert!', user });
@@ -1320,8 +1281,6 @@ router.post('/reset-password', async (req, res) => {
 });
 
 module.exports = router;
-
-purgeDisallowedUsers();
 
 
 

@@ -31,6 +31,7 @@ db.exec(`
     birth_date  TEXT    DEFAULT NULL,
     belief      TEXT    DEFAULT NULL,
     accent_color TEXT   DEFAULT NULL,
+    early_supporter INTEGER DEFAULT 0,
     created_at  TEXT    DEFAULT (datetime('now')),
     last_active_at TEXT DEFAULT (datetime('now'))
   )
@@ -44,6 +45,7 @@ const hasPronounsColumn = userColumns.some((column) => column.name === 'pronouns
 const hasBioColumn = userColumns.some((column) => column.name === 'bio');
 const hasBirthDateColumn = userColumns.some((column) => column.name === 'birth_date');
 const hasBeliefColumn = userColumns.some((column) => column.name === 'belief');
+const hasEarlySupporterColumn = userColumns.some((column) => column.name === 'early_supporter');
 
 if (!hasLastActiveColumn) {
   db.exec('ALTER TABLE users ADD COLUMN last_active_at TEXT');
@@ -73,9 +75,20 @@ if (!hasBeliefColumn) {
   db.exec('ALTER TABLE users ADD COLUMN belief TEXT');
 }
 
+if (!hasEarlySupporterColumn) {
+  db.exec('ALTER TABLE users ADD COLUMN early_supporter INTEGER DEFAULT 0');
+}
+
 db.exec(`
   UPDATE users
   SET last_active_at = COALESCE(last_active_at, created_at, datetime('now'))
+`);
+
+db.exec(`
+  UPDATE users
+  SET early_supporter = 1
+  WHERE COALESCE(early_supporter, 0) = 0
+    AND datetime(created_at) < datetime('2026-06-18 00:00:00')
 `);
 
 // Email verification codes (for registration)

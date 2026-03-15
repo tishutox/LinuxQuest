@@ -376,40 +376,6 @@ img {
   margin-top: .55rem;
 }
 
-.admin-user-list__toolbar {
-  margin: .5rem 0 0;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.admin-user-list__meta {
-  margin-top: .35rem;
-  color: var(--text-color);
-  font-size: .8rem;
-  text-align: right;
-  opacity: .85;
-}
-
-.admin-user-list__purge {
-  border: 1px solid var(--container-color);
-  background: var(--container-color);
-  color: var(--text-color);
-  border-radius: .4rem;
-  padding: .35rem .6rem;
-  font-size: .8rem;
-  cursor: pointer;
-}
-
-.admin-user-list__purge:hover {
-  color: var(--first-color);
-  border-color: var(--first-color);
-}
-
-.admin-user-list__purge:disabled {
-  opacity: .65;
-  cursor: not-allowed;
-}
-
 .admin-user-list__item {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -1154,6 +1120,10 @@ body.user-theme-active .profile-background__reset:disabled {
   line-height: 1;
   display: block;
   transform: translateY(1px);
+}
+
+.public-profile__action--badge {
+  cursor: help;
 }
 
 #public-profile-modal {

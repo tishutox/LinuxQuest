@@ -85,12 +85,10 @@ function renderSearchResults(payload) {
    const results = payload?.results || {}
    const displayNames = Array.isArray(results.displayNames) ? results.displayNames : []
    const usernames = Array.isArray(results.usernames) ? results.usernames : []
-   const fullNames = Array.isArray(results.fullNames) ? results.fullNames : []
 
    searchResults.innerHTML = ''
    searchResults.appendChild(createSearchGroup('Anzeigename', displayNames, (user) => user.profile_name || '(kein Anzeigename)'))
    searchResults.appendChild(createSearchGroup('Username', usernames, (user) => '@' + user.username))
-   searchResults.appendChild(createSearchGroup('Echter Name', fullNames, (user) => user.full_name))
    searchResults.style.display = 'block'
 }
 
@@ -329,6 +327,7 @@ const publicProfileMessage = document.getElementById('public-profile-message')
 const publicProfileCopyBtn = document.getElementById('public-profile-copy-btn')
 const publicProfileZodiac = document.getElementById('public-profile-zodiac')
 const publicProfileBelief = document.getElementById('public-profile-belief')
+const publicProfileEarlySupporter = document.getElementById('public-profile-early-supporter')
 const publicProfileEmailLink = document.getElementById('public-profile-email-link')
 const publicProfileFollowingBadge = document.getElementById('public-profile-following-badge')
 const publicProfileFollowersCount = document.getElementById('public-profile-followers-count')
@@ -345,8 +344,6 @@ const adminUserListSearch = document.getElementById('admin-user-list-search')
 const adminUserListMessage = document.getElementById('admin-user-list-message')
 const adminUserListResults = document.getElementById('admin-user-list-results')
 const adminUserListForm = document.getElementById('admin-user-list-form')
-const adminUserListPurgeBtn = document.getElementById('admin-user-list-purge-btn')
-const adminUserListMeta = document.getElementById('admin-user-list-meta')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de',
@@ -641,6 +638,23 @@ function updatePublicProfileBelief(belief) {
    publicProfileBelief.href = beliefInfo.wikiUrl
    publicProfileBelief.title = beliefInfo.value
    publicProfileBelief.setAttribute('aria-label', `${beliefInfo.value} auf Wikipedia öffnen`)
+}
+
+function updatePublicProfileEarlySupporter(isEarlySupporter) {
+   if (!publicProfileEarlySupporter) return
+
+   if (!isEarlySupporter) {
+      publicProfileEarlySupporter.style.display = 'none'
+      publicProfileEarlySupporter.innerHTML = ''
+      publicProfileEarlySupporter.title = 'Early Supporter'
+      publicProfileEarlySupporter.setAttribute('aria-label', 'Early Supporter')
+      return
+   }
+
+   publicProfileEarlySupporter.style.display = 'inline-flex'
+   publicProfileEarlySupporter.innerHTML = '<i class="fi fi-rc-seedling"></i>'
+   publicProfileEarlySupporter.title = 'Early Supporter'
+   publicProfileEarlySupporter.setAttribute('aria-label', 'Early Supporter')
 }
 
 function hslToHex(h, s, l) {
@@ -957,6 +971,7 @@ function updatePublicProfileView(payload) {
    publicProfileUsername.textContent = '@' + user.username
    updatePublicProfileZodiac(user?.birth_date)
    updatePublicProfileBelief(user?.belief)
+   updatePublicProfileEarlySupporter(Boolean(user?.early_supporter))
    publicProfileBioText.textContent = hasBio ? publicBio : ''
    publicProfileBioBox.style.display = hasBio ? 'block' : 'none'
    updatePublicFollowStats()
@@ -1007,6 +1022,7 @@ function showPublicProfileError(message) {
    publicProfileUsername.textContent = '@unbekannt'
    updatePublicProfileZodiac(null)
    updatePublicProfileBelief(null)
+   updatePublicProfileEarlySupporter(false)
    publicProfileBioText.textContent = ''
    publicProfileBioBox.style.display = 'none'
     updatePublicFollowStats()
@@ -1484,37 +1500,6 @@ adminUserListSearch.addEventListener('input', () => {
 adminUserListForm.addEventListener('submit', (event) => {
    event.preventDefault()
    loadAdminUserList(adminUserListSearch.value)
-})
-
-adminUserListPurgeBtn.addEventListener('click', async () => {
-   if (!isAdminUser(currentUser)) {
-      return showMsg('admin-user-list-message', 'Kein Zugriff auf den Admin-Bereich.', 'error')
-   }
-
-   adminUserListPurgeBtn.disabled = true
-
-   try {
-      const response = await fetch('/api/auth/admin/purge-disallowed', {
-         method: 'POST',
-         credentials: 'include'
-      })
-
-      const data = await response.json()
-      if (!response.ok) {
-         showMsg('admin-user-list-message', data.error || 'Purge konnte nicht ausgeführt werden.', 'error')
-         return
-      }
-
-      showMsg('admin-user-list-message', data.message || 'Purge ausgeführt.', 'success')
-      if (adminUserListMeta) {
-         adminUserListMeta.textContent = `Zuletzt bereinigt: ${new Date().toLocaleTimeString('de-DE')}`
-      }
-      await loadAdminUserList(adminUserListSearch.value)
-   } catch (_) {
-      showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
-   } finally {
-      adminUserListPurgeBtn.disabled = false
-   }
 })
 
 async function openSharedProfileFromUrl() {
