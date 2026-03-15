@@ -1045,6 +1045,11 @@ function updatePublicProfileView(payload) {
       publicProfileEmailLink.dataset.action = viewerIsAdmin ? 'open-admin-list' : 'admin-label'
       setPublicProfileTooltip(publicProfileEmailLink, 'Admin')
       publicProfileEmailLink.setAttribute('aria-label', viewerIsAdmin ? 'Admin-Bereich öffnen' : 'Admin')
+      if (viewerIsAdmin) {
+         publicProfileEmailLink.classList.remove('public-profile__action--badge')
+      } else {
+         publicProfileEmailLink.classList.add('public-profile__action--badge')
+      }
    } else {
       hidePublicProfileTooltip(publicProfileEmailLink)
       publicProfileEmailLink.style.display = 'none'
@@ -1053,6 +1058,7 @@ function updatePublicProfileView(payload) {
       publicProfileEmailLink.dataset.action = ''
       publicProfileEmailLink.title = 'E-Mail schreiben'
       publicProfileEmailLink.setAttribute('aria-label', 'E-Mail schreiben')
+      publicProfileEmailLink.classList.remove('public-profile__action--badge')
    }
 }
 
@@ -1092,6 +1098,7 @@ function showPublicProfileError(message) {
    publicProfileEmailLink.dataset.action = ''
    publicProfileEmailLink.title = 'E-Mail schreiben'
    publicProfileEmailLink.setAttribute('aria-label', 'E-Mail schreiben')
+   publicProfileEmailLink.classList.remove('public-profile__action--badge')
    hideAll()
    publicProfileModal.classList.add('show-login')
 }
@@ -1578,6 +1585,7 @@ publicProfileEmailLink.addEventListener('click', async (event) => {
 
    if (publicProfileEmailLink.dataset.action !== 'open-admin-list') {
       event.preventDefault()
+      showPublicProfileTooltip(publicProfileEmailLink, { autoHide: false })
       return
    }
 
