@@ -766,7 +766,19 @@ body.user-theme-active .profile__avatar-button:hover {
   margin-top: .4rem;
   text-align: right;
   font-size: .75rem;
+  color: var(--text-color);
+  opacity: .6;
+  transition: color .2s, opacity .2s;
+}
+
+.profile__input-counter--warn {
+  color: hsl(35, 90%, 52%);
+  opacity: 1;
+}
+
+.profile__input-counter--danger {
   color: hsl(0, 75%, 56%);
+  opacity: 1;
 }
 
 .profile__bio-input {

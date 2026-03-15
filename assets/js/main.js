@@ -292,6 +292,8 @@ const profileFullNameInput = document.getElementById('profile-full-name-input')
 const profileDisplayNameInput = document.getElementById('profile-display-name-input')
 const profilePronounsInput = document.getElementById('profile-pronouns-input')
 const profilePronounsCounter = document.getElementById('profile-pronouns-counter')
+const profileDisplayNameCounter = document.getElementById('profile-display-name-counter')
+const profileUsernameCounter = document.getElementById('profile-username-counter')
 const profileBioInput = document.getElementById('profile-bio-input')
 const profileBioCounter = document.getElementById('profile-bio-counter')
 const profileBirthDateInput = document.getElementById('profile-birth-date-input')
@@ -476,16 +478,32 @@ function normalizeBio(value) {
    return value.replace(/\r\n?/g, '\n').trim()
 }
 
+function updateCounter(el, value, max) {
+   if (!el) return
+   const len = typeof value === 'string' ? value.length : 0
+   el.textContent = `${len}/${max}`
+   el.classList.remove('profile__input-counter--warn', 'profile__input-counter--danger')
+   if (len >= Math.ceil(max * 2 / 3)) {
+      el.classList.add('profile__input-counter--danger')
+   } else if (len >= Math.ceil(max / 3)) {
+      el.classList.add('profile__input-counter--warn')
+   }
+}
+
 function updatePronounsCounter(value = '') {
-   if (!profilePronounsCounter) return
-   const inputValue = typeof value === 'string' ? value : ''
-   profilePronounsCounter.textContent = `${inputValue.length}/30`
+   updateCounter(profilePronounsCounter, value, 30)
 }
 
 function updateBioCounter(value = '') {
-   if (!profileBioCounter) return
-   const inputValue = typeof value === 'string' ? value : ''
-   profileBioCounter.textContent = `${inputValue.length}/200`
+   updateCounter(profileBioCounter, value, 200)
+}
+
+function updateDisplayNameCounter(value = '') {
+   updateCounter(profileDisplayNameCounter, value, 20)
+}
+
+function updateUsernameCounter(value = '') {
+   updateCounter(profileUsernameCounter, value, 20)
 }
 
 function getZodiacSignByBirthDate(value) {
@@ -1089,6 +1107,7 @@ function updateProfileView(user) {
    profileAvatarImage.src  = getAvatarUrl(user)
    profileFullNameInput.value = user.full_name
    profileDisplayNameInput.value = getProfileDisplayName(user)
+   updateDisplayNameCounter(profileDisplayNameInput.value)
    profilePronounsInput.value = normalizePronouns(user?.pronouns)
    updatePronounsCounter(profilePronounsInput.value)
    profileBioInput.value = normalizeBio(user?.bio)
@@ -1096,6 +1115,7 @@ function updateProfileView(user) {
    profileBirthDateInput.value = typeof user.birth_date === 'string' ? user.birth_date : ''
    profileBeliefInput.value = getBeliefInfo(user?.belief)?.value || ''
    profileUsernameInput.value = user.username
+   updateUsernameCounter(profileUsernameInput.value)
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
    updateBackgroundControls(user)
    const displayName = getProfileDisplayName(user)
@@ -1140,6 +1160,7 @@ function setLoggedOut() {
    profileAvatarImage.src  = ''
    profileFullNameInput.value = ''
    profileDisplayNameInput.value = ''
+   updateDisplayNameCounter('')
    profilePronounsInput.value = ''
    updatePronounsCounter('')
    profileBioInput.value = ''
@@ -1147,6 +1168,7 @@ function setLoggedOut() {
    profileBirthDateInput.value = ''
    profileBeliefInput.value = ''
    profileUsernameInput.value = ''
+   updateUsernameCounter('')
    updateProfileAccentSummary(getDefaultAccentColor())
    profileDeletePasswordInput.value = ''
    profileDeletePasswordInput.disabled = false
@@ -1425,12 +1447,14 @@ profileBackgroundResetBtn.addEventListener('click', () => {
 profileUsernameInput.addEventListener('input', () => {
    const value = profileUsernameInput.value.trim()
    profileUsername.textContent = value ? '@' + value : '@'
+   updateUsernameCounter(profileUsernameInput.value)
 })
 
 profileDisplayNameInput.addEventListener('input', () => {
    const value = profileDisplayNameInput.value.trim()
    profileDisplayName.textContent = value
    profileDisplayName.style.display = value ? 'block' : 'none'
+   updateDisplayNameCounter(profileDisplayNameInput.value)
 })
 
 profilePronounsInput.addEventListener('input', () => {
@@ -1461,6 +1485,10 @@ profileForm.addEventListener('submit', async (e) => {
 
    if (trimmedProfileName.length > 20) {
       return showMsg('profile-message', 'Der Profilname darf maximal 20 Zeichen lang sein.', 'error')
+   }
+
+   if (username.length > 20) {
+      return showMsg('profile-message', 'Der Benutzername darf maximal 20 Zeichen lang sein.', 'error')
    }
 
    if (pronouns.length > 30) {

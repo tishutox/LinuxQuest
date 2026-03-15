@@ -407,6 +407,10 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
       return res.status(400).json({ error: 'Der Benutzername darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten.' });
     }
 
+    if (username.length > 20) {
+      return res.status(400).json({ error: 'Der Benutzername darf maximal 20 Zeichen lang sein.' });
+    }
+
     if (!THA_REGEX.test(email)) {
       return res.status(400).json({ error: 'Nur @tha.de-E-Mail-Adressen sind erlaubt.' });
     }
@@ -793,6 +797,10 @@ router.post('/update-username', (req, res) => {
       return res.status(400).json({ error: 'Der Benutzername darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten.' });
     }
 
+    if (newUsername.length > 20) {
+      return res.status(400).json({ error: 'Der Benutzername darf maximal 20 Zeichen lang sein.' });
+    }
+
     // Check if username is already taken
     const existing = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?')
                        .get(newUsername, req.session.userId);
@@ -880,6 +888,10 @@ router.post('/update-profile', (req, res) => {
 
     if (!USERNAME_REGEX.test(trimmedUsername)) {
       return res.status(400).json({ error: 'Der Benutzername darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten.' });
+    }
+
+    if (trimmedUsername.length > 20) {
+      return res.status(400).json({ error: 'Der Benutzername darf maximal 20 Zeichen lang sein.' });
     }
 
     const normalizedAccentColor = normalizeAccentColor(accent_color);
