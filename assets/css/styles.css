@@ -373,16 +373,21 @@ img {
 }
 
 .admin-user-list__results {
-  width: min(44rem, 92vw);
-  margin-inline: auto;
   margin-top: .55rem;
 }
 
 .admin-user-list__toolbar {
-  width: min(44rem, 92vw);
-  margin: .5rem auto 0;
+  margin: .5rem 0 0;
   display: flex;
   justify-content: flex-end;
+}
+
+.admin-user-list__meta {
+  margin-top: .35rem;
+  color: var(--text-color);
+  font-size: .8rem;
+  text-align: right;
+  opacity: .85;
 }
 
 .admin-user-list__purge {

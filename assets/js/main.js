@@ -346,6 +346,7 @@ const adminUserListMessage = document.getElementById('admin-user-list-message')
 const adminUserListResults = document.getElementById('admin-user-list-results')
 const adminUserListForm = document.getElementById('admin-user-list-form')
 const adminUserListPurgeBtn = document.getElementById('admin-user-list-purge-btn')
+const adminUserListMeta = document.getElementById('admin-user-list-meta')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de',
@@ -1505,6 +1506,9 @@ adminUserListPurgeBtn.addEventListener('click', async () => {
       }
 
       showMsg('admin-user-list-message', data.message || 'Purge ausgeführt.', 'success')
+      if (adminUserListMeta) {
+         adminUserListMeta.textContent = `Zuletzt bereinigt: ${new Date().toLocaleTimeString('de-DE')}`
+      }
       await loadAdminUserList(adminUserListSearch.value)
    } catch (_) {
       showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')

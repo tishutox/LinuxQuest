@@ -53,11 +53,15 @@ const DISALLOWED_USERNAME_TERMS = Object.freeze([
   'hitler',
   'h1tlerdidnothingwrong',
   'hitlerdidnothingwrong',
-  'muscular anime girl sprinting on a track with sunset city backdrop'
+  'muscular anime girl sprinting on a track with sunset city backdrop',
+  'muscular anime girl',
+  'muscularanimegirl'
 ]);
 const DISALLOWED_USERNAME_PATTERNS = Object.freeze([
   /h[e3]il+[^a-z0-9]*h[i1l!]+t[l1!][e3]r/iu,
-  /n+[^a-z0-9]*[i1l!]+[^a-z0-9]*[g69]+[^a-z0-9]*[g69]+[^a-z0-9]*[e3]+[^a-z0-9]*[r4]+/iu
+  /n+[^a-z0-9]*[i1l!]+[^a-z0-9]*[g69]+[^a-z0-9]*[g69]+[^a-z0-9]*[e3]+[^a-z0-9]*[r4]+/iu,
+  /muscular[^a-z0-9]*anime[^a-z0-9]*girl/iu,
+  /sprinting[^a-z0-9]*on[^a-z0-9]*a[^a-z0-9]*track/iu
 ]);
 const SALT_ROUNDS    = 12;
 const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
@@ -145,7 +149,10 @@ function isDisallowedUsername(usernameValue) {
 
   const compact = leetspeakNormalized.replace(/[^a-z0-9]/g, '');
 
-  const termMatch = DISALLOWED_USERNAME_TERMS.some((term) => compact.includes(term));
+  const termMatch = DISALLOWED_USERNAME_TERMS.some((term) => {
+    const compactTerm = String(term).toLowerCase().replace(/[^a-z0-9]/g, '');
+    return compactTerm && compact.includes(compactTerm);
+  });
   if (termMatch) return true;
 
   return DISALLOWED_USERNAME_PATTERNS.some((pattern) => pattern.test(leetspeakNormalized));
