@@ -448,6 +448,18 @@ function normalizeHexColor(value) {
    return /^#[0-9A-Fa-f]{6}$/.test(trimmed) ? trimmed.toUpperCase() : null
 }
 
+function getAccentTextColor(hexColor) {
+   const normalizedHex = normalizeHexColor(hexColor)
+   if (!normalizedHex) return '#FFF'
+
+   const red = parseInt(normalizedHex.slice(1, 3), 16)
+   const green = parseInt(normalizedHex.slice(3, 5), 16)
+   const blue = parseInt(normalizedHex.slice(5, 7), 16)
+   const perceivedBrightness = (red * 299 + green * 587 + blue * 114) / 1000
+
+   return perceivedBrightness >= 186 ? '#000' : '#FFF'
+}
+
 function parseBirthDate(value) {
    if (typeof value !== 'string') return null
    const trimmed = value.trim()
@@ -713,6 +725,7 @@ function syncAccentPickerUi({ hexOverride = null } = {}) {
    const hexColor = hexOverride || hslToHex(accentPickerState.hue, accentPickerState.saturation, accentPickerState.lightness)
    accentHexInput.value = hexColor
    accentColorModal.style.setProperty('--accent-picker-selected-color', hexColor)
+   accentColorModal.style.setProperty('--accent-picker-text-color', getAccentTextColor(hexColor))
 }
 
 function setAccentPickerFromHex(hexColor) {
@@ -752,11 +765,13 @@ function applyUserAccentColor(accentColor) {
    if (!normalizedAccentColor) {
       document.body.classList.remove(USER_THEME_CLASS)
       document.documentElement.style.setProperty('--user-accent-color', getDefaultAccentColor())
+      document.documentElement.style.setProperty('--user-accent-text-color', '#FFF')
       return
    }
 
    document.body.classList.add(USER_THEME_CLASS)
    document.documentElement.style.setProperty('--user-accent-color', normalizedAccentColor)
+   document.documentElement.style.setProperty('--user-accent-text-color', getAccentTextColor(normalizedAccentColor))
 }
 
 function applyPublicProfileAccentColor(accentColor) {
