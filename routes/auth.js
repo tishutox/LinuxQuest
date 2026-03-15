@@ -50,9 +50,14 @@ const BELIEF_VALUES = new Set([
   'Shintoismus'
 ]);
 const DISALLOWED_USERNAME_TERMS = Object.freeze([
+  'hitler',
   'h1tlerdidnothingwrong',
   'hitlerdidnothingwrong',
   'muscular anime girl sprinting on a track with sunset city backdrop'
+]);
+const DISALLOWED_USERNAME_PATTERNS = Object.freeze([
+  /h[e3]il+[^a-z0-9]*h[i1l!]+t[l1!][e3]r/iu,
+  /n+[^a-z0-9]*[i1l!]+[^a-z0-9]*[g69]+[^a-z0-9]*[g69]+[^a-z0-9]*[e3]+[^a-z0-9]*[r4]+/iu
 ]);
 const SALT_ROUNDS    = 12;
 const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
@@ -125,9 +130,25 @@ function getPublicUserProfileByEmail(email) {
 
 function isDisallowedUsername(usernameValue) {
   if (typeof usernameValue !== 'string') return false;
-  const lowered = usernameValue.trim().toLowerCase();
-  if (!lowered) return false;
-  return DISALLOWED_USERNAME_TERMS.some((term) => lowered.includes(term));
+  const rawValue = usernameValue.trim().toLowerCase();
+  if (!rawValue) return false;
+
+  const leetspeakNormalized = rawValue
+    .replace(/0/g, 'o')
+    .replace(/[1!|]/g, 'i')
+    .replace(/3/g, 'e')
+    .replace(/4/g, 'a')
+    .replace(/[5$]/g, 's')
+    .replace(/[6@]/g, 'g')
+    .replace(/[7+]/g, 't')
+    .replace(/8/g, 'b');
+
+  const compact = leetspeakNormalized.replace(/[^a-z0-9]/g, '');
+
+  const termMatch = DISALLOWED_USERNAME_TERMS.some((term) => compact.includes(term));
+  if (termMatch) return true;
+
+  return DISALLOWED_USERNAME_PATTERNS.some((pattern) => pattern.test(leetspeakNormalized));
 }
 
 function filterDisallowedUsers(users) {
@@ -145,7 +166,7 @@ function purgeDisallowedUsers() {
 
     const disallowedUsers = allUsers.filter((user) => isDisallowedUsername(user.username));
 
-    if (!disallowedUsers.length) return;
+    if (!disallowedUsers.length) return 0;
 
     const purgeTransaction = db.transaction((users) => {
       const deleteEmailVerificationsByEmail = db.prepare('DELETE FROM email_verifications WHERE LOWER(email) = LOWER(?)');
@@ -166,8 +187,10 @@ function purgeDisallowedUsers() {
     purgeTransaction(disallowedUsers);
     disallowedUsers.forEach((user) => deleteOldAvatar(user.avatar));
     console.log(`[MODERATION] Purged ${disallowedUsers.length} disallowed user(s).`);
+    return disallowedUsers.length;
   } catch (err) {
     console.error('[MODERATION PURGE ERROR]', err);
+    return 0;
   }
 }
 
@@ -731,6 +754,29 @@ router.get('/admin/users', (req, res) => {
   } catch (err) {
     console.error('[ADMIN USER LIST ERROR]', err);
     return res.status(500).json({ error: 'Admin-Userliste konnte nicht geladen werden.' });
+  }
+});
+
+router.post('/admin/purge-disallowed', (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    if (!isAdminSessionUser(req)) {
+      return res.status(403).json({ error: 'Kein Zugriff auf den Admin-Bereich.' });
+    }
+
+    const removedCount = purgeDisallowedUsers();
+    return res.json({
+      message: removedCount
+        ? `${removedCount} disallowed Nutzer wurden entfernt.`
+        : 'Keine disallowed Nutzer gefunden.',
+      removedCount
+    });
+  } catch (err) {
+    console.error('[ADMIN PURGE DISALLOWED ERROR]', err);
+    return res.status(500).json({ error: 'Disallowed-Purge konnte nicht ausgeführt werden.' });
   }
 });
 
