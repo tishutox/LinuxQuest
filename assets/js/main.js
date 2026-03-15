@@ -462,19 +462,19 @@ function getZodiacSignByBirthDate(value) {
 
    const monthDay = parsed.month * 100 + parsed.day
 
-   if (monthDay >= 120 && monthDay <= 218) return { name: 'Wassermann', iconClass: 'fi fi-rr-water' }
-   if (monthDay >= 219 && monthDay <= 320) return { name: 'Fische', iconClass: 'fi fi-rr-fish' }
-   if (monthDay >= 321 && monthDay <= 419) return { name: 'Widder', iconClass: 'fi fi-rr-ram' }
-   if (monthDay >= 420 && monthDay <= 520) return { name: 'Stier', iconClass: 'fi fi-rr-skull-cow' }
-   if (monthDay >= 521 && monthDay <= 620) return { name: 'Zwillinge', iconClass: 'fi fi-rr-mirror-user' }
-   if (monthDay >= 621 && monthDay <= 722) return { name: 'Krebs', iconClass: 'fi fi-rr-crab' }
-   if (monthDay >= 723 && monthDay <= 822) return { name: 'Löwe', iconClass: 'fi fi-rr-lion-head' }
-   if (monthDay >= 823 && monthDay <= 922) return { name: 'Jungfrau', iconClass: 'fi fi-rr-angel' }
-   if (monthDay >= 923 && monthDay <= 1022) return { name: 'Waage', iconClass: 'fi fi-rr-equality' }
-   if (monthDay >= 1023 && monthDay <= 1121) return { name: 'Skorpion', iconClass: 'fi fi-rr-scorpion' }
-   if (monthDay >= 1122 && monthDay <= 1221) return { name: 'Schütze', iconClass: 'fi fi-rr-bow-arrow' }
+   if (monthDay >= 120 && monthDay <= 218) return { name: 'Wassermann', iconClass: 'fi fi-rr-water', wikiUrl: 'https://de.wikipedia.org/wiki/Wassermann_(Tierkreiszeichen)' }
+   if (monthDay >= 219 && monthDay <= 320) return { name: 'Fische', iconClass: 'fi fi-rr-fish', wikiUrl: 'https://de.wikipedia.org/wiki/Fische_(Tierkreiszeichen)' }
+   if (monthDay >= 321 && monthDay <= 419) return { name: 'Widder', iconClass: 'fi fi-rr-ram', wikiUrl: 'https://de.wikipedia.org/wiki/Widder_(Tierkreiszeichen)' }
+   if (monthDay >= 420 && monthDay <= 520) return { name: 'Stier', iconClass: 'fi fi-rr-skull-cow', wikiUrl: 'https://de.wikipedia.org/wiki/Stier_(Tierkreiszeichen)' }
+   if (monthDay >= 521 && monthDay <= 620) return { name: 'Zwillinge', iconClass: 'fi fi-rr-mirror-user', wikiUrl: 'https://de.wikipedia.org/wiki/Zwillinge_(Tierkreiszeichen)' }
+   if (monthDay >= 621 && monthDay <= 722) return { name: 'Krebs', iconClass: 'fi fi-rr-crab', wikiUrl: 'https://de.wikipedia.org/wiki/Krebs_(Tierkreiszeichen)' }
+   if (monthDay >= 723 && monthDay <= 822) return { name: 'Löwe', iconClass: 'fi fi-rr-lion-head', wikiUrl: 'https://de.wikipedia.org/wiki/L%C3%B6we_(Tierkreiszeichen)' }
+   if (monthDay >= 823 && monthDay <= 922) return { name: 'Jungfrau', iconClass: 'fi fi-rr-angel', wikiUrl: 'https://de.wikipedia.org/wiki/Jungfrau_(Tierkreiszeichen)' }
+   if (monthDay >= 923 && monthDay <= 1022) return { name: 'Waage', iconClass: 'fi fi-rr-equality', wikiUrl: 'https://de.wikipedia.org/wiki/Waage_(Tierkreiszeichen)' }
+   if (monthDay >= 1023 && monthDay <= 1121) return { name: 'Skorpion', iconClass: 'fi fi-rr-scorpion', wikiUrl: 'https://de.wikipedia.org/wiki/Skorpion_(Tierkreiszeichen)' }
+   if (monthDay >= 1122 && monthDay <= 1221) return { name: 'Schütze', iconClass: 'fi fi-rr-bow-arrow', wikiUrl: 'https://de.wikipedia.org/wiki/Sch%C3%BCtze_(Tierkreiszeichen)' }
 
-   return { name: 'Steinbock', iconClass: 'fi fi-rr-sheep' }
+   return { name: 'Steinbock', iconClass: 'fi fi-rr-sheep', wikiUrl: 'https://de.wikipedia.org/wiki/Steinbock_(Tierkreiszeichen)' }
 }
 
 function updatePublicProfileZodiac(birthDate) {
@@ -484,6 +484,7 @@ function updatePublicProfileZodiac(birthDate) {
    if (!zodiacSign) {
       publicProfileZodiac.style.display = 'none'
       publicProfileZodiac.innerHTML = ''
+      publicProfileZodiac.href = '#'
       publicProfileZodiac.title = 'Sternzeichen'
       publicProfileZodiac.setAttribute('aria-label', 'Sternzeichen')
       return
@@ -491,8 +492,9 @@ function updatePublicProfileZodiac(birthDate) {
 
    publicProfileZodiac.style.display = 'inline-flex'
    publicProfileZodiac.innerHTML = `<i class="${zodiacSign.iconClass}"></i>`
+   publicProfileZodiac.href = zodiacSign.wikiUrl
    publicProfileZodiac.title = zodiacSign.name
-   publicProfileZodiac.setAttribute('aria-label', zodiacSign.name)
+   publicProfileZodiac.setAttribute('aria-label', `${zodiacSign.name} auf Wikipedia öffnen`)
 }
 
 function hslToHex(h, s, l) {

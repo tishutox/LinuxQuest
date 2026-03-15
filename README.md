@@ -19,6 +19,7 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 	- Optional (leer = keine Anzeige)
 - Optionales Geburtsdatum speichern (`dd/mm/yyyy`)
 - Sternzeichen-Icon im öffentlichen Profil anzeigen (wenn Geburtsdatum gesetzt ist)
+	- Klick auf das Sternzeichen-Icon öffnet den passenden Wikipedia-Artikel
 - Akzentfarbe fürs Profil auswählen
 - Konto löschen (mit Passwort-Bestätigung)
 - Geschützte Projektkonten können nicht gelöscht werden
