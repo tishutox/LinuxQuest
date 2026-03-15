@@ -721,6 +721,10 @@ body.user-theme-active .nav__avatar {
   margin-top: .1rem;
 }
 
+#public-profile-modal .info-modal__avatar-wrap {
+  margin-bottom: 1rem;
+}
+
 .profile__avatar-button {
   width: 6rem;
   height: 6rem;
@@ -894,7 +898,7 @@ body.user-theme-active .profile-background__reset:disabled {
   align-items: center;
   justify-content: center;
   column-gap: .6rem;
-  margin-top: -.7rem;
+  margin-top: .1rem;
 }
 
 .public-profile__name-row {
@@ -903,7 +907,7 @@ body.user-theme-active .profile-background__reset:disabled {
   align-items: baseline;
   justify-content: center;
   column-gap: .4rem;
-  margin-top: -.7rem;
+  margin-top: .2rem;
 }
 
 #public-profile-modal .profile__display-name {
@@ -951,12 +955,12 @@ body.user-theme-active .profile-background__reset:disabled {
   align-items: center;
   justify-content: center;
   column-gap: .65rem;
-  margin-top: -.8rem;
+  margin-top: .2rem;
 }
 
 .public-profile__bio-box {
   width: 100%;
-  margin-top: -.45rem;
+  margin-top: .5rem;
   padding: .65rem .8rem;
   border: 1px solid var(--border-color);
   border-radius: .6rem;
