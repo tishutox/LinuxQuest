@@ -23,6 +23,21 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 - Konto löschen (mit Passwort-Bestätigung)
 - Geschützte Projektkonten können nicht gelöscht werden
 
+#### Schnelltest: Geburtsdatum & Sternzeichen
+1. Einloggen und Profil öffnen.
+2. Im Feld „Geburtsdatum“ einen Wert im Format `dd/mm/yyyy` eintragen (z. B. `21/03/2000`) und speichern.
+3. Das öffentliche Profil des Accounts öffnen.
+4. In der Username-Zeile prüfen: Direkt nach dem Link-Icon erscheint das Sternzeichen-Icon passend zum Datum.
+5. Negativtest: Ungültiges Datum wie `31/02/2000` oder falsches Format wie `2000-03-21` speichern → Validierungsfehler sollte angezeigt werden.
+
+#### QA-Beispiele (Datum → Sternzeichen)
+| Geburtsdatum | Erwartetes Sternzeichen |
+|---|---|
+| `21/03/2000` | Widder |
+| `15/08/1999` | Löwe |
+| `05/12/2001` | Schütze |
+| `10/01/1998` | Steinbock |
+
 ### Öffentliche Profile & Social
 - Öffentliche Profilansicht für alle Accounts
 - Profil-Link teilen/kopieren
