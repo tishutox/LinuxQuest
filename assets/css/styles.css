@@ -767,6 +767,13 @@ body.user-theme-active .profile__avatar-button:hover {
   color: var(--text-color);
 }
 
+.profile__input-counter {
+  margin-top: .4rem;
+  text-align: right;
+  font-size: .75rem;
+  color: hsl(0, 75%, 56%);
+}
+
 .profile-background__pick,
 .profile-background__reset {
   width: 100%;

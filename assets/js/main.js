@@ -291,6 +291,7 @@ const profileForm         = document.getElementById('profile-form')
 const profileFullNameInput = document.getElementById('profile-full-name-input')
 const profileDisplayNameInput = document.getElementById('profile-display-name-input')
 const profilePronounsInput = document.getElementById('profile-pronouns-input')
+const profilePronounsCounter = document.getElementById('profile-pronouns-counter')
 const profileBirthDateInput = document.getElementById('profile-birth-date-input')
 const profileUsernameInput = document.getElementById('profile-username-input')
 const profileAccentColorOpen = document.getElementById('profile-accent-color-open')
@@ -462,6 +463,12 @@ function parseBirthDate(value) {
 function normalizePronouns(value) {
    if (typeof value !== 'string') return ''
    return value.replace(/\s+/g, ' ').trim()
+}
+
+function updatePronounsCounter(value = '') {
+   if (!profilePronounsCounter) return
+   const inputValue = typeof value === 'string' ? value : ''
+   profilePronounsCounter.textContent = `${inputValue.length}/30`
 }
 
 function getZodiacSignByBirthDate(value) {
@@ -988,6 +995,7 @@ function updateProfileView(user) {
    profileFullNameInput.value = user.full_name
    profileDisplayNameInput.value = getProfileDisplayName(user)
    profilePronounsInput.value = normalizePronouns(user?.pronouns)
+   updatePronounsCounter(profilePronounsInput.value)
    profileBirthDateInput.value = typeof user.birth_date === 'string' ? user.birth_date : ''
    profileUsernameInput.value = user.username
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
@@ -1035,6 +1043,7 @@ function setLoggedOut() {
    profileFullNameInput.value = ''
    profileDisplayNameInput.value = ''
    profilePronounsInput.value = ''
+   updatePronounsCounter('')
    profileBirthDateInput.value = ''
    profileUsernameInput.value = ''
    updateProfileAccentSummary(getDefaultAccentColor())
@@ -1321,6 +1330,10 @@ profileDisplayNameInput.addEventListener('input', () => {
    const value = profileDisplayNameInput.value.trim()
    profileDisplayName.textContent = value
    profileDisplayName.style.display = value ? 'block' : 'none'
+})
+
+profilePronounsInput.addEventListener('input', () => {
+   updatePronounsCounter(profilePronounsInput.value)
 })
 
 profileForm.addEventListener('submit', async (e) => {
