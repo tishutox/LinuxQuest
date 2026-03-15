@@ -706,6 +706,11 @@ body.user-theme-active .nav__avatar {
 .profile__avatar-wrap {
   display: flex;
   justify-content: center;
+  margin-bottom: .55rem;
+}
+
+.profile__bio-group {
+  margin-top: .45rem;
 }
 
 .profile__avatar-button {
