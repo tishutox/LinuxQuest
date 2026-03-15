@@ -940,7 +940,7 @@ body.user-theme-active .profile-background__reset:disabled {
   margin: 0;
   line-height: .9;
   display: inline-block;
-  transform: translateY(-1px);
+  transform: translateY(0.5px);
 }
 
 .public-profile__following-badge {
@@ -967,7 +967,7 @@ body.user-theme-active .profile-background__reset:disabled {
   align-items: center;
   justify-content: center;
   column-gap: .65rem;
-  margin-top: -1.25rem;
+  margin-top: -.82rem;
 }
 
 .public-profile__bio-box {
