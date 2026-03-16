@@ -1,4 +1,4 @@
-const CACHE_NAME = 'linuxquest-v5'
+const CACHE_NAME = 'linuxquest-v6'
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -29,9 +29,17 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
 
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse
-      return fetch(event.request)
-    })
+    (async () => {
+      try {
+        const networkResponse = await fetch(event.request)
+        const cache = await caches.open(CACHE_NAME)
+        cache.put(event.request, networkResponse.clone())
+        return networkResponse
+      } catch (_) {
+        const cachedResponse = await caches.match(event.request)
+        if (cachedResponse) return cachedResponse
+        throw _
+      }
+    })()
   )
 })

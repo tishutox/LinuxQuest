@@ -34,8 +34,14 @@ window.addEventListener('appinstalled', () => {
 
 if ('serviceWorker' in navigator) {
    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch((error) => {
+      navigator.serviceWorker.register('/sw.js').then((registration) => {
+         registration.update().catch(() => {})
+      }).catch((error) => {
          console.error('[SERVICE WORKER REGISTRATION ERROR]', error)
+      })
+
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+         window.location.reload()
       })
    })
 }
