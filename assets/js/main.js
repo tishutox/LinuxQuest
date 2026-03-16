@@ -267,6 +267,7 @@ profileClose.addEventListener('click', hideAll)
 accentColorClose.addEventListener('click', () => accentColorModal.classList.remove('show-login'))
 birthDateClose.addEventListener('click', () => birthDateModal.classList.remove('show-login'))
 beliefClose.addEventListener('click', () => beliefModal.classList.remove('show-login'))
+reportClose.addEventListener('click', hideAll)
 publicProfileClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
 adminUserListClose.addEventListener('click', hideAll)
@@ -399,6 +400,15 @@ const adminUserListSearch = document.getElementById('admin-user-list-search')
 const adminUserListMessage = document.getElementById('admin-user-list-message')
 const adminUserListResults = document.getElementById('admin-user-list-results')
 const adminUserListForm = document.getElementById('admin-user-list-form')
+
+const reportModal = document.getElementById('report-modal')
+const reportReasonInput = document.getElementById('report-reason-input')
+const reportReasonCounter = document.getElementById('report-reason-counter')
+const reportCancelBtn = document.getElementById('report-cancel-btn')
+const reportSubmitBtn = document.getElementById('report-submit-btn')
+const reportClose = document.getElementById('report-close')
+const reportMessage = document.getElementById('report-message')
+const publicProfileReportBtn = document.getElementById('public-profile-report-btn')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de',

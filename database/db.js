@@ -134,4 +134,20 @@ db.exec(`
 db.exec('CREATE INDEX IF NOT EXISTS idx_follows_follower_id ON follows(follower_id)');
 db.exec('CREATE INDEX IF NOT EXISTS idx_follows_following_id ON follows(following_id)');
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS reports (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    reported_user_id INTEGER NOT NULL,
+    reporter_user_id INTEGER NOT NULL,
+    reason        TEXT    DEFAULT NULL,
+    created_at    TEXT    DEFAULT (datetime('now')),
+    FOREIGN KEY (reported_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (reporter_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CHECK (reported_user_id <> reporter_user_id)
+  )
+`);
+
+db.exec('CREATE INDEX IF NOT EXISTS idx_reports_reported_user_id ON reports(reported_user_id)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_reports_reporter_user_id ON reports(reporter_user_id)');
+
 module.exports = db;

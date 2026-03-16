@@ -1672,3 +1672,21 @@ body.user-theme-active .profile-background__reset:disabled {
     color: var(--text-color) !important;
   }
 }
+
+/* =============== REPORT BUTTON =============== */
+.public-profile__action--report {
+  color: var(--text-color);
+  font-size: 1.3rem;
+  transition: color .3s;
+}
+
+.public-profile__action--report:hover {
+  color: hsl(0, 75%, 56%);
+}
+
+/* =============== REPORT MODAL =============== */
+.report-modal__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+}
