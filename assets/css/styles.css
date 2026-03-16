@@ -648,7 +648,6 @@ body.user-theme-active #belief-modal .belief-picker__religion {
 }
 
 .info-modal__avatar-wrap {
-  position: relative;
   display: flex;
   justify-content: center;
   margin-bottom: .35rem;
@@ -1011,7 +1010,6 @@ body.user-theme-active #belief-modal #belief-picker-confession {
 }
 
 #public-profile-modal .info-modal__avatar-wrap {
-  width: 100%;
   margin-bottom: .9rem;
 }
 
@@ -1699,23 +1697,12 @@ body.user-theme-active .profile-background__reset:disabled {
 /* =============== REPORT BUTTON =============== */
 .public-profile__action--report {
   color: var(--text-color);
-  font-size: 3.9rem;
+  font-size: 1.5rem;
   transition: color .3s;
 }
 
 .public-profile__action--report:hover {
   color: hsl(0, 75%, 56%);
-}
-
-.public-profile__action--report-float {
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  z-index: 2;
 }
 
 /* =============== REPORT MODAL =============== */
