@@ -1040,7 +1040,7 @@ body.user-theme-active #belief-modal #belief-picker-confession {
 
 .report-modal__actions {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: .6rem;
 }
 

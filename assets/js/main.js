@@ -404,7 +404,9 @@ const publicProfileBioText = document.getElementById('public-profile-bio-text')
 const publicProfileReportBtn = document.getElementById('public-profile-report-btn')
 const reportReasonInput = document.getElementById('report-reason-input')
 const reportReasonCounter = document.getElementById('report-reason-counter')
+const reportSubmitBtn = document.getElementById('report-submit-btn')
 const reportCancelBtn = document.getElementById('report-cancel-btn')
+const reportMessage = document.getElementById('report-message')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
 const followListContainer = document.getElementById('follow-list-container')
@@ -1785,6 +1787,7 @@ publicProfileReportBtn.addEventListener('click', () => {
    hideAll()
    if (reportReasonInput) reportReasonInput.value = ''
    if (reportReasonCounter) reportReasonCounter.textContent = '0/200'
+   if (reportMessage) clearMsg('report-message')
    reportModal.classList.add('show-login')
 })
 
@@ -1792,6 +1795,17 @@ reportCancelBtn.addEventListener('click', hideAll)
 
 reportReasonInput?.addEventListener('input', () => {
    reportReasonCounter.textContent = `${reportReasonInput.value.length}/200`
+})
+
+reportSubmitBtn?.addEventListener('click', () => {
+   reportSubmitBtn.disabled = true
+   reportSubmitBtn.textContent = 'Meldet…'
+
+   window.setTimeout(() => {
+      showMsg('report-message', 'Melde-Backend folgt im nächsten Schritt.', 'success')
+      reportSubmitBtn.disabled = false
+      reportSubmitBtn.textContent = 'Melden'
+   }, 700)
 })
 
 publicProfileFollowBtn.addEventListener('click', async () => {
