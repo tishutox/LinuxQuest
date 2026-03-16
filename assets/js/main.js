@@ -1518,6 +1518,17 @@ function renderAdminUserList(users) {
          const actions = document.createElement('div')
          actions.className = 'admin-user-list__actions'
 
+         const reportsButton = document.createElement('button')
+         reportsButton.type = 'button'
+         reportsButton.className = 'admin-user-list__reports'
+         reportsButton.textContent = 'Meldungen'
+
+         reportsButton.addEventListener('click', () => {
+            showMsg('admin-user-list-message', `Meldungen für @${user.username} folgen im nächsten Schritt.`, 'success')
+         })
+
+         actions.appendChild(reportsButton)
+
          if (user.isProtected) {
             const protectedLabel = document.createElement('span')
             protectedLabel.className = 'admin-user-list__protected'
