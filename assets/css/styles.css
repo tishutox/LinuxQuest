@@ -446,6 +446,21 @@ img {
   color: #fff;
 }
 
+.admin-user-list__reports {
+  border: 1px solid var(--first-color);
+  background: transparent;
+  color: var(--first-color);
+  padding: .25rem .5rem;
+  border-radius: .35rem;
+  font-size: .8rem;
+  cursor: pointer;
+}
+
+.admin-user-list__reports:hover {
+  background: var(--first-color);
+  color: #fff;
+}
+
 .admin-user-list__protected {
   font-size: .75rem;
   color: var(--text-color);
@@ -1689,4 +1704,48 @@ body.user-theme-active .profile-background__reset:disabled {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: .6rem;
+}
+
+/* =============== ADMIN REPORTS MODAL =============== */
+.admin-reports__list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: .4rem;
+  margin-bottom: 1rem;
+}
+
+.admin-reports__item {
+  padding: .75rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: .9rem;
+}
+
+.admin-reports__item:last-child {
+  border-bottom: none;
+}
+
+.admin-reports__empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-color);
+  opacity: .6;
+}
+
+.admin-reports__reporter {
+  font-weight: 600;
+  color: var(--first-color);
+  margin-bottom: .25rem;
+}
+
+.admin-reports__reason {
+  color: var(--text-color);
+  margin-bottom: .25rem;
+  word-break: break-word;
+}
+
+.admin-reports__date {
+  font-size: .8rem;
+  color: var(--text-color);
+  opacity: .6;
 }
