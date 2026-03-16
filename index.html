@@ -392,9 +392,6 @@
                   <a href="#" class="public-profile__action" id="public-profile-email-link" title="E-Mail schreiben" aria-label="E-Mail schreiben" style="display:none;">
                      <i class="fi fi-rc-envelope"></i>
                   </a>
-                  <button type="button" class="public-profile__action public-profile__action--report" id="public-profile-report-btn" title="Melden" aria-label="Melden">
-                     <i class="fi fi-rr-megaphone"></i>
-                  </button>
                </div>
             </div>
 
@@ -418,45 +415,6 @@
          </div>
 
          <i class="fi fi-rr-cross-small login__close" id="public-profile-close"></i>
-      </div>
-
-      <!--==================== REPORT MODAL ====================-->
-      <div class="login" id="report-modal">
-         <div class="login__form profile__form">
-            <h2 class="login__title">Benutzer melden</h2>
-
-            <div class="login__message" id="report-message"></div>
-
-            <div>
-               <label for="report-reason-input" class="login__label">Grund (optional)</label>
-               <textarea id="report-reason-input" class="login__input profile__bio-input" maxlength="200" placeholder="Kurze Beschreibung des Problems..."></textarea>
-               <p class="profile__input-counter" id="report-reason-counter">0/200</p>
-            </div>
-
-            <div class="report-modal__actions">
-               <button type="button" class="login__button profile__delete-button" id="report-cancel-btn">Abbrechen</button>
-               <button type="button" class="login__button" id="report-submit-btn">Melden</button>
-            </div>
-         </div>
-
-         <i class="fi fi-rr-cross-small login__close" id="report-close"></i>
-      </div>
-
-      <!--==================== ADMIN REPORTS MODAL ====================-->
-      <div class="login" id="admin-reports-modal">
-         <div class="login__form profile__form">
-            <h2 class="login__title" id="admin-reports-title">Meldungen</h2>
-
-            <div class="login__message" id="admin-reports-message"></div>
-
-            <div id="admin-reports-list" class="admin-reports__list">
-               <!-- Reports werden hier eingefügt -->
-            </div>
-
-            <button type="button" class="login__button" id="admin-reports-close-btn">Schließen</button>
-         </div>
-
-         <i class="fi fi-rr-cross-small login__close" id="admin-reports-close"></i>
       </div>
 
       <div class="login" id="accent-color-modal">

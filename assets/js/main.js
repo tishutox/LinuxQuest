@@ -221,7 +221,7 @@ function hideStaticModals() {
 const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
 const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
 const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); adminReportsModal?.classList.remove('show-login'); hideStaticModals() }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -267,7 +267,6 @@ profileClose.addEventListener('click', hideAll)
 accentColorClose.addEventListener('click', () => accentColorModal.classList.remove('show-login'))
 birthDateClose.addEventListener('click', () => birthDateModal.classList.remove('show-login'))
 beliefClose.addEventListener('click', () => beliefModal.classList.remove('show-login'))
-reportClose?.addEventListener('click', hideAll)
 publicProfileClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
 adminUserListClose.addEventListener('click', hideAll)
@@ -400,22 +399,6 @@ const adminUserListSearch = document.getElementById('admin-user-list-search')
 const adminUserListMessage = document.getElementById('admin-user-list-message')
 const adminUserListResults = document.getElementById('admin-user-list-results')
 const adminUserListForm = document.getElementById('admin-user-list-form')
-
-const reportModal = document.getElementById('report-modal')
-const reportReasonInput = document.getElementById('report-reason-input')
-const reportReasonCounter = document.getElementById('report-reason-counter')
-const reportCancelBtn = document.getElementById('report-cancel-btn')
-const reportSubmitBtn = document.getElementById('report-submit-btn')
-const reportClose = document.getElementById('report-close')
-const reportMessage = document.getElementById('report-message')
-const publicProfileReportBtn = document.getElementById('public-profile-report-btn')
-
-const adminReportsModal = document.getElementById('admin-reports-modal')
-const adminReportsList = document.getElementById('admin-reports-list')
-const adminReportsTitle = document.getElementById('admin-reports-title')
-const adminReportsMessage = document.getElementById('admin-reports-message')
-const adminReportsCloseBtn = document.getElementById('admin-reports-close-btn')
-const adminReportsClose = document.getElementById('admin-reports-close')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de',
@@ -1520,18 +1503,6 @@ function renderAdminUserList(users) {
          const actions = document.createElement('div')
          actions.className = 'admin-user-list__actions'
 
-         // ─── REPORTS BUTTON (always available) ───
-         const reportsButton = document.createElement('button')
-         reportsButton.type = 'button'
-         reportsButton.className = 'admin-user-list__reports'
-         reportsButton.textContent = 'Meldungen'
-
-         reportsButton.addEventListener('click', async () => {
-            await openAdminReports(user.username)
-         })
-
-         actions.appendChild(reportsButton)
-
          if (user.isProtected) {
             const protectedLabel = document.createElement('span')
             protectedLabel.className = 'admin-user-list__protected'
@@ -2266,151 +2237,6 @@ profileForm.addEventListener('submit', async (e) => {
       profileSaveBtn.textContent = 'Änderungen speichern'
    }
 })
-
-// ─── REPORT CHARACTER COUNTER ───────────────────────────────────────────
-reportReasonInput?.addEventListener('input', () => {
-   const length = reportReasonInput.value.length
-   reportReasonCounter.textContent = `${length}/200`
-})
-
-// ─── OPEN REPORT MODAL ───────────────────────────────────────────────────
-let reportTargetUsername = null
-
-publicProfileReportBtn?.addEventListener('click', () => {
-   if (!currentUser) {
-      return showMsg('public-profile-message', 'Du musst angemeldet sein, um zu melden.', 'error')
-   }
-
-   const resolvedTargetUsername = (currentPublicProfileUser?.username || publicProfileUsername.textContent || '')
-      .trim()
-      .replace(/^@/, '')
-   reportTargetUsername = resolvedTargetUsername
-
-   if (!reportTargetUsername || reportTargetUsername.toLowerCase() === 'unbekannt') {
-      return showMsg('public-profile-message', 'Benutzer konnte nicht ermittelt werden.', 'error')
-   }
-
-   if (reportTargetUsername.toLowerCase() === String(currentUser.username || '').trim().toLowerCase()) {
-      return showMsg('public-profile-message', 'Du kannst dich selbst nicht melden.', 'error')
-   }
-   
-   reportReasonInput.value = ''
-   reportReasonCounter.textContent = '0/200'
-   clearMsg('report-message')
-   clearMsg('public-profile-message')
-   hideAll()
-   reportModal.classList.add('show-login')
-})
-
-// ─── REPORT SUBMIT ───────────────────────────────────────────────────────
-reportSubmitBtn?.addEventListener('click', async () => {
-   if (!reportTargetUsername || !currentUser) {
-      return showMsg('report-message', 'Fehler: Benutzername nicht gespeichert.', 'error')
-   }
-
-   const reason = reportReasonInput.value.trim()
-   
-   reportSubmitBtn.disabled = true
-   reportSubmitBtn.textContent = 'Meldet…'
-   
-   try {
-      const res = await fetch(`/api/auth/report/${encodeURIComponent(reportTargetUsername)}`, {
-         method: 'POST',
-         credentials: 'include',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ reason: reason || null })
-      })
-      const data = await res.json()
-      
-      if (!res.ok) {
-         showMsg('report-message', data.error || 'Meldung konnte nicht eingereicht werden.', 'error')
-      } else {
-         showMsg('report-message', 'Vielen Dank! Deine Meldung wurde eingereicht.', 'success')
-         setTimeout(() => {
-            hideAll()
-            reportReasonInput.value = ''
-            reportReasonCounter.textContent = '0/200'
-         }, 800)
-      }
-   } catch (_) {
-      showMsg('report-message', 'Server nicht erreichbar.', 'error')
-   } finally {
-      reportSubmitBtn.disabled = false
-      reportSubmitBtn.textContent = 'Melden'
-   }
-})
-
-// ─── REPORT CANCEL ───────────────────────────────────────────────────────
-reportCancelBtn?.addEventListener('click', hideAll)
-
-// ─── ADMIN REPORTS MODAL CLOSE ───────────────────────────────────────────────────────
-adminReportsCloseBtn?.addEventListener('click', hideAll)
-adminReportsClose?.addEventListener('click', hideAll)
-
-// ─── OPEN ADMIN REPORTS ──────────────────────────────────────────────────────────────
-async function openAdminReports(username) {
-   clearMsg('admin-reports-message')
-   adminReportsList.innerHTML = ''
-   
-   adminReportsTitle.textContent = `Meldungen für @${username}`
-   hideAll()
-   adminReportsModal.classList.add('show-login')
-   
-   try {
-      const res = await fetch(`/api/auth/admin/reports/${encodeURIComponent(username)}`, {
-         method: 'GET',
-         credentials: 'include'
-      })
-      const data = await res.json()
-      
-      if (!res.ok) {
-         showMsg('admin-reports-message', data.error || 'Konnte Meldungen nicht abrufen.', 'error')
-         return
-      }
-      
-      const reports = data.reports || []
-      
-      if (reports.length === 0) {
-         adminReportsList.innerHTML = '<div class="admin-reports__empty">Keine Meldungen vorhanden</div>'
-         return
-      }
-      
-      reports.forEach((report) => {
-         const item = document.createElement('div')
-         item.className = 'admin-reports__item'
-         
-         const reporterDiv = document.createElement('div')
-         reporterDiv.className = 'admin-reports__reporter'
-         reporterDiv.textContent = `@${report.reporter_username || 'Unbekannt'}`
-         
-         let reasonDiv = ''
-         if (report.reason) {
-            const reasonEl = document.createElement('div')
-            reasonEl.className = 'admin-reports__reason'
-            reasonEl.textContent = report.reason
-            reasonDiv = reasonEl
-         }
-         
-         const dateDiv = document.createElement('div')
-         dateDiv.className = 'admin-reports__date'
-         const date = new Date(report.created_at)
-         dateDiv.textContent = date.toLocaleDateString('de-DE', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-         })
-         
-         item.appendChild(reporterDiv)
-         if (reasonDiv) item.appendChild(reasonDiv)
-         item.appendChild(dateDiv)
-         adminReportsList.appendChild(item)
-      })
-   } catch (_) {
-      showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
-   }
-}
 
 profileDeleteBtn.addEventListener('click', async () => {
    if (!currentUser) return
