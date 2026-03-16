@@ -474,10 +474,19 @@ async function openAdminReports(username) {
          const item = document.createElement('div')
          item.className = 'admin-reports__item'
 
-         const reporter = document.createElement('div')
-         reporter.className = 'admin-reports__reporter'
+         const reporter = document.createElement('button')
+         reporter.type = 'button'
+         reporter.className = 'admin-reports__reporter admin-reports__reporter-button'
          const reporterName = report.reporter_full_name ? `${report.reporter_full_name} (@${report.reporter_username || 'unbekannt'})` : `@${report.reporter_username || 'unbekannt'}`
          reporter.textContent = reporterName
+
+         if (report.reporter_username) {
+            reporter.addEventListener('click', async () => {
+               await openPublicProfileByUsername(report.reporter_username)
+            })
+         } else {
+            reporter.disabled = true
+         }
 
          const reason = document.createElement('div')
          reason.className = 'admin-reports__reason'
