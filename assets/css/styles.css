@@ -870,7 +870,7 @@ body.user-theme-active .birth-date-picker__day.is-selected {
   justify-content: center;
   font-size: .9rem;
   line-height: 1;
-  transform: translateY(.12em);
+  transform: translateY(.25em);
 }
 
 .belief-picker__religion span {
