@@ -1,4 +1,3 @@
-
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
@@ -11,7 +10,6 @@ const { isProtectedEmail, normalizeEmail } = require('../protectedUsers');
 const router = express.Router();
 
 // ─── Multer – Profile picture storage ────────────────────────────────────────
-
 const uploadsDir = process.env.DATA_DIR
   ? path.join(process.env.DATA_DIR, 'uploads')
   : path.join(__dirname, '..', 'uploads');
@@ -35,8 +33,6 @@ const upload = multer({
     ok ? cb(null, true) : cb(new Error('Only image files are allowed'));
   }
 });
-
-// ─── Helper ───────────────────────────────────────────────────────────────────
 
 // ─── Konfigurationen und Konstanten ─────────────────────────────────────────
 const THA_REGEX = /^[^\s@]+@tha\.de$/i;

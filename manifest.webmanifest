@@ -1,0 +1,23 @@
+{
+  "name": "LinuxQuest",
+  "short_name": "LinuxQuest",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F7FF",
+  "theme_color": "#352C59",
+  "description": "LinuxQuest als installierbare Webapp.",
+  "icons": [
+    {
+      "src": "/assets/img/Logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/img/Logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

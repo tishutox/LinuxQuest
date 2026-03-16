@@ -6,6 +6,40 @@ const navMenu = document.getElementById('nav-menu'),
 navToggle.addEventListener('click', () => navMenu.classList.add('show-menu'))
 navClose.addEventListener('click',  () => navMenu.classList.remove('show-menu'))
 
+/*=============== APP INSTALL (NO POPUP) ===============*/
+const installAppBtn = document.getElementById('install-app-btn')
+let deferredInstallPrompt = null
+
+window.addEventListener('beforeinstallprompt', (event) => {
+   event.preventDefault()
+   deferredInstallPrompt = event
+   if (installAppBtn) installAppBtn.style.display = 'inline-flex'
+})
+
+installAppBtn?.addEventListener('click', async () => {
+   if (!deferredInstallPrompt) {
+      return
+   }
+
+   deferredInstallPrompt.prompt()
+   await deferredInstallPrompt.userChoice
+   deferredInstallPrompt = null
+   installAppBtn.style.display = 'none'
+})
+
+window.addEventListener('appinstalled', () => {
+   deferredInstallPrompt = null
+   if (installAppBtn) installAppBtn.style.display = 'none'
+})
+
+if ('serviceWorker' in navigator) {
+   window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch((error) => {
+         console.error('[SERVICE WORKER REGISTRATION ERROR]', error)
+      })
+   })
+}
+
 /*=============== SEARCH ===============*/
 const search      = document.getElementById('search'),
       searchBtn   = document.getElementById('search-btn'),
