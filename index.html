@@ -303,23 +303,21 @@
                </div>
 
                <div>
-                  <label for="profile-birth-date-input" class="login__label">Geburtsdatum <small>(optional, dd/mm/yyyy)</small></label>
-                  <input type="text" id="profile-birth-date-input" class="login__input" autocomplete="bday" maxlength="10" placeholder="dd/mm/yyyy">
+                  <label for="profile-birth-date-open" class="login__label">Geburtsdatum <small>(optional, dd/mm/yyyy)</small></label>
+                  <button type="button" id="profile-birth-date-open" class="profile-select-trigger" aria-haspopup="dialog" aria-controls="birth-date-modal">
+                     <span class="profile-select-trigger__value" id="profile-birth-date-value">Bitte wählen</span>
+                  </button>
+                  <input type="hidden" id="profile-birth-date-input" autocomplete="bday">
                </div>
 
                <div>
-                  <label for="profile-belief-input" class="login__label">Glaube <small>(optional)</small></label>
-                  <select id="profile-belief-input" class="login__input">
-                     <option value="">Bitte wählen</option>
-                     <option value="Atheismus">Atheismus</option>
-                     <option value="Christentum">Christentum</option>
-                     <option value="Islam">Islam</option>
-                     <option value="Judentum">Judentum</option>
-                     <option value="Hinduismus">Hinduismus</option>
-                     <option value="Buddhismus">Buddhismus</option>
-                     <option value="Daoismus">Daoismus</option>
-                     <option value="Shintoismus">Shintoismus</option>
-                  </select>
+                  <label for="profile-belief-open" class="login__label">Religion & Konfession <small>(optional)</small></label>
+                  <button type="button" id="profile-belief-open" class="profile-select-trigger" aria-haspopup="dialog" aria-controls="belief-modal">
+                     <span class="profile-select-trigger__value" id="profile-belief-value">Bitte wählen</span>
+                     <span class="profile-select-trigger__subvalue" id="profile-confession-value">Keine Konfession ausgewählt</span>
+                  </button>
+                  <input type="hidden" id="profile-belief-input">
+                  <input type="hidden" id="profile-confession-input">
                </div>
 
                <div>
@@ -385,8 +383,8 @@
                   <button type="button" class="public-profile__action" id="public-profile-copy-btn" title="Profil-Link kopieren" aria-label="Profil-Link kopieren">
                      <i class="fi fi-rc-link-alt"></i>
                   </button>
-                  <a href="#" class="public-profile__action public-profile__zodiac" id="public-profile-zodiac" title="Sternzeichen" aria-label="Sternzeichen" style="display:none;" target="_blank" rel="noopener noreferrer"></a>
-                  <a href="#" class="public-profile__action" id="public-profile-belief" title="Glaube" aria-label="Glaube" style="display:none;" target="_blank" rel="noopener noreferrer"></a>
+                  <button type="button" class="public-profile__action public-profile__zodiac public-profile__action--badge" id="public-profile-zodiac" title="Sternzeichen" aria-label="Sternzeichen" style="display:none;"></button>
+                  <button type="button" class="public-profile__action public-profile__action--badge" id="public-profile-belief" title="Religion" aria-label="Religion" style="display:none;"></button>
                   <span class="public-profile__action public-profile__action--badge" id="public-profile-early-supporter" title="Early Supporter" aria-label="Early Supporter" role="img" tabindex="0" style="display:none;"></span>
                   <a href="#" class="public-profile__action" id="public-profile-email-link" title="E-Mail schreiben" aria-label="E-Mail schreiben" style="display:none;">
                      <i class="fi fi-rc-envelope"></i>
@@ -445,6 +443,54 @@
          </div>
 
          <i class="fi fi-rr-cross-small login__close" id="accent-color-close"></i>
+      </div>
+
+      <div class="login" id="birth-date-modal">
+         <div class="login__form profile__form birth-date-picker__form">
+            <h2 class="login__title">Geburtsdatum wählen</h2>
+
+            <div class="birth-date-picker__header">
+               <button type="button" class="birth-date-picker__nav" id="birth-date-prev-month" aria-label="Vorheriger Monat">
+                  <i class="fi fi-rr-angle-small-left"></i>
+               </button>
+               <p class="birth-date-picker__month" id="birth-date-current-month"></p>
+               <button type="button" class="birth-date-picker__nav" id="birth-date-next-month" aria-label="Nächster Monat">
+                  <i class="fi fi-rr-angle-small-right"></i>
+               </button>
+            </div>
+
+            <div class="birth-date-picker__weekdays" aria-hidden="true">
+               <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+            </div>
+
+            <div class="birth-date-picker__grid" id="birth-date-calendar-grid"></div>
+
+            <div class="birth-date-picker__actions">
+               <button type="button" class="login__button profile__delete-button" id="birth-date-clear-btn">Zurücksetzen</button>
+               <button type="button" class="login__button" id="birth-date-apply-btn" disabled>Datum übernehmen</button>
+            </div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" id="birth-date-close"></i>
+      </div>
+
+      <div class="login" id="belief-modal">
+         <div class="login__form profile__form belief-picker__form">
+            <h2 class="login__title">Religion & Konfession</h2>
+
+            <div class="belief-picker__religions" id="belief-picker-religions"></div>
+
+            <div>
+               <label for="belief-picker-confession" class="login__label">Konfession</label>
+               <select id="belief-picker-confession" class="login__input" disabled>
+                  <option value="">Bitte zuerst eine Religion wählen</option>
+               </select>
+            </div>
+
+            <button type="button" class="login__button" id="belief-apply-btn">Auswahl übernehmen</button>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" id="belief-close"></i>
       </div>
 
       <div class="login" id="follow-list-modal">

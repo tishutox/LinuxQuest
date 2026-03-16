@@ -134,6 +134,8 @@ const loginPanel      = document.getElementById('login'),
       resetPasswordPanel = document.getElementById('reset-password'),
       profileModal    = document.getElementById('profile-modal'),
       accentColorModal = document.getElementById('accent-color-modal'),
+      birthDateModal = document.getElementById('birth-date-modal'),
+      beliefModal = document.getElementById('belief-modal'),
       publicProfileModal = document.getElementById('public-profile-modal'),
    followListModal = document.getElementById('follow-list-modal'),
    adminUserListModal = document.getElementById('admin-user-list-modal'),
@@ -147,6 +149,8 @@ const loginPanel      = document.getElementById('login'),
       backToLoginLink = document.getElementById('back-to-login-link'),
       profileClose    = document.getElementById('profile-close'),
       accentColorClose = document.getElementById('accent-color-close'),
+      birthDateClose = document.getElementById('birth-date-close'),
+      beliefClose = document.getElementById('belief-close'),
       publicProfileClose = document.getElementById('public-profile-close'),
       followListClose = document.getElementById('follow-list-close'),
       adminUserListClose = document.getElementById('admin-user-list-close')
@@ -180,10 +184,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -227,6 +231,8 @@ backToLoginLink.addEventListener('click', (e) => {
 })
 profileClose.addEventListener('click', hideAll)
 accentColorClose.addEventListener('click', () => accentColorModal.classList.remove('show-login'))
+birthDateClose.addEventListener('click', () => birthDateModal.classList.remove('show-login'))
+beliefClose.addEventListener('click', () => beliefModal.classList.remove('show-login'))
 publicProfileClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
 adminUserListClose.addEventListener('click', hideAll)
@@ -297,8 +303,23 @@ const profileDisplayNameCounter = document.getElementById('profile-display-name-
 const profileUsernameCounter = document.getElementById('profile-username-counter')
 const profileBioInput = document.getElementById('profile-bio-input')
 const profileBioCounter = document.getElementById('profile-bio-counter')
+const profileBirthDateOpen = document.getElementById('profile-birth-date-open')
+const profileBirthDateValue = document.getElementById('profile-birth-date-value')
 const profileBirthDateInput = document.getElementById('profile-birth-date-input')
+const birthDatePrevMonthBtn = document.getElementById('birth-date-prev-month')
+const birthDateNextMonthBtn = document.getElementById('birth-date-next-month')
+const birthDateCurrentMonth = document.getElementById('birth-date-current-month')
+const birthDateCalendarGrid = document.getElementById('birth-date-calendar-grid')
+const birthDateClearBtn = document.getElementById('birth-date-clear-btn')
+const birthDateApplyBtn = document.getElementById('birth-date-apply-btn')
+const profileBeliefOpen = document.getElementById('profile-belief-open')
+const profileBeliefValue = document.getElementById('profile-belief-value')
+const profileConfessionValue = document.getElementById('profile-confession-value')
 const profileBeliefInput = document.getElementById('profile-belief-input')
+const profileConfessionInput = document.getElementById('profile-confession-input')
+const beliefPickerReligions = document.getElementById('belief-picker-religions')
+const beliefPickerConfession = document.getElementById('belief-picker-confession')
+const beliefApplyBtn = document.getElementById('belief-apply-btn')
 const profileUsernameInput = document.getElementById('profile-username-input')
 const profileAccentColorOpen = document.getElementById('profile-accent-color-open')
 const profileAccentColorPreview = document.getElementById('profile-accent-color-preview')
@@ -373,6 +394,15 @@ let accentPickerState = {
    hue: 270,
    saturation: 35,
    lightness: 26
+}
+let birthDatePickerView = {
+   month: new Date().getMonth() + 1,
+   year: new Date().getFullYear(),
+   selectedDate: ''
+}
+let beliefPickerState = {
+   belief: '',
+   confession: ''
 }
 let currentPublicProfileUser = null
 let adminUserListDebounceTimer = null
@@ -536,62 +566,65 @@ function getZodiacSignByBirthDate(value) {
 
    const monthDay = parsed.month * 100 + parsed.day
 
-   if (monthDay >= 120 && monthDay <= 218) return { name: 'Wassermann', iconClass: 'fi fi-rr-water', wikiUrl: 'https://de.wikipedia.org/wiki/Wassermann_(Tierkreiszeichen)' }
-   if (monthDay >= 219 && monthDay <= 320) return { name: 'Fische', iconClass: 'fi fi-rr-fish', wikiUrl: 'https://de.wikipedia.org/wiki/Fische_(Tierkreiszeichen)' }
-   if (monthDay >= 321 && monthDay <= 419) return { name: 'Widder', iconClass: 'fi fi-rr-ram', wikiUrl: 'https://de.wikipedia.org/wiki/Widder_(Tierkreiszeichen)' }
-   if (monthDay >= 420 && monthDay <= 520) return { name: 'Stier', iconClass: 'fi fi-rr-skull-cow', wikiUrl: 'https://de.wikipedia.org/wiki/Stier_(Tierkreiszeichen)' }
-   if (monthDay >= 521 && monthDay <= 620) return { name: 'Zwillinge', iconClass: 'fi fi-rr-mirror-user', wikiUrl: 'https://de.wikipedia.org/wiki/Zwillinge_(Tierkreiszeichen)' }
-   if (monthDay >= 621 && monthDay <= 722) return { name: 'Krebs', iconClass: 'fi fi-rr-crab', wikiUrl: 'https://de.wikipedia.org/wiki/Krebs_(Tierkreiszeichen)' }
-   if (monthDay >= 723 && monthDay <= 822) return { name: 'Löwe', iconClass: 'fi fi-rr-lion-head', wikiUrl: 'https://de.wikipedia.org/wiki/L%C3%B6we_(Tierkreiszeichen)' }
-   if (monthDay >= 823 && monthDay <= 922) return { name: 'Jungfrau', iconClass: 'fi fi-rr-angel', wikiUrl: 'https://de.wikipedia.org/wiki/Jungfrau_(Tierkreiszeichen)' }
-   if (monthDay >= 923 && monthDay <= 1022) return { name: 'Waage', iconClass: 'fi fi-rr-equality', wikiUrl: 'https://de.wikipedia.org/wiki/Waage_(Tierkreiszeichen)' }
-   if (monthDay >= 1023 && monthDay <= 1121) return { name: 'Skorpion', iconClass: 'fi fi-rr-scorpion', wikiUrl: 'https://de.wikipedia.org/wiki/Skorpion_(Tierkreiszeichen)' }
-   if (monthDay >= 1122 && monthDay <= 1221) return { name: 'Schütze', iconClass: 'fi fi-rr-bow-arrow', wikiUrl: 'https://de.wikipedia.org/wiki/Sch%C3%BCtze_(Tierkreiszeichen)' }
+   if (monthDay >= 120 && monthDay <= 218) return { name: 'Wassermann', iconClass: 'fi fi-rr-water' }
+   if (monthDay >= 219 && monthDay <= 320) return { name: 'Fische', iconClass: 'fi fi-rr-fish' }
+   if (monthDay >= 321 && monthDay <= 419) return { name: 'Widder', iconClass: 'fi fi-rr-ram' }
+   if (monthDay >= 420 && monthDay <= 520) return { name: 'Stier', iconClass: 'fi fi-rr-skull-cow' }
+   if (monthDay >= 521 && monthDay <= 620) return { name: 'Zwillinge', iconClass: 'fi fi-rr-mirror-user' }
+   if (monthDay >= 621 && monthDay <= 722) return { name: 'Krebs', iconClass: 'fi fi-rr-crab' }
+   if (monthDay >= 723 && monthDay <= 822) return { name: 'Löwe', iconClass: 'fi fi-rr-lion-head' }
+   if (monthDay >= 823 && monthDay <= 922) return { name: 'Jungfrau', iconClass: 'fi fi-rr-angel' }
+   if (monthDay >= 923 && monthDay <= 1022) return { name: 'Waage', iconClass: 'fi fi-rr-equality' }
+   if (monthDay >= 1023 && monthDay <= 1121) return { name: 'Skorpion', iconClass: 'fi fi-rr-scorpion' }
+   if (monthDay >= 1122 && monthDay <= 1221) return { name: 'Schütze', iconClass: 'fi fi-rr-bow-arrow' }
 
-   return { name: 'Steinbock', iconClass: 'fi fi-rr-sheep', wikiUrl: 'https://de.wikipedia.org/wiki/Steinbock_(Tierkreiszeichen)' }
+   return { name: 'Steinbock', iconClass: 'fi fi-rr-sheep' }
 }
 
 const BELIEF_INFO_BY_VALUE = {
    Atheismus: {
       value: 'Atheismus',
-      iconClass: 'fi fi-rc-physics',
-      wikiUrl: 'https://de.wikipedia.org/wiki/Atheismus'
+      iconClass: 'fi fi-rc-physics'
    },
    Christentum: {
       value: 'Christentum',
-      iconClass: 'fi fi-rc-cross-religion',
-      wikiUrl: 'https://de.wikipedia.org/wiki/Christentum'
+      iconClass: 'fi fi-rc-cross-religion'
    },
    Islam: {
       value: 'Islam',
-      iconClass: 'fi fi-rc-star-and-crescent',
-      wikiUrl: 'https://de.wikipedia.org/wiki/Islam'
+      iconClass: 'fi fi-rc-star-and-crescent'
    },
    Judentum: {
       value: 'Judentum',
-      iconClass: 'fi fi-rc-star-of-david',
-      wikiUrl: 'https://de.wikipedia.org/wiki/Judentum'
+      iconClass: 'fi fi-rc-star-of-david'
    },
    Hinduismus: {
       value: 'Hinduismus',
-      iconClass: 'fi fi-rc-om',
-      wikiUrl: 'https://de.wikipedia.org/wiki/Hinduismus'
+      iconClass: 'fi fi-rc-om'
    },
    Buddhismus: {
       value: 'Buddhismus',
-      iconClass: 'fi fi-rr-dharmachakra',
-      wikiUrl: 'https://de.wikipedia.org/wiki/Buddhismus'
+      iconClass: 'fi fi-rr-dharmachakra'
    },
    Daoismus: {
       value: 'Daoismus',
-      iconClass: 'fi fi-rc-yin-yang',
-      wikiUrl: 'https://de.wikipedia.org/wiki/Daoismus'
+      iconClass: 'fi fi-rc-yin-yang'
    },
    Shintoismus: {
       value: 'Shintoismus',
-      iconClass: 'fi fi-rc-torii-gate',
-      wikiUrl: 'https://de.wikipedia.org/wiki/Shint%C5%8D'
+      iconClass: 'fi fi-rc-torii-gate'
    }
+}
+
+const CONFESSIONS_BY_BELIEF = {
+   Atheismus: ['Agnostizismus', 'Säkularer Humanismus', 'Freidenkertum', 'Keine Konfession'],
+   Christentum: ['Katholizismus', 'Evangelisch', 'Orthodoxie', 'Freikirchlich', 'Keine Konfession'],
+   Islam: ['Sunnitentum', 'Schiitentum', 'Alevitentum', 'Ahmadiyya', 'Keine Konfession'],
+   Judentum: ['Orthodox', 'Konservativ', 'Reformiert', 'Liberal', 'Keine Konfession'],
+   Hinduismus: ['Vaishnavismus', 'Shaivismus', 'Shaktismus', 'Smartismus', 'Keine Konfession'],
+   Buddhismus: ['Theravada', 'Mahayana', 'Vajrayana', 'Zen', 'Keine Konfession'],
+   Daoismus: ['Zhengyi', 'Quanzhen', 'Keine Konfession'],
+   Shintoismus: ['Schrein-Shinto', 'Sektenshinto', 'Volks-Shinto', 'Keine Konfession']
 }
 
 function getBeliefInfo(value) {
@@ -601,6 +634,197 @@ function getBeliefInfo(value) {
    return BELIEF_INFO_BY_VALUE[trimmedValue] || null
 }
 
+function getConfessionsForBelief(belief) {
+   const beliefInfo = getBeliefInfo(belief)
+   if (!beliefInfo) return []
+   return Array.isArray(CONFESSIONS_BY_BELIEF[beliefInfo.value]) ? CONFESSIONS_BY_BELIEF[beliefInfo.value] : []
+}
+
+function formatBirthDateForDisplay(value) {
+   const parsed = parseBirthDate(value)
+   if (!parsed) return ''
+   return `${String(parsed.day).padStart(2, '0')}/${String(parsed.month).padStart(2, '0')}/${parsed.year}`
+}
+
+function formatBirthDateForTooltip(value) {
+   const parsed = parseBirthDate(value)
+   if (!parsed) return ''
+   return `${String(parsed.day).padStart(2, '0')}.${String(parsed.month).padStart(2, '0')}.${parsed.year}`
+}
+
+function getBeliefLabelWithConfession(belief, confession) {
+   const beliefInfo = getBeliefInfo(belief)
+   if (!beliefInfo) return ''
+
+   const normalizedConfession = typeof confession === 'string' ? confession.trim() : ''
+   const validConfessions = getConfessionsForBelief(beliefInfo.value)
+   const safeConfession = normalizedConfession && validConfessions.includes(normalizedConfession)
+      ? normalizedConfession
+      : 'ohne Konfession'
+
+   return `${beliefInfo.value}, ${safeConfession}`
+}
+
+function updateBirthDateSummary(value) {
+   if (!profileBirthDateValue) return
+   const formatted = formatBirthDateForDisplay(value)
+   profileBirthDateValue.textContent = formatted || 'Bitte wählen'
+}
+
+function updateBeliefSummary(belief, confession) {
+   const beliefInfo = getBeliefInfo(belief)
+   if (!beliefInfo) {
+      profileBeliefValue.textContent = 'Bitte wählen'
+      profileConfessionValue.textContent = 'Keine Konfession ausgewählt'
+      return
+   }
+
+   profileBeliefValue.textContent = beliefInfo.value
+   const displayConfession = typeof confession === 'string' && confession.trim() ? confession.trim() : 'Keine Konfession'
+   profileConfessionValue.textContent = displayConfession
+}
+
+function getMonthLabel(month, year) {
+   const monthDate = new Date(year, month - 1, 1)
+   return monthDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })
+}
+
+function renderBirthDateCalendar() {
+   if (!birthDateCalendarGrid || !birthDateCurrentMonth) return
+
+   birthDateCurrentMonth.textContent = getMonthLabel(birthDatePickerView.month, birthDatePickerView.year)
+   birthDateCalendarGrid.innerHTML = ''
+
+   const firstOfMonth = new Date(birthDatePickerView.year, birthDatePickerView.month - 1, 1)
+   const weekdayOffset = (firstOfMonth.getDay() + 6) % 7
+   const daysInMonth = new Date(birthDatePickerView.year, birthDatePickerView.month, 0).getDate()
+   const selectedParsed = parseBirthDate(birthDatePickerView.selectedDate)
+
+   for (let blank = 0; blank < weekdayOffset; blank++) {
+      const spacer = document.createElement('span')
+      spacer.className = 'birth-date-picker__day birth-date-picker__day--empty'
+      birthDateCalendarGrid.appendChild(spacer)
+   }
+
+   for (let day = 1; day <= daysInMonth; day++) {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'birth-date-picker__day'
+      button.textContent = String(day)
+
+      const isSelected = selectedParsed
+         && selectedParsed.day === day
+         && selectedParsed.month === birthDatePickerView.month
+         && selectedParsed.year === birthDatePickerView.year
+
+      if (isSelected) {
+         button.classList.add('is-selected')
+      }
+
+      button.addEventListener('click', () => {
+         const dayLabel = String(day).padStart(2, '0')
+         const monthLabel = String(birthDatePickerView.month).padStart(2, '0')
+         birthDatePickerView.selectedDate = `${dayLabel}/${monthLabel}/${birthDatePickerView.year}`
+         birthDateApplyBtn.disabled = false
+         renderBirthDateCalendar()
+      })
+
+      birthDateCalendarGrid.appendChild(button)
+   }
+}
+
+function openBirthDateModal() {
+   const parsed = parseBirthDate(profileBirthDateInput.value)
+   const sourceDate = parsed ? new Date(parsed.year, parsed.month - 1, parsed.day) : new Date()
+
+   birthDatePickerView = {
+      month: sourceDate.getMonth() + 1,
+      year: sourceDate.getFullYear(),
+      selectedDate: parsed ? parsed.normalized : ''
+   }
+
+   birthDateApplyBtn.disabled = !parsed
+   renderBirthDateCalendar()
+   birthDateModal.classList.add('show-login')
+}
+
+function renderBeliefPickerReligions() {
+   if (!beliefPickerReligions) return
+
+   beliefPickerReligions.innerHTML = ''
+   Object.values(BELIEF_INFO_BY_VALUE).forEach((beliefInfo) => {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'belief-picker__religion'
+      button.dataset.value = beliefInfo.value
+      button.innerHTML = `<i class="${beliefInfo.iconClass}"></i><span>${beliefInfo.value}</span>`
+
+      if (beliefPickerState.belief === beliefInfo.value) {
+         button.classList.add('is-selected')
+      }
+
+      button.addEventListener('click', () => {
+         beliefPickerState.belief = beliefInfo.value
+         const confessions = getConfessionsForBelief(beliefInfo.value)
+         if (!confessions.includes(beliefPickerState.confession)) {
+            beliefPickerState.confession = ''
+         }
+         renderBeliefPickerReligions()
+         renderBeliefPickerConfessions()
+      })
+
+      beliefPickerReligions.appendChild(button)
+   })
+}
+
+function renderBeliefPickerConfessions() {
+   if (!beliefPickerConfession) return
+
+   const selectedBelief = getBeliefInfo(beliefPickerState.belief)?.value || ''
+   const confessions = selectedBelief
+      ? getConfessionsForBelief(selectedBelief).filter((entry) => entry !== 'Keine Konfession')
+      : []
+
+   beliefPickerConfession.innerHTML = ''
+   if (!selectedBelief) {
+      const option = document.createElement('option')
+      option.value = ''
+      option.textContent = 'Bitte zuerst eine Religion wählen'
+      beliefPickerConfession.appendChild(option)
+      beliefPickerConfession.disabled = true
+      return
+   }
+
+   beliefPickerConfession.disabled = false
+
+   const emptyOption = document.createElement('option')
+   emptyOption.value = ''
+   emptyOption.textContent = 'Keine Konfession'
+   beliefPickerConfession.appendChild(emptyOption)
+
+   confessions.forEach((confession) => {
+      const option = document.createElement('option')
+      option.value = confession
+      option.textContent = confession
+      beliefPickerConfession.appendChild(option)
+   })
+
+   beliefPickerConfession.value = confessions.includes(beliefPickerState.confession)
+      ? beliefPickerState.confession
+      : ''
+}
+
+function openBeliefModal() {
+   beliefPickerState = {
+      belief: getBeliefInfo(profileBeliefInput.value)?.value || '',
+      confession: typeof profileConfessionInput.value === 'string' ? profileConfessionInput.value.trim() : ''
+   }
+
+   renderBeliefPickerReligions()
+   renderBeliefPickerConfessions()
+   beliefModal.classList.add('show-login')
+}
+
 function updatePublicProfileZodiac(birthDate) {
    if (!publicProfileZodiac) return
 
@@ -608,37 +832,39 @@ function updatePublicProfileZodiac(birthDate) {
    if (!zodiacSign) {
       publicProfileZodiac.style.display = 'none'
       publicProfileZodiac.innerHTML = ''
-      publicProfileZodiac.href = '#'
+      setPublicProfileTooltip(publicProfileZodiac, '')
       publicProfileZodiac.title = 'Sternzeichen'
       publicProfileZodiac.setAttribute('aria-label', 'Sternzeichen')
       return
    }
 
+   const dateLabel = formatBirthDateForTooltip(birthDate)
    publicProfileZodiac.style.display = 'inline-flex'
    publicProfileZodiac.innerHTML = `<i class="${zodiacSign.iconClass}"></i>`
-   publicProfileZodiac.href = zodiacSign.wikiUrl
+   setPublicProfileTooltip(publicProfileZodiac, `${dateLabel}, ${zodiacSign.name}`)
    publicProfileZodiac.title = zodiacSign.name
-   publicProfileZodiac.setAttribute('aria-label', `${zodiacSign.name} auf Wikipedia öffnen`)
+   publicProfileZodiac.setAttribute('aria-label', `${dateLabel}, ${zodiacSign.name}`)
 }
 
-function updatePublicProfileBelief(belief) {
+function updatePublicProfileBelief(belief, confession) {
    if (!publicProfileBelief) return
 
    const beliefInfo = getBeliefInfo(belief)
    if (!beliefInfo) {
       publicProfileBelief.style.display = 'none'
       publicProfileBelief.innerHTML = ''
-      publicProfileBelief.href = '#'
-      publicProfileBelief.title = 'Glaube'
-      publicProfileBelief.setAttribute('aria-label', 'Glaube')
+      setPublicProfileTooltip(publicProfileBelief, '')
+      publicProfileBelief.title = 'Religion'
+      publicProfileBelief.setAttribute('aria-label', 'Religion')
       return
    }
 
+   const religionLabel = getBeliefLabelWithConfession(beliefInfo.value, confession)
    publicProfileBelief.style.display = 'inline-flex'
    publicProfileBelief.innerHTML = `<i class="${beliefInfo.iconClass}"></i>`
-   publicProfileBelief.href = beliefInfo.wikiUrl
+   setPublicProfileTooltip(publicProfileBelief, religionLabel)
    publicProfileBelief.title = beliefInfo.value
-   publicProfileBelief.setAttribute('aria-label', `${beliefInfo.value} auf Wikipedia öffnen`)
+   publicProfileBelief.setAttribute('aria-label', religionLabel)
 }
 
 function clearPublicProfileTooltipHideTimer(element) {
@@ -657,7 +883,7 @@ function hidePublicProfileTooltip(element) {
 }
 
 function hideAllPublicProfileTooltips(exceptElement = null) {
-   ;[publicProfileEmailLink, publicProfileEarlySupporter].forEach((element) => {
+   ;[publicProfileEmailLink, publicProfileEarlySupporter, publicProfileZodiac, publicProfileBelief].forEach((element) => {
       if (!element || element === exceptElement) return
       hidePublicProfileTooltip(element)
    })
@@ -1027,7 +1253,7 @@ function updatePublicProfileView(payload) {
    publicProfileNameRow.style.display = (hasDisplayName || hasPronouns) ? 'flex' : 'none'
    publicProfileUsername.textContent = '@' + user.username
    updatePublicProfileZodiac(user?.birth_date)
-   updatePublicProfileBelief(user?.belief)
+   updatePublicProfileBelief(user?.belief, user?.confession)
    updatePublicProfileEarlySupporter(Boolean(user?.early_supporter))
    publicProfileBioText.textContent = hasBio ? publicBio : ''
    publicProfileBioBox.style.display = hasBio ? 'block' : 'none'
@@ -1085,7 +1311,7 @@ function showPublicProfileError(message) {
    publicProfileNameRow.style.display = 'none'
    publicProfileUsername.textContent = '@unbekannt'
    updatePublicProfileZodiac(null)
-   updatePublicProfileBelief(null)
+   updatePublicProfileBelief(null, null)
    updatePublicProfileEarlySupporter(false)
    hideAllPublicProfileTooltips()
    publicProfileBioText.textContent = ''
@@ -1395,7 +1621,10 @@ function updateProfileView(user) {
    profileBioInput.value = normalizeBio(user?.bio)
    updateBioCounter(profileBioInput.value)
    profileBirthDateInput.value = typeof user.birth_date === 'string' ? user.birth_date : ''
+   updateBirthDateSummary(profileBirthDateInput.value)
    profileBeliefInput.value = getBeliefInfo(user?.belief)?.value || ''
+   profileConfessionInput.value = typeof user?.confession === 'string' ? user.confession.trim() : ''
+   updateBeliefSummary(profileBeliefInput.value, profileConfessionInput.value)
    profileUsernameInput.value = user.username
    updateUsernameCounter(profileUsernameInput.value)
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
@@ -1448,7 +1677,10 @@ function setLoggedOut() {
    profileBioInput.value = ''
    updateBioCounter('')
    profileBirthDateInput.value = ''
+   updateBirthDateSummary('')
    profileBeliefInput.value = ''
+   profileConfessionInput.value = ''
+   updateBeliefSummary('', '')
    profileUsernameInput.value = ''
    updateUsernameCounter('')
    updateProfileAccentSummary(getDefaultAccentColor())
@@ -1543,22 +1775,17 @@ publicProfileFollowingTrigger.addEventListener('click', async () => {
    await openFollowList('following')
 })
 
-publicProfileEmailLink.addEventListener('mouseenter', () => {
-   if (!publicProfileEmailLink.dataset.tooltip) return
-   showPublicProfileTooltip(publicProfileEmailLink)
-})
+;[publicProfileEmailLink, publicProfileEarlySupporter, publicProfileZodiac, publicProfileBelief].forEach((element) => {
+   if (!element) return
 
-publicProfileEmailLink.addEventListener('mouseleave', () => {
-   hidePublicProfileTooltip(publicProfileEmailLink)
-})
+   element.addEventListener('mouseenter', () => {
+      if (!element.dataset.tooltip) return
+      showPublicProfileTooltip(element)
+   })
 
-publicProfileEarlySupporter.addEventListener('mouseenter', () => {
-   if (!publicProfileEarlySupporter.dataset.tooltip) return
-   showPublicProfileTooltip(publicProfileEarlySupporter)
-})
-
-publicProfileEarlySupporter.addEventListener('mouseleave', () => {
-   hidePublicProfileTooltip(publicProfileEarlySupporter)
+   element.addEventListener('mouseleave', () => {
+      hidePublicProfileTooltip(element)
+   })
 })
 
 publicProfileEmailLink.addEventListener('click', async (event) => {
@@ -1598,6 +1825,15 @@ publicProfileEarlySupporter.addEventListener('click', (event) => {
    showPublicProfileTooltip(publicProfileEarlySupporter, { autoHide: hasTouchTooltipInteraction() })
 })
 
+;[publicProfileZodiac, publicProfileBelief].forEach((element) => {
+   if (!element) return
+
+   element.addEventListener('click', (event) => {
+      event.preventDefault()
+      showPublicProfileTooltip(element, { autoHide: hasTouchTooltipInteraction() })
+   })
+})
+
 document.addEventListener('click', (event) => {
    if (!activePublicProfileTooltip) return
 
@@ -1634,11 +1870,70 @@ async function openSharedProfileFromUrl() {
 profileBtn.addEventListener('click', showProfileModal)
 profileAvatarButton.addEventListener('click', () => profileAvatarInput.click())
 profileAccentColorOpen.addEventListener('click', openAccentColorModal)
+profileBirthDateOpen.addEventListener('click', openBirthDateModal)
+profileBeliefOpen.addEventListener('click', openBeliefModal)
 
 accentColorModal.addEventListener('click', (event) => {
    if (event.target === accentColorModal) {
       accentColorModal.classList.remove('show-login')
    }
+})
+
+birthDateModal.addEventListener('click', (event) => {
+   if (event.target === birthDateModal) {
+      birthDateModal.classList.remove('show-login')
+   }
+})
+
+beliefModal.addEventListener('click', (event) => {
+   if (event.target === beliefModal) {
+      beliefModal.classList.remove('show-login')
+   }
+})
+
+birthDatePrevMonthBtn.addEventListener('click', () => {
+   if (birthDatePickerView.month === 1) {
+      birthDatePickerView.month = 12
+      birthDatePickerView.year -= 1
+   } else {
+      birthDatePickerView.month -= 1
+   }
+   renderBirthDateCalendar()
+})
+
+birthDateNextMonthBtn.addEventListener('click', () => {
+   if (birthDatePickerView.month === 12) {
+      birthDatePickerView.month = 1
+      birthDatePickerView.year += 1
+   } else {
+      birthDatePickerView.month += 1
+   }
+   renderBirthDateCalendar()
+})
+
+birthDateApplyBtn.addEventListener('click', () => {
+   profileBirthDateInput.value = birthDatePickerView.selectedDate || ''
+   updateBirthDateSummary(profileBirthDateInput.value)
+   birthDateModal.classList.remove('show-login')
+})
+
+birthDateClearBtn.addEventListener('click', () => {
+   birthDatePickerView.selectedDate = ''
+   birthDateApplyBtn.disabled = true
+   profileBirthDateInput.value = ''
+   updateBirthDateSummary('')
+   birthDateModal.classList.remove('show-login')
+})
+
+beliefPickerConfession.addEventListener('change', () => {
+   beliefPickerState.confession = beliefPickerConfession.value
+})
+
+beliefApplyBtn.addEventListener('click', () => {
+   profileBeliefInput.value = beliefPickerState.belief || ''
+   profileConfessionInput.value = beliefPickerState.confession || ''
+   updateBeliefSummary(profileBeliefInput.value, profileConfessionInput.value)
+   beliefModal.classList.remove('show-login')
 })
 
 accentColorWheel.addEventListener('mousedown', (event) => {
@@ -1838,6 +2133,7 @@ profileForm.addEventListener('submit', async (e) => {
    const bio = normalizeBio(profileBioInput.value)
    const birth_date = profileBirthDateInput.value.trim()
    const belief = profileBeliefInput.value.trim()
+   const confession = profileConfessionInput.value.trim()
    const trimmedProfileName = typeof profile_name === 'string' ? profile_name.trim() : ''
    const username  = profileUsernameInput.value.trim()
    const accent_color = normalizeHexColor(profileAccentColorInput.value)
@@ -1870,6 +2166,14 @@ profileForm.addEventListener('submit', async (e) => {
       return showMsg('profile-message', 'Bitte wähle einen gültigen Glauben aus der Liste aus.', 'error')
    }
 
+   if (!belief && confession) {
+      return showMsg('profile-message', 'Bitte wähle zuerst eine Religion aus.', 'error')
+   }
+
+   if (belief && confession && !getConfessionsForBelief(belief).includes(confession)) {
+      return showMsg('profile-message', 'Bitte wähle eine gültige Konfession passend zur Religion aus.', 'error')
+   }
+
     if (!accent_color) {
       return showMsg('profile-message', 'Bitte wähle eine gültige Profilfarbe.', 'error')
    }
@@ -1882,7 +2186,7 @@ profileForm.addEventListener('submit', async (e) => {
          method: 'POST',
          credentials: 'include',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ full_name, profile_name, pronouns, bio, birth_date, belief, username, accent_color })
+         body: JSON.stringify({ full_name, profile_name, pronouns, bio, birth_date, belief, confession, username, accent_color })
       })
       const data = await res.json()
 

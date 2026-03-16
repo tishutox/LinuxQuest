@@ -49,6 +49,16 @@ const BELIEF_VALUES = new Set([
   'Daoismus',
   'Shintoismus'
 ]);
+const CONFESSIONS_BY_BELIEF = Object.freeze({
+  Atheismus: ['Agnostizismus', 'Säkularer Humanismus', 'Freidenkertum', 'Keine Konfession'],
+  Christentum: ['Katholizismus', 'Evangelisch', 'Orthodoxie', 'Freikirchlich', 'Keine Konfession'],
+  Islam: ['Sunnitentum', 'Schiitentum', 'Alevitentum', 'Ahmadiyya', 'Keine Konfession'],
+  Judentum: ['Orthodox', 'Konservativ', 'Reformiert', 'Liberal', 'Keine Konfession'],
+  Hinduismus: ['Vaishnavismus', 'Shaivismus', 'Shaktismus', 'Smartismus', 'Keine Konfession'],
+  Buddhismus: ['Theravada', 'Mahayana', 'Vajrayana', 'Zen', 'Keine Konfession'],
+  Daoismus: ['Zhengyi', 'Quanzhen', 'Keine Konfession'],
+  Shintoismus: ['Schrein-Shinto', 'Sektenshinto', 'Volks-Shinto', 'Keine Konfession']
+});
 const DISALLOWED_USERNAME_TERMS = Object.freeze([
   'hitler',
   'h1tler',
@@ -158,7 +168,7 @@ function touchUserActivity(userId) {
 
 function getPublicUserProfileByEmail(email) {
   return db.prepare(`
-    SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at
+    SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at
     FROM users
     WHERE email = ?
   `).get(normalizeEmail(email));
@@ -243,6 +253,20 @@ function normalizeBelief(beliefValue) {
   if (!BELIEF_VALUES.has(trimmedBelief)) return null;
 
   return trimmedBelief;
+}
+
+function normalizeConfession(beliefValue, confessionValue) {
+  if (typeof confessionValue !== 'string') return null;
+
+  const trimmedConfession = confessionValue.trim();
+  if (!trimmedConfession) return null;
+
+  if (!beliefValue || !BELIEF_VALUES.has(beliefValue)) return null;
+
+  const validConfessions = CONFESSIONS_BY_BELIEF[beliefValue] || [];
+  if (!validConfessions.includes(trimmedConfession)) return null;
+
+  return trimmedConfession;
 }
 
 function normalizePronouns(pronounsValue) {
@@ -575,7 +599,7 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
 
     db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizeEmail(email));
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at FROM users WHERE id = ?')
                    .get(info.lastInsertRowid);
 
     return res.status(201).json({ message: 'Konto erfolgreich erstellt!', user });
@@ -613,7 +637,7 @@ router.post('/login', async (req, res) => {
     grantEarlySupporterStatus(user.id);
 
     const refreshedUser = db.prepare(`
-      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at
+      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at
       FROM users
       WHERE id = ?
     `).get(user.id);
@@ -633,6 +657,7 @@ router.post('/login', async (req, res) => {
         avatar: refreshedUser.avatar,
         birth_date: refreshedUser.birth_date,
         belief: refreshedUser.belief,
+        confession: refreshedUser.confession,
         accent_color: refreshedUser.accent_color,
         early_supporter: refreshedUser.early_supporter,
         created_at: refreshedUser.created_at
@@ -655,7 +680,7 @@ router.get('/me', (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Nicht authentifiziert.' });
 
   const user = db.prepare(
-    'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at FROM users WHERE id = ?'
+    'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at FROM users WHERE id = ?'
   ).get(req.session.userId);
 
   if (!user) return res.status(401).json({ error: 'Benutzer nicht gefunden.' });
@@ -848,7 +873,7 @@ router.get('/public/:username', (req, res) => {
     }
 
     const user = db.prepare(`
-      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at
+      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at
       FROM users
       WHERE username = ?
     `).get(username);
@@ -1049,7 +1074,7 @@ router.post('/update-username', (req, res) => {
     db.prepare("UPDATE users SET username = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(newUsername, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Benutzername aktualisiert!', user });
@@ -1085,7 +1110,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 
     deleteOldAvatar(currentUser.avatar);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profilbild aktualisiert!', user });
@@ -1098,7 +1123,7 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 // ─── UPDATE PROFILE (NAME + USERNAME) ───────────────────────────────────────
 router.post('/update-profile', (req, res) => {
   try {
-    const { full_name, profile_name, pronouns, bio, birth_date, belief, username, accent_color } = req.body;
+    const { full_name, profile_name, pronouns, bio, birth_date, belief, confession, username, accent_color } = req.body;
 
     if (!req.session.userId) {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
@@ -1114,6 +1139,7 @@ router.post('/update-profile', (req, res) => {
     const rawBio = typeof bio === 'string' ? bio : '';
     const trimmedBirthDate = typeof birth_date === 'string' ? birth_date.trim() : '';
     const trimmedBelief = typeof belief === 'string' ? belief.trim() : '';
+    const trimmedConfession = typeof confession === 'string' ? confession.trim() : '';
     const trimmedUsername = username.trim();
 
     if (!trimmedName) {
@@ -1151,6 +1177,15 @@ router.post('/update-profile', (req, res) => {
       return res.status(400).json({ error: 'Bitte wähle einen gültigen Glauben aus der Liste aus.' });
     }
 
+    if (!trimmedBelief && trimmedConfession) {
+      return res.status(400).json({ error: 'Bitte wähle zuerst eine Religion aus.' });
+    }
+
+    const normalizedConfession = normalizeConfession(normalizedBelief, trimmedConfession);
+    if (trimmedConfession && !normalizedConfession) {
+      return res.status(400).json({ error: 'Bitte wähle eine gültige Konfession passend zur Religion aus.' });
+    }
+
     const normalizedPronouns = normalizePronouns(trimmedPronouns);
     if (trimmedPronouns && !normalizedPronouns) {
       return res.status(400).json({ error: 'Die Pronomen dürfen maximal 30 Zeichen lang sein.' });
@@ -1168,10 +1203,10 @@ router.post('/update-profile', (req, res) => {
       return res.status(409).json({ error: 'Dieser Benutzername ist bereits vergeben.' });
     }
 
-    db.prepare("UPDATE users SET full_name = ?, profile_name = ?, pronouns = ?, bio = ?, birth_date = ?, belief = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
-      .run(trimmedName, trimmedProfileName || null, normalizedPronouns, normalizedBio, normalizedBirthDate, normalizedBelief, trimmedUsername, normalizedAccentColor, req.session.userId);
+    db.prepare("UPDATE users SET full_name = ?, profile_name = ?, pronouns = ?, bio = ?, birth_date = ?, belief = ?, confession = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
+      .run(trimmedName, trimmedProfileName || null, normalizedPronouns, normalizedBio, normalizedBirthDate, normalizedBelief, normalizedConfession, trimmedUsername, normalizedAccentColor, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, accent_color, early_supporter, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
     return res.json({ message: 'Profil aktualisiert!', user });

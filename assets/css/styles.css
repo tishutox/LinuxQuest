@@ -719,6 +719,140 @@ body.user-theme-active .nav__avatar {
   cursor: pointer;
 }
 
+.profile-select-trigger {
+  width: 100%;
+  display: grid;
+  gap: .2rem;
+  text-align: left;
+  padding: .75rem 1rem;
+  border-radius: .5rem;
+  border: 2px solid var(--border-color);
+  background: var(--container-color);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.profile-select-trigger__value {
+  color: var(--title-color);
+  font-weight: var(--font-medium);
+}
+
+.profile-select-trigger__subvalue {
+  color: var(--text-color);
+  opacity: .8;
+  font-size: .82rem;
+}
+
+.birth-date-picker__form,
+.belief-picker__form {
+  max-width: 430px;
+}
+
+.birth-date-picker__header {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr 2.2rem;
+  align-items: center;
+  gap: .4rem;
+}
+
+.birth-date-picker__nav {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: .5rem;
+  border: 1px solid var(--border-color);
+  background: var(--container-color);
+  color: var(--title-color);
+  cursor: pointer;
+}
+
+.birth-date-picker__month {
+  text-align: center;
+  color: var(--title-color);
+  font-weight: var(--font-semi-bold);
+  text-transform: capitalize;
+}
+
+.birth-date-picker__weekdays,
+.birth-date-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: .3rem;
+}
+
+.birth-date-picker__weekdays span {
+  text-align: center;
+  font-size: .75rem;
+  color: var(--text-color);
+  opacity: .8;
+}
+
+.birth-date-picker__day {
+  min-height: 2rem;
+  border-radius: .45rem;
+  border: 1px solid var(--border-color);
+  background: var(--container-color);
+  color: var(--title-color);
+  cursor: pointer;
+}
+
+.birth-date-picker__day--empty {
+  border-color: transparent;
+  background: transparent;
+  pointer-events: none;
+}
+
+.birth-date-picker__day.is-selected {
+  background: var(--first-color);
+  border-color: var(--first-color);
+  color: #fff;
+}
+
+body.user-theme-active .birth-date-picker__day.is-selected {
+  background: var(--user-accent-color);
+  border-color: var(--user-accent-color);
+  color: var(--user-accent-text-color);
+}
+
+.birth-date-picker__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+}
+
+.belief-picker__religions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .45rem;
+}
+
+.belief-picker__religion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  min-height: 2.35rem;
+  border-radius: .5rem;
+  border: 1px solid var(--border-color);
+  background: var(--container-color);
+  color: var(--title-color);
+  cursor: pointer;
+  font-weight: var(--font-medium);
+}
+
+.belief-picker__religion i {
+  font-size: .9rem;
+}
+
+.belief-picker__religion.is-selected {
+  border-color: var(--first-color);
+  color: var(--first-color);
+}
+
+body.user-theme-active .belief-picker__religion.is-selected {
+  border-color: var(--user-accent-color);
+  color: var(--user-accent-color);
+}
+
 .profile-color-trigger__preview {
   width: 1.3rem;
   height: 1.3rem;

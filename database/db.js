@@ -30,6 +30,7 @@ db.exec(`
     avatar      TEXT    DEFAULT NULL,
     birth_date  TEXT    DEFAULT NULL,
     belief      TEXT    DEFAULT NULL,
+    confession  TEXT    DEFAULT NULL,
     accent_color TEXT   DEFAULT NULL,
     early_supporter INTEGER DEFAULT 0,
     created_at  TEXT    DEFAULT (datetime('now')),
@@ -45,6 +46,7 @@ const hasPronounsColumn = userColumns.some((column) => column.name === 'pronouns
 const hasBioColumn = userColumns.some((column) => column.name === 'bio');
 const hasBirthDateColumn = userColumns.some((column) => column.name === 'birth_date');
 const hasBeliefColumn = userColumns.some((column) => column.name === 'belief');
+const hasConfessionColumn = userColumns.some((column) => column.name === 'confession');
 const hasEarlySupporterColumn = userColumns.some((column) => column.name === 'early_supporter');
 
 if (!hasLastActiveColumn) {
@@ -73,6 +75,10 @@ if (!hasBirthDateColumn) {
 
 if (!hasBeliefColumn) {
   db.exec('ALTER TABLE users ADD COLUMN belief TEXT');
+}
+
+if (!hasConfessionColumn) {
+  db.exec('ALTER TABLE users ADD COLUMN confession TEXT');
 }
 
 if (!hasEarlySupporterColumn) {
