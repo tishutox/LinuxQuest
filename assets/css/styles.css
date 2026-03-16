@@ -1088,6 +1088,19 @@ body.user-theme-active #belief-modal #belief-picker-confession {
   transition: color .3s;
 }
 
+#public-profile-modal .public-profile__action--report-float {
+  width: auto;
+  height: auto;
+  padding: 0;
+  background: transparent;
+}
+
+#public-profile-modal .public-profile__action--report-float i {
+  font-size: 12rem !important;
+  line-height: 1;
+  transform: none;
+}
+
 .public-profile__action--report:hover {
   color: hsl(0, 75%, 56%);
 }
