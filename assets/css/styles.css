@@ -559,18 +559,16 @@ body.user-theme-active #profile-modal .profile__delete-button {
 
 body.user-theme-active #profile-modal .profile-select-trigger,
 body.user-theme-active #profile-modal .profile-color-trigger {
-  border-color: var(--user-accent-color);
-  color: var(--user-accent-color);
+  border-color: var(--border-color);
+  color: var(--text-color);
 }
 
 body.user-theme-active #profile-modal .profile-select-trigger__value,
 body.user-theme-active #profile-modal .profile-select-trigger__subvalue,
 body.user-theme-active #profile-modal .profile-color-trigger__value {
-  color: var(--user-accent-color);
+  color: var(--text-color);
 }
 
-body.user-theme-active #birth-date-modal .birth-date-picker__nav,
-body.user-theme-active #birth-date-modal .birth-date-picker__day,
 body.user-theme-active #belief-modal .belief-picker__religion {
   border-color: var(--user-accent-color);
   color: var(--user-accent-color);
@@ -759,7 +757,7 @@ body.user-theme-active .nav__avatar {
 }
 
 .profile-select-trigger__value {
-  color: var(--title-color);
+  color: var(--text-color);
   font-weight: var(--font-medium);
 }
 
@@ -787,7 +785,7 @@ body.user-theme-active .nav__avatar {
   border-radius: .5rem;
   border: 1px solid var(--border-color);
   background: var(--container-color);
-  color: var(--title-color);
+  color: var(--text-color);
   cursor: pointer;
 }
 
@@ -817,7 +815,7 @@ body.user-theme-active .nav__avatar {
   border-radius: .45rem;
   border: 1px solid var(--border-color);
   background: var(--container-color);
-  color: var(--title-color);
+  color: var(--text-color);
   cursor: pointer;
 }
 
@@ -889,7 +887,7 @@ body.user-theme-active .belief-picker__religion.is-selected {
 
 .profile-color-trigger__value {
   font-weight: var(--font-semi-bold);
-  color: var(--title-color);
+  color: var(--text-color);
   margin-left: auto;
 }
 
@@ -1029,6 +1027,7 @@ body.user-theme-active .profile__avatar-button:hover {
   margin-top: .45rem;
   font-size: .78rem;
   color: var(--text-color);
+  text-align: left;
 }
 
 .profile__input-counter {
@@ -1420,6 +1419,19 @@ body.user-theme-active .profile-background__reset:disabled {
 
 .profile__delete-button:hover {
   border-color: var(--first-color);
+  box-shadow: none;
+}
+
+#birth-date-modal #birth-date-clear-btn {
+  background-color: var(--container-color);
+  border-color: var(--border-color);
+  color: var(--border-color);
+}
+
+#birth-date-modal #birth-date-clear-btn:hover {
+  background-color: var(--container-color);
+  border-color: var(--border-color);
+  color: var(--border-color);
   box-shadow: none;
 }
 
