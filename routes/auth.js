@@ -1330,6 +1330,44 @@ router.post('/report/:username', (req, res) => {
   }
 });
 
+// ─── GET ADMIN REPORTS FOR USER ───────────────────────────────────────────────
+router.get('/admin/reports/:username', (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    const requester = db.prepare('SELECT id, email FROM users WHERE id = ?').get(req.session.userId);
+    if (!isProtectedUser(requester)) {
+      return res.status(403).json({ error: 'Nur Admins können Meldungen sehen.' });
+    }
+
+    const username = (req.params.username || '').trim();
+    const reportedUser = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+    if (!reportedUser) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    const reports = db.prepare(`
+      SELECT
+        r.id,
+        r.reason,
+        r.created_at,
+        u.username AS reporter_username,
+        u.full_name AS reporter_full_name
+      FROM reports r
+      JOIN users u ON u.id = r.reporter_user_id
+      WHERE r.reported_user_id = ?
+      ORDER BY datetime(r.created_at) DESC
+    `).all(reportedUser.id);
+
+    return res.json({ reports });
+  } catch (err) {
+    console.error('[GET ADMIN REPORTS ERROR]', err);
+    return res.status(500).json({ error: 'Serverfehler beim Abrufen der Meldungen.' });
+  }
+});
+
 module.exports = router;
 
 

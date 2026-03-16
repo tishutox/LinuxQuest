@@ -178,6 +178,7 @@ const loginPanel      = document.getElementById('login'),
       beliefModal = document.getElementById('belief-modal'),
       publicProfileModal = document.getElementById('public-profile-modal'),
       reportModal = document.getElementById('report-modal'),
+      adminReportsModal = document.getElementById('admin-reports-modal'),
    followListModal = document.getElementById('follow-list-modal'),
    adminUserListModal = document.getElementById('admin-user-list-modal'),
       loginBtn        = document.getElementById('login-btn'),
@@ -194,6 +195,7 @@ const loginPanel      = document.getElementById('login'),
       beliefClose = document.getElementById('belief-close'),
       publicProfileClose = document.getElementById('public-profile-close'),
       reportClose = document.getElementById('report-close'),
+      adminReportsClose = document.getElementById('admin-reports-close'),
       followListClose = document.getElementById('follow-list-close'),
       adminUserListClose = document.getElementById('admin-user-list-close')
 
@@ -226,10 +228,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -277,6 +279,7 @@ birthDateClose.addEventListener('click', () => birthDateModal.classList.remove('
 beliefClose.addEventListener('click', () => beliefModal.classList.remove('show-login'))
 publicProfileClose.addEventListener('click', hideAll)
 reportClose.addEventListener('click', hideAll)
+adminReportsClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
 adminUserListClose.addEventListener('click', hideAll)
 
@@ -407,6 +410,10 @@ const reportReasonCounter = document.getElementById('report-reason-counter')
 const reportSubmitBtn = document.getElementById('report-submit-btn')
 const reportCancelBtn = document.getElementById('report-cancel-btn')
 const reportMessage = document.getElementById('report-message')
+const adminReportsTitle = document.getElementById('admin-reports-title')
+const adminReportsMessage = document.getElementById('admin-reports-message')
+const adminReportsList = document.getElementById('admin-reports-list')
+const adminReportsCloseBtn = document.getElementById('admin-reports-close-btn')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
 const followListContainer = document.getElementById('follow-list-container')
@@ -435,6 +442,63 @@ const mainBackgroundImage = document.querySelector('.main__bg')
 const DEFAULT_MAIN_BACKGROUND_SRC = mainBackgroundImage?.getAttribute('src') || 'assets/img/bg-image.png'
 
 const messageTimers = new Map()
+
+async function openAdminReports(username) {
+   if (!username) return
+
+   clearMsg('admin-reports-message')
+   adminReportsTitle.textContent = `Meldungen für @${username}`
+   adminReportsList.innerHTML = ''
+
+   hideAll()
+   adminReportsModal.classList.add('show-login')
+
+   try {
+      const response = await fetch(`/api/auth/admin/reports/${encodeURIComponent(username)}`, {
+         credentials: 'include'
+      })
+      const data = await response.json()
+
+      if (!response.ok) {
+         showMsg('admin-reports-message', data.error || 'Meldungen konnten nicht geladen werden.', 'error')
+         return
+      }
+
+      const reports = Array.isArray(data.reports) ? data.reports : []
+      if (!reports.length) {
+         adminReportsList.innerHTML = '<p class="admin-reports__empty">Keine Meldungen vorhanden.</p>'
+         return
+      }
+
+      reports.forEach((report) => {
+         const item = document.createElement('div')
+         item.className = 'admin-reports__item'
+
+         const reporter = document.createElement('div')
+         reporter.className = 'admin-reports__reporter'
+         const reporterName = report.reporter_full_name ? `${report.reporter_full_name} (@${report.reporter_username || 'unbekannt'})` : `@${report.reporter_username || 'unbekannt'}`
+         reporter.textContent = reporterName
+
+         const reason = document.createElement('div')
+         reason.className = 'admin-reports__reason'
+         reason.textContent = report.reason || 'Kein Grund angegeben.'
+
+         const date = document.createElement('div')
+         date.className = 'admin-reports__date'
+         const createdAt = report.created_at ? new Date(report.created_at) : null
+         date.textContent = createdAt && !Number.isNaN(createdAt.getTime())
+            ? createdAt.toLocaleString('de-DE')
+            : 'Zeit unbekannt'
+
+         item.appendChild(reporter)
+         item.appendChild(reason)
+         item.appendChild(date)
+         adminReportsList.appendChild(item)
+      })
+   } catch (_) {
+      showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
+   }
+}
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
 let currentUser = null
@@ -1523,8 +1587,8 @@ function renderAdminUserList(users) {
          reportsButton.className = 'admin-user-list__reports'
          reportsButton.textContent = 'Meldungen'
 
-         reportsButton.addEventListener('click', () => {
-            showMsg('admin-user-list-message', `Meldungen für @${user.username} folgen im nächsten Schritt.`, 'success')
+         reportsButton.addEventListener('click', async () => {
+            await openAdminReports(user.username)
          })
 
          actions.appendChild(reportsButton)
@@ -1804,6 +1868,7 @@ publicProfileReportBtn.addEventListener('click', () => {
 })
 
 reportCancelBtn.addEventListener('click', hideAll)
+adminReportsCloseBtn.addEventListener('click', hideAll)
 
 reportReasonInput?.addEventListener('input', () => {
    updateCounter(reportReasonCounter, reportReasonInput.value, 200)

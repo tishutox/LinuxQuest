@@ -467,6 +467,52 @@ img {
   opacity: .8;
 }
 
+.admin-reports__list {
+  max-height: 22rem;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: .5rem;
+  padding: .25rem;
+}
+
+.admin-reports__item {
+  padding: .6rem .7rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.admin-reports__item:last-child {
+  border-bottom: none;
+}
+
+.admin-reports__reporter {
+  font-size: .86rem;
+  color: var(--title-color);
+  font-weight: var(--font-semi-bold);
+}
+
+.admin-reports__reason {
+  margin-top: .2rem;
+  font-size: .85rem;
+  color: var(--text-color);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.admin-reports__date {
+  margin-top: .2rem;
+  font-size: .75rem;
+  color: var(--text-color);
+  opacity: .75;
+}
+
+.admin-reports__empty {
+  margin: 0;
+  padding: .9rem;
+  text-align: center;
+  color: var(--text-color);
+  opacity: .7;
+}
+
 /* Show search */
 .show-search {
   opacity: 1;
