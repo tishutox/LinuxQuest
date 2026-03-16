@@ -2280,11 +2280,17 @@ publicProfileReportBtn.addEventListener('click', () => {
    if (!currentUser) {
       return showMsg('public-profile-message', 'Du musst angemeldet sein, um zu melden.', 'error')
    }
-   
-   reportTargetUsername = publicProfileUsername.textContent.trim().replace(/^@/, '')
-   if (!reportTargetUsername) return
-   
-   if (reportTargetUsername === currentUser.username) {
+
+   const resolvedTargetUsername = (currentPublicProfileUser?.username || publicProfileUsername.textContent || '')
+      .trim()
+      .replace(/^@/, '')
+   reportTargetUsername = resolvedTargetUsername
+
+   if (!reportTargetUsername || reportTargetUsername.toLowerCase() === 'unbekannt') {
+      return showMsg('public-profile-message', 'Benutzer konnte nicht ermittelt werden.', 'error')
+   }
+
+   if (reportTargetUsername.toLowerCase() === String(currentUser.username || '').trim().toLowerCase()) {
       return showMsg('public-profile-message', 'Du kannst dich selbst nicht melden.', 'error')
    }
    
