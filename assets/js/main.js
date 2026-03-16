@@ -2278,19 +2278,20 @@ let reportTargetUsername = null
 
 publicProfileReportBtn.addEventListener('click', () => {
    if (!currentUser) {
-      return showMsg('report-message', 'Du musst angemeldet sein, um zu melden.', 'error')
+      return showMsg('public-profile-message', 'Du musst angemeldet sein, um zu melden.', 'error')
    }
    
-   reportTargetUsername = publicProfileUsername.textContent.trim()
+   reportTargetUsername = publicProfileUsername.textContent.trim().replace(/^@/, '')
    if (!reportTargetUsername) return
    
    if (reportTargetUsername === currentUser.username) {
-      return showMsg('report-message', 'Du kannst dich selbst nicht melden.', 'error')
+      return showMsg('public-profile-message', 'Du kannst dich selbst nicht melden.', 'error')
    }
    
    reportReasonInput.value = ''
    reportReasonCounter.textContent = '0/200'
    clearMsg('report-message')
+   clearMsg('public-profile-message')
    hideAll()
    reportModal.classList.add('show-login')
 })
