@@ -1,4 +1,4 @@
-const CACHE_NAME = 'linuxquest-v1'
+const CACHE_NAME = 'linuxquest-v2'
 const STATIC_ASSETS = [
   '/',
   '/index.html',

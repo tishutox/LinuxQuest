@@ -570,8 +570,8 @@ body.user-theme-active #profile-modal .profile-color-trigger__value {
 }
 
 body.user-theme-active #belief-modal .belief-picker__religion {
-  border-color: var(--user-accent-color);
-  color: var(--user-accent-color);
+  border-color: var(--border-color);
+  color: var(--text-color);
 }
 
 /* Show login */
@@ -873,8 +873,13 @@ body.user-theme-active .birth-date-picker__day.is-selected {
 }
 
 body.user-theme-active .belief-picker__religion.is-selected {
-  border-color: var(--user-accent-color);
-  color: var(--user-accent-color);
+  border-color: var(--first-color);
+  color: var(--first-color);
+}
+
+body.user-theme-active #belief-modal #belief-picker-confession {
+  border-color: var(--border-color);
+  color: var(--text-color);
 }
 
 .profile-color-trigger__preview {
