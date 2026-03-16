@@ -544,10 +544,36 @@ body.user-theme-active #profile-modal .login__button {
   color: var(--user-accent-text-color);
 }
 
+body.user-theme-active #birth-date-modal .login__button,
+body.user-theme-active #belief-modal .login__button,
+body.user-theme-active #accent-color-modal .login__button {
+  background-color: var(--user-accent-color);
+  color: var(--user-accent-text-color);
+}
+
 body.user-theme-active #profile-modal .profile__delete-button {
   background-color: transparent;
   color: var(--user-accent-color);
   border-color: var(--user-accent-color);
+}
+
+body.user-theme-active #profile-modal .profile-select-trigger,
+body.user-theme-active #profile-modal .profile-color-trigger {
+  border-color: var(--user-accent-color);
+  color: var(--user-accent-color);
+}
+
+body.user-theme-active #profile-modal .profile-select-trigger__value,
+body.user-theme-active #profile-modal .profile-select-trigger__subvalue,
+body.user-theme-active #profile-modal .profile-color-trigger__value {
+  color: var(--user-accent-color);
+}
+
+body.user-theme-active #birth-date-modal .birth-date-picker__nav,
+body.user-theme-active #birth-date-modal .birth-date-picker__day,
+body.user-theme-active #belief-modal .belief-picker__religion {
+  border-color: var(--user-accent-color);
+  color: var(--user-accent-color);
 }
 
 /* Show login */
