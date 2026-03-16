@@ -402,6 +402,8 @@ const publicProfileFollowBtn = document.getElementById('public-profile-follow-bt
 const publicProfileBioBox = document.getElementById('public-profile-bio-box')
 const publicProfileBioText = document.getElementById('public-profile-bio-text')
 const publicProfileReportBtn = document.getElementById('public-profile-report-btn')
+const reportReasonInput = document.getElementById('report-reason-input')
+const reportReasonCounter = document.getElementById('report-reason-counter')
 const reportCancelBtn = document.getElementById('report-cancel-btn')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
@@ -1781,10 +1783,16 @@ publicProfileCopyBtn.addEventListener('click', async () => {
 
 publicProfileReportBtn.addEventListener('click', () => {
    hideAll()
+   if (reportReasonInput) reportReasonInput.value = ''
+   if (reportReasonCounter) reportReasonCounter.textContent = '0/200'
    reportModal.classList.add('show-login')
 })
 
 reportCancelBtn.addEventListener('click', hideAll)
+
+reportReasonInput?.addEventListener('input', () => {
+   reportReasonCounter.textContent = `${reportReasonInput.value.length}/200`
+})
 
 publicProfileFollowBtn.addEventListener('click', async () => {
    if (!currentPublicProfileUser?.username) return

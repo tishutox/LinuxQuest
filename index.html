@@ -426,6 +426,12 @@
             <h2 class="login__title">Benutzer melden</h2>
             <p class="report-modal__description">Melden ist im nächsten Schritt aktiv. Aktuell ist nur das Öffnen dieses Modals implementiert.</p>
 
+            <div>
+               <label for="report-reason-input" class="login__label">Grund (optional)</label>
+               <textarea id="report-reason-input" class="login__input profile__bio-input" maxlength="200" placeholder="Kurze Beschreibung des Problems..."></textarea>
+               <p class="profile__input-counter" id="report-reason-counter">0/200</p>
+            </div>
+
             <div class="report-modal__actions">
                <button type="button" class="login__button profile__delete-button" id="report-cancel-btn">Schließen</button>
             </div>
