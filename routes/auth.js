@@ -1,15 +1,17 @@
-const express    = require('express');
-const bcrypt     = require('bcryptjs');
-const multer     = require('multer');
-const path       = require('path');
-const fs         = require('fs');
-const db         = require('../database/db');
+
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const db = require('../database/db');
 const { createMailTransport, getMailConfig } = require('../services/mailer');
 const { isProtectedEmail, normalizeEmail } = require('../protectedUsers');
 
 const router = express.Router();
 
 // ─── Multer – Profile picture storage ────────────────────────────────────────
+
 const uploadsDir = process.env.DATA_DIR
   ? path.join(process.env.DATA_DIR, 'uploads')
   : path.join(__dirname, '..', 'uploads');
@@ -35,8 +37,10 @@ const upload = multer({
 });
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
-const THA_REGEX      = /^[^\s@]+@tha\.de$/i;
-const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;  // Only letters, numbers, underscore, hyphen
+
+// ─── Konfigurationen und Konstanten ─────────────────────────────────────────
+const THA_REGEX = /^[^\s@]+@tha\.de$/i;
+const USERNAME_REGEX = /^[a-zA-Z0-9_-]+$/;
 const HEX_COLOR_REGEX = /^#[0-9a-fA-F]{6}$/;
 const BIRTH_DATE_REGEX = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 const BELIEF_VALUES = new Set([
@@ -60,33 +64,10 @@ const CONFESSIONS_BY_BELIEF = Object.freeze({
   Shintoismus: ['Schrein-Shinto', 'Sektenshinto', 'Volks-Shinto', 'Keine Konfession']
 });
 const DISALLOWED_USERNAME_TERMS = Object.freeze([
-  'hitler',
-  'h1tler',
-  'adolfhitler',
-  'heilhitler',
-  'siegheil',
-  'nazis',
-  'nazi',
-  'faschist',
-  'faschismus',
-  'whitepower',
-  'whitesupremacy',
-  'aryan',
-  'kukluxklan',
-  'kkk',
-  '14words',
-  '1488',
-  '88',
-  'nigga',
-  'nigger',
-  'nword',
-  'nazi88',
-  'heil88',
-  'h1tlerdidnothingwrong',
-  'hitlerdidnothingwrong',
-  'muscular anime girl sprinting on a track with sunset city backdrop',
-  'muscular anime girl',
-  'muscularanimegirl'
+  'hitler', 'h1tler', 'adolfhitler', 'heilhitler', 'siegheil', 'nazis', 'nazi', 'faschist', 'faschismus',
+  'whitepower', 'whitesupremacy', 'aryan', 'kukluxklan', 'kkk', '14words', '1488', '88', 'nigga', 'nigger',
+  'nword', 'nazi88', 'heil88', 'h1tlerdidnothingwrong', 'hitlerdidnothingwrong',
+  'muscular anime girl sprinting on a track with sunset city backdrop', 'muscular anime girl', 'muscularanimegirl'
 ]);
 const DISALLOWED_USERNAME_PATTERNS = Object.freeze([
   /h[e3]il+[^a-z0-9]*h[i1l!]+t[l1!][e3]r/iu,
@@ -104,7 +85,7 @@ const DISALLOWED_USERNAME_PATTERNS = Object.freeze([
   /muscular[^a-z0-9]*anime[^a-z0-9]*girl/iu,
   /sprinting[^a-z0-9]*on[^a-z0-9]*a[^a-z0-9]*track/iu
 ]);
-const SALT_ROUNDS    = 12;
+const SALT_ROUNDS = 12;
 const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
 const VERIFY_IP_MAX_REQUESTS = 6;
 const verificationIpRequests = new Map();
