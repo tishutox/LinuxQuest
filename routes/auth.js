@@ -1292,6 +1292,44 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+// ─── REPORT USER ──────────────────────────────────────────────────────────────
+router.post('/report/:username', (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Du musst angemeldet sein, um zu melden.' });
+    }
+
+    const { username } = req.params;
+    const { reason } = req.body;
+
+    const reporterUser = db.prepare('SELECT id FROM users WHERE id = ?').get(req.session.userId);
+    if (!reporterUser) {
+      return res.status(401).json({ error: 'Ungültige Session.' });
+    }
+
+    const reportedUser = db.prepare('SELECT id FROM users WHERE username = ?').get((username || '').trim());
+    if (!reportedUser) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    if (reportedUser.id === req.session.userId) {
+      return res.status(400).json({ error: 'Du kannst dich selbst nicht melden.' });
+    }
+
+    const trimmedReason = typeof reason === 'string' ? reason.trim() : '';
+
+    db.prepare(`
+      INSERT INTO reports (reported_user_id, reporter_user_id, reason)
+      VALUES (?, ?, ?)
+    `).run(reportedUser.id, req.session.userId, trimmedReason || null);
+
+    return res.status(201).json({ message: 'Meldung erfolgreich eingereicht.' });
+  } catch (err) {
+    console.error('[REPORT USER ERROR]', err);
+    return res.status(500).json({ error: 'Serverfehler beim Erstellen der Meldung.' });
+  }
+});
+
 module.exports = router;
 
 

@@ -1784,9 +1784,10 @@ publicProfileCopyBtn.addEventListener('click', async () => {
 })
 
 publicProfileReportBtn.addEventListener('click', () => {
+   if (!currentPublicProfileUser?.username) return
    hideAll()
    if (reportReasonInput) reportReasonInput.value = ''
-   if (reportReasonCounter) reportReasonCounter.textContent = '0/200'
+   updateCounter(reportReasonCounter, '', 200)
    if (reportMessage) clearMsg('report-message')
    reportModal.classList.add('show-login')
 })
@@ -1794,18 +1795,53 @@ publicProfileReportBtn.addEventListener('click', () => {
 reportCancelBtn.addEventListener('click', hideAll)
 
 reportReasonInput?.addEventListener('input', () => {
-   reportReasonCounter.textContent = `${reportReasonInput.value.length}/200`
+   updateCounter(reportReasonCounter, reportReasonInput.value, 200)
 })
 
-reportSubmitBtn?.addEventListener('click', () => {
+reportSubmitBtn?.addEventListener('click', async () => {
+   if (!currentUser) {
+      showMsg('report-message', 'Du musst angemeldet sein, um zu melden.', 'error')
+      return
+   }
+
+   const targetUsername = currentPublicProfileUser?.username
+   if (!targetUsername) {
+      showMsg('report-message', 'Benutzer konnte nicht ermittelt werden.', 'error')
+      return
+   }
+
+   if (String(targetUsername).trim().toLowerCase() === String(currentUser.username || '').trim().toLowerCase()) {
+      showMsg('report-message', 'Du kannst dich selbst nicht melden.', 'error')
+      return
+   }
+
    reportSubmitBtn.disabled = true
    reportSubmitBtn.textContent = 'Meldet…'
 
-   window.setTimeout(() => {
-      showMsg('report-message', 'Melde-Backend folgt im nächsten Schritt.', 'success')
+   try {
+      const reason = (reportReasonInput?.value || '').trim()
+      const response = await fetch(`/api/auth/report/${encodeURIComponent(targetUsername)}`, {
+         method: 'POST',
+         credentials: 'include',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ reason: reason || null })
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+         showMsg('report-message', data.error || 'Meldung konnte nicht gesendet werden.', 'error')
+      } else {
+         showMsg('report-message', data.message || 'Meldung erfolgreich gesendet.', 'success')
+         setTimeout(() => {
+            hideAll()
+         }, 900)
+      }
+   } catch (_) {
+      showMsg('report-message', 'Server nicht erreichbar.', 'error')
+   } finally {
       reportSubmitBtn.disabled = false
       reportSubmitBtn.textContent = 'Melden'
-   }, 700)
+   }
 })
 
 publicProfileFollowBtn.addEventListener('click', async () => {
