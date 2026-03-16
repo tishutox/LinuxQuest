@@ -1,3 +1,33 @@
+// =============== DOWNLOAD APP POPUP ===============
+const downloadAppModal = document.getElementById('download-app-modal');
+const downloadAppClose = document.getElementById('download-app-close');
+const downloadAppLink = document.getElementById('download-app-link');
+
+function showDownloadAppModal() {
+   downloadAppModal.style.display = 'block';
+   setTimeout(() => downloadAppModal.classList.add('show-login'), 10);
+}
+
+function hideDownloadAppModal() {
+   downloadAppModal.classList.remove('show-login');
+   setTimeout(() => downloadAppModal.style.display = 'none', 400);
+}
+
+downloadAppClose?.addEventListener('click', hideDownloadAppModal);
+
+// Optional: Zeige das Popup beim ersten Besuch (nur einmal)
+if (!localStorage.getItem('linuxquestAppPopupShown')) {
+   setTimeout(() => {
+      showDownloadAppModal();
+      localStorage.setItem('linuxquestAppPopupShown', '1');
+   }, 2000);
+}
+
+// Optional: Download-Link kann auf PWA-Install-Event reagieren
+downloadAppLink?.addEventListener('click', (e) => {
+   e.preventDefault();
+   alert('Nutze im Chromium-Browser das Menü (drei Punkte oben rechts) und wähle "App installieren".');
+});
 /*=============== SHOW MENU ===============*/
 const navMenu = document.getElementById('nav-menu'),
       navToggle = document.getElementById('nav-toggle'),
