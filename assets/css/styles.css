@@ -995,7 +995,39 @@ body.user-theme-active #belief-modal #belief-picker-confession {
 }
 
 #public-profile-modal .info-modal__avatar-wrap {
+  position: relative;
+  width: 100%;
   margin-bottom: .9rem;
+}
+
+/* =============== REPORT BUTTON =============== */
+.public-profile__action--report {
+  color: var(--text-color);
+  font-size: 3rem;
+  line-height: 1;
+  transition: color .3s;
+}
+
+.public-profile__action--report:hover {
+  color: hsl(0, 75%, 56%);
+}
+
+#public-profile-modal .public-profile__action--report-float {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.public-profile__action--report-float {
+  pointer-events: none;
+}
+
+#public-profile-modal.show-login .public-profile__action--report-float {
+  pointer-events: auto;
 }
 
 .profile__avatar-button {
