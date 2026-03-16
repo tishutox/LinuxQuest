@@ -1083,7 +1083,7 @@ body.user-theme-active #belief-modal #belief-picker-confession {
 /* =============== REPORT BUTTON =============== */
 .public-profile__action--report {
   color: var(--text-color);
-  font-size: 1.64rem;
+  font-size: 1.23rem;
   line-height: 1;
   transition: color .3s;
 }
@@ -1096,7 +1096,7 @@ body.user-theme-active #belief-modal #belief-picker-confession {
 }
 
 #public-profile-modal .public-profile__action--report-float i {
-  font-size: 1.64rem !important;
+  font-size: 1.23rem !important;
   line-height: 1;
   transform: none;
 }
