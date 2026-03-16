@@ -1639,3 +1639,36 @@ body.user-theme-active .profile-background__reset:disabled {
     margin-inline: auto;
   }
 }
+
+@media screen and (max-width: 1023px) {
+  body.user-theme-active #profile-modal .profile-select-trigger,
+  body.user-theme-active #profile-modal .profile-color-trigger {
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+  }
+
+  body.user-theme-active #profile-modal .profile-select-trigger__value,
+  body.user-theme-active #profile-modal .profile-select-trigger__subvalue,
+  body.user-theme-active #profile-modal .profile-color-trigger__value {
+    color: var(--text-color) !important;
+  }
+
+  body.user-theme-active #birth-date-modal .birth-date-picker__nav,
+  body.user-theme-active #birth-date-modal .birth-date-picker__day {
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+  }
+
+  body.user-theme-active #birth-date-modal #birth-date-clear-btn {
+    background-color: var(--container-color) !important;
+    border-color: var(--border-color) !important;
+    color: var(--border-color) !important;
+    box-shadow: none !important;
+  }
+
+  body.user-theme-active #belief-modal .belief-picker__religion,
+  body.user-theme-active #belief-modal #belief-picker-confession {
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+  }
+}
