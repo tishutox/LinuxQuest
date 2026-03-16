@@ -1030,6 +1030,19 @@ body.user-theme-active #belief-modal #belief-picker-confession {
   pointer-events: auto;
 }
 
+.report-modal__description {
+  margin: 0;
+  color: var(--text-color);
+  font-size: .9rem;
+  line-height: 1.4;
+}
+
+.report-modal__actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .6rem;
+}
+
 .profile__avatar-button {
   width: 6rem;
   height: 6rem;

@@ -177,6 +177,7 @@ const loginPanel      = document.getElementById('login'),
       birthDateModal = document.getElementById('birth-date-modal'),
       beliefModal = document.getElementById('belief-modal'),
       publicProfileModal = document.getElementById('public-profile-modal'),
+      reportModal = document.getElementById('report-modal'),
    followListModal = document.getElementById('follow-list-modal'),
    adminUserListModal = document.getElementById('admin-user-list-modal'),
       loginBtn        = document.getElementById('login-btn'),
@@ -192,6 +193,7 @@ const loginPanel      = document.getElementById('login'),
       birthDateClose = document.getElementById('birth-date-close'),
       beliefClose = document.getElementById('belief-close'),
       publicProfileClose = document.getElementById('public-profile-close'),
+      reportClose = document.getElementById('report-close'),
       followListClose = document.getElementById('follow-list-close'),
       adminUserListClose = document.getElementById('admin-user-list-close')
 
@@ -224,10 +226,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -274,6 +276,7 @@ accentColorClose.addEventListener('click', () => accentColorModal.classList.remo
 birthDateClose.addEventListener('click', () => birthDateModal.classList.remove('show-login'))
 beliefClose.addEventListener('click', () => beliefModal.classList.remove('show-login'))
 publicProfileClose.addEventListener('click', hideAll)
+reportClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
 adminUserListClose.addEventListener('click', hideAll)
 
@@ -398,6 +401,8 @@ const publicProfileFollowingTrigger = document.getElementById('public-profile-fo
 const publicProfileFollowBtn = document.getElementById('public-profile-follow-btn')
 const publicProfileBioBox = document.getElementById('public-profile-bio-box')
 const publicProfileBioText = document.getElementById('public-profile-bio-text')
+const publicProfileReportBtn = document.getElementById('public-profile-report-btn')
+const reportCancelBtn = document.getElementById('report-cancel-btn')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
 const followListContainer = document.getElementById('follow-list-container')
@@ -1773,6 +1778,13 @@ publicProfileCopyBtn.addEventListener('click', async () => {
       showPublicProfileNotice('Link konnte nicht kopiert werden. Bitte manuell kopieren.', 'error', 4000)
    }
 })
+
+publicProfileReportBtn.addEventListener('click', () => {
+   hideAll()
+   reportModal.classList.add('show-login')
+})
+
+reportCancelBtn.addEventListener('click', hideAll)
 
 publicProfileFollowBtn.addEventListener('click', async () => {
    if (!currentPublicProfileUser?.username) return
