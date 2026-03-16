@@ -1517,6 +1517,11 @@ body.user-theme-active .profile-background__reset:disabled {
   color: var(--public-profile-accent-color);
 }
 
+#public-profile-modal .public-profile__action--report:hover,
+#public-profile-modal .public-profile__action--report:focus-visible {
+  color: hsl(0, 75%, 56%);
+}
+
 #public-profile-modal .public-profile__stat:hover {
   color: var(--public-profile-accent-color);
 }
