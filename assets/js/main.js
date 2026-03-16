@@ -221,7 +221,7 @@ function hideStaticModals() {
 const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
 const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
 const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); adminReportsModal.classList.remove('show-login'); hideStaticModals() }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); adminReportsModal?.classList.remove('show-login'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -267,7 +267,7 @@ profileClose.addEventListener('click', hideAll)
 accentColorClose.addEventListener('click', () => accentColorModal.classList.remove('show-login'))
 birthDateClose.addEventListener('click', () => birthDateModal.classList.remove('show-login'))
 beliefClose.addEventListener('click', () => beliefModal.classList.remove('show-login'))
-reportClose.addEventListener('click', hideAll)
+reportClose?.addEventListener('click', hideAll)
 publicProfileClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
 adminUserListClose.addEventListener('click', hideAll)
@@ -2268,7 +2268,7 @@ profileForm.addEventListener('submit', async (e) => {
 })
 
 // ─── REPORT CHARACTER COUNTER ───────────────────────────────────────────
-reportReasonInput.addEventListener('input', () => {
+reportReasonInput?.addEventListener('input', () => {
    const length = reportReasonInput.value.length
    reportReasonCounter.textContent = `${length}/200`
 })
@@ -2276,7 +2276,7 @@ reportReasonInput.addEventListener('input', () => {
 // ─── OPEN REPORT MODAL ───────────────────────────────────────────────────
 let reportTargetUsername = null
 
-publicProfileReportBtn.addEventListener('click', () => {
+publicProfileReportBtn?.addEventListener('click', () => {
    if (!currentUser) {
       return showMsg('public-profile-message', 'Du musst angemeldet sein, um zu melden.', 'error')
    }
@@ -2303,7 +2303,7 @@ publicProfileReportBtn.addEventListener('click', () => {
 })
 
 // ─── REPORT SUBMIT ───────────────────────────────────────────────────────
-reportSubmitBtn.addEventListener('click', async () => {
+reportSubmitBtn?.addEventListener('click', async () => {
    if (!reportTargetUsername || !currentUser) {
       return showMsg('report-message', 'Fehler: Benutzername nicht gespeichert.', 'error')
    }
@@ -2341,11 +2341,11 @@ reportSubmitBtn.addEventListener('click', async () => {
 })
 
 // ─── REPORT CANCEL ───────────────────────────────────────────────────────
-reportCancelBtn.addEventListener('click', hideAll)
+reportCancelBtn?.addEventListener('click', hideAll)
 
 // ─── ADMIN REPORTS MODAL CLOSE ───────────────────────────────────────────────────────
-adminReportsCloseBtn.addEventListener('click', hideAll)
-adminReportsClose.addEventListener('click', hideAll)
+adminReportsCloseBtn?.addEventListener('click', hideAll)
+adminReportsClose?.addEventListener('click', hideAll)
 
 // ─── OPEN ADMIN REPORTS ──────────────────────────────────────────────────────────────
 async function openAdminReports(username) {
