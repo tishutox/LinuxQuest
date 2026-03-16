@@ -1338,7 +1338,7 @@ router.get('/admin/reports/:username', (req, res) => {
     }
 
     const requester = db.prepare('SELECT id, email FROM users WHERE id = ?').get(req.session.userId);
-    if (!isProtectedUser(requester)) {
+    if (!requester?.email || !isProtectedEmail(requester.email)) {
       return res.status(403).json({ error: 'Nur Admins können Meldungen sehen.' });
     }
 
