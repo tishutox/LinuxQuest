@@ -856,12 +856,9 @@ async function loadAdminBugReports() {
 // Admin reports tab handling
 if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannungen) {
    adminReportsTabMeldungen.addEventListener('click', () => {
-      adminReportsTabMeldungen.style.color = 'var(--title-color)'
-      adminReportsTabMeldungen.style.borderBottomColor = 'var(--first-color)'
-      adminReportsTabBugs.style.color = 'var(--text-color)'
-      adminReportsTabBugs.style.borderBottomColor = 'transparent'
-      adminReportsTabEntbannungen.style.color = 'var(--text-color)'
-      adminReportsTabEntbannungen.style.borderBottomColor = 'transparent'
+      adminReportsTabMeldungen.classList.add('active')
+      adminReportsTabBugs.classList.remove('active')
+      adminReportsTabEntbannungen.classList.remove('active')
       adminReportsList.style.display = 'block'
       adminBugReportsList.style.display = 'none'
       adminUnbanRequestsList.style.display = 'none'
@@ -870,12 +867,9 @@ if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannung
    })
 
    adminReportsTabBugs.addEventListener('click', () => {
-      adminReportsTabMeldungen.style.color = 'var(--text-color)'
-      adminReportsTabMeldungen.style.borderBottomColor = 'transparent'
-      adminReportsTabBugs.style.color = 'var(--title-color)'
-      adminReportsTabBugs.style.borderBottomColor = 'var(--first-color)'
-      adminReportsTabEntbannungen.style.color = 'var(--text-color)'
-      adminReportsTabEntbannungen.style.borderBottomColor = 'transparent'
+      adminReportsTabMeldungen.classList.remove('active')
+      adminReportsTabBugs.classList.add('active')
+      adminReportsTabEntbannungen.classList.remove('active')
       adminReportsList.style.display = 'none'
       adminBugReportsList.style.display = 'block'
       adminUnbanRequestsList.style.display = 'none'
@@ -884,12 +878,9 @@ if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannung
    })
 
    adminReportsTabEntbannungen.addEventListener('click', () => {
-      adminReportsTabMeldungen.style.color = 'var(--text-color)'
-      adminReportsTabMeldungen.style.borderBottomColor = 'transparent'
-      adminReportsTabBugs.style.color = 'var(--text-color)'
-      adminReportsTabBugs.style.borderBottomColor = 'transparent'
-      adminReportsTabEntbannungen.style.color = 'var(--title-color)'
-      adminReportsTabEntbannungen.style.borderBottomColor = 'var(--first-color)'
+      adminReportsTabMeldungen.classList.remove('active')
+      adminReportsTabBugs.classList.remove('active')
+      adminReportsTabEntbannungen.classList.add('active')
       adminReportsList.style.display = 'none'
       adminBugReportsList.style.display = 'none'
       adminUnbanRequestsList.style.display = 'block'

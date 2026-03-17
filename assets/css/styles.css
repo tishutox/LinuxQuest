@@ -617,6 +617,36 @@ img {
   cursor: default;
 }
 
+/* Admin reports tabs */
+.admin-reports__tabs {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: .5rem;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-reports__tab-btn {
+  flex: 1;
+  min-width: 80px;
+  font-size: .85rem;
+  padding: .4rem .6rem;
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color .3s, border-bottom-color .3s;
+  white-space: nowrap;
+}
+
+.admin-reports__tab-btn.active {
+  color: var(--title-color);
+  border-bottom-color: var(--first-color);
+}
+
 /* Show search */
 .show-search {
   opacity: 1;
