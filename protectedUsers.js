@@ -1,6 +1,5 @@
 const PROTECTED_EMAILS = Object.freeze([
-  'armand.patrick.asztalos@tha.de',
-  'jost.witthauer@tha.de'
+  'armand.patrick.asztalos@tha.de'
 ]);
 
 function normalizeEmail(email) {

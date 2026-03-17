@@ -423,9 +423,14 @@ const adminUserListResults = document.getElementById('admin-user-list-results')
 const adminUserListForm = document.getElementById('admin-user-list-form')
 
 const PROTECTED_EMAILS = new Set([
-   'armand.patrick.asztalos@tha.de',
-   'jost.witthauer@tha.de'
+   'armand.patrick.asztalos@tha.de'
 ])
+
+const USER_ROLES = Object.freeze({
+   USER: 'user',
+   MODERATOR: 'moderator',
+   ADMINISTRATOR: 'administrator'
+})
 
 const projectContactsByKey = {
    armand: null,
@@ -465,6 +470,7 @@ async function openAdminReports(username) {
       }
 
       const reports = Array.isArray(data.reports) ? data.reports : []
+      const viewerIsAdministrator = isAdminUser(currentUser)
       if (!reports.length) {
          adminReportsList.innerHTML = '<p class="admin-reports__empty">Keine Meldungen vorhanden.</p>'
          return
@@ -517,7 +523,7 @@ async function openAdminReports(username) {
          item.appendChild(reason)
          item.appendChild(date)
 
-         if (!isClosed) {
+         if (!isClosed && viewerIsAdministrator) {
             const closeBtn = document.createElement('button')
             closeBtn.type = 'button'
             closeBtn.className = 'admin-reports__close-btn'
@@ -641,8 +647,27 @@ function isProtectedUser(user) {
    return Boolean(user?.email) && PROTECTED_EMAILS.has(user.email.trim().toLowerCase())
 }
 
+function normalizeUserRole(value) {
+   if (typeof value !== 'string') return USER_ROLES.USER
+   const normalized = value.trim().toLowerCase()
+   if (normalized === USER_ROLES.ADMINISTRATOR) return USER_ROLES.ADMINISTRATOR
+   if (normalized === USER_ROLES.MODERATOR) return USER_ROLES.MODERATOR
+   return USER_ROLES.USER
+}
+
+function getUserRole(user) {
+   if (!user) return USER_ROLES.USER
+   if (isProtectedUser(user)) return USER_ROLES.ADMINISTRATOR
+   return normalizeUserRole(user.role)
+}
+
 function isAdminUser(user) {
-   return isProtectedUser(user)
+   return getUserRole(user) === USER_ROLES.ADMINISTRATOR
+}
+
+function canAccessAdminPanel(user) {
+   const role = getUserRole(user)
+   return role === USER_ROLES.ADMINISTRATOR || role === USER_ROLES.MODERATOR
 }
 
 function getDefaultAccentColor() {
@@ -1427,18 +1452,19 @@ function updatePublicProfileView(payload) {
    updatePublicFollowStats()
    updateFollowButton()
 
-   const normalizedEmail = user.email ? user.email.trim().toLowerCase() : ''
-   const viewedIsAdmin = PROTECTED_EMAILS.has(normalizedEmail)
-   const viewerIsAdmin = isAdminUser(currentUser)
+   const viewedRole = getUserRole(user)
+   const viewedHasStaffBadge = viewedRole === USER_ROLES.ADMINISTRATOR || viewedRole === USER_ROLES.MODERATOR
+   const viewerCanAccessAdminPanel = canAccessAdminPanel(currentUser)
+   const viewedRoleLabel = viewedRole === USER_ROLES.ADMINISTRATOR ? 'Administrator*in' : 'Moderator*in'
 
-   if (viewedIsAdmin) {
+   if (viewedHasStaffBadge) {
       publicProfileEmailLink.style.display = 'inline-flex'
       publicProfileEmailLink.href = '#'
       publicProfileEmailLink.innerHTML = '<i class="fi fi-rc-shield"></i>'
-      publicProfileEmailLink.dataset.action = viewerIsAdmin ? 'open-admin-list' : 'admin-label'
-      setPublicProfileTooltip(publicProfileEmailLink, 'Admin')
-      publicProfileEmailLink.setAttribute('aria-label', viewerIsAdmin ? 'Admin-Bereich öffnen' : 'Admin')
-      if (viewerIsAdmin) {
+      publicProfileEmailLink.dataset.action = viewerCanAccessAdminPanel ? 'open-admin-list' : 'role-label'
+      setPublicProfileTooltip(publicProfileEmailLink, viewedRoleLabel)
+      publicProfileEmailLink.setAttribute('aria-label', viewerCanAccessAdminPanel ? 'Admin-Bereich öffnen' : viewedRoleLabel)
+      if (viewerCanAccessAdminPanel) {
          publicProfileEmailLink.classList.remove('public-profile__action--badge')
       } else {
          publicProfileEmailLink.classList.add('public-profile__action--badge')
@@ -1592,6 +1618,7 @@ function renderFollowList(users) {
 
 function renderAdminUserList(users, reportedUsers = []) {
    adminUserListResults.innerHTML = ''
+   const viewerIsAdministrator = isAdminUser(currentUser)
 
    function createUserGroup(title, userList) {
       const group = document.createElement('section')
@@ -1648,12 +1675,50 @@ function renderAdminUserList(users, reportedUsers = []) {
 
          actions.appendChild(reportsButton)
 
+         const targetRole = normalizeUserRole(user?.role)
+
+         if (viewerIsAdministrator && !user.isProtected && targetRole !== USER_ROLES.ADMINISTRATOR) {
+            const roleButton = document.createElement('button')
+            roleButton.type = 'button'
+            roleButton.className = 'admin-user-list__moderator-toggle'
+            roleButton.textContent = targetRole === USER_ROLES.MODERATOR
+               ? 'Moderator*in degradieren'
+               : 'Zu Moderator*in befördern'
+
+            roleButton.addEventListener('click', async () => {
+               roleButton.disabled = true
+               try {
+                  const response = await fetch(`/api/auth/admin/users/${encodeURIComponent(user.username)}/moderator-toggle`, {
+                     method: 'PATCH',
+                     credentials: 'include'
+                  })
+
+                  const data = await response.json()
+                  if (!response.ok) {
+                     showMsg('admin-user-list-message', data.error || 'Rolle konnte nicht geändert werden.', 'error')
+                     roleButton.disabled = false
+                     return
+                  }
+
+                  showMsg('admin-user-list-message', data.message || 'Rolle aktualisiert.', 'success')
+                  await loadAdminUserList(adminUserListSearch.value)
+               } catch (_) {
+                  showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
+                  roleButton.disabled = false
+               }
+            })
+
+            actions.appendChild(roleButton)
+         }
+
          if (user.isProtected) {
             const protectedLabel = document.createElement('span')
             protectedLabel.className = 'admin-user-list__protected'
-            protectedLabel.textContent = 'Geschützter Admin-Nutzer'
+            protectedLabel.textContent = 'Geschütztes Administrator*innen-Konto'
             actions.appendChild(protectedLabel)
-         } else {
+         }
+
+         if (viewerIsAdministrator && !user.isProtected) {
             const deleteButton = document.createElement('button')
             deleteButton.type = 'button'
             deleteButton.className = 'admin-user-list__delete'
@@ -1716,7 +1781,7 @@ function renderAdminUserList(users, reportedUsers = []) {
 }
 
 async function loadAdminUserList(query = '') {
-   if (!isAdminUser(currentUser)) {
+   if (!canAccessAdminPanel(currentUser)) {
       return showMsg('admin-user-list-message', 'Kein Zugriff auf den Admin-Bereich.', 'error')
    }
 
@@ -1756,7 +1821,7 @@ async function loadAdminUserList(query = '') {
 }
 
 async function openAdminUserListModal() {
-   if (!isAdminUser(currentUser)) {
+   if (!canAccessAdminPanel(currentUser)) {
       return showPublicProfileNotice('Kein Zugriff auf den Admin-Bereich.', 'error', 3000)
    }
 
