@@ -937,7 +937,7 @@ body.user-theme-active .nav__avatar {
 .birth-date-picker__header {
   display: grid;
   grid-template-columns: 2.2rem 1fr 2.2rem;
-  align-items: center;
+  align-items: end;
   gap: .4rem;
 }
 
@@ -949,6 +949,7 @@ body.user-theme-active .nav__avatar {
   background: var(--container-color);
   color: var(--text-color);
   cursor: pointer;
+  align-self: end;
 }
 
 .birth-date-picker__month {
