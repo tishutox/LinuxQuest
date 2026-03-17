@@ -602,8 +602,21 @@
             <h2 class="login__title" id="admin-reports-title">Meldungen</h2>
 
             <div class="login__message" id="admin-reports-message"></div>
+
+            <!-- Search bar -->
+            <div class="admin-reports__search">
+               <input type="search" id="admin-reports-search" placeholder="Welchen Nutzer möchtest du verwalten?" autocomplete="off">
+            </div>
+
+            <!-- Categories -->
+            <div class="admin-reports__categories">
+               <button type="button" id="admin-reports-category-bugs" class="admin-reports__category-btn">Bugs</button>
+               <button type="button" id="admin-reports-category-freigaben" class="admin-reports__category-btn">Freigaben</button>
+               <button type="button" id="admin-reports-category-meldungen" class="admin-reports__category-btn">Meldungen</button>
+               <button type="button" id="admin-reports-category-users" class="admin-reports__category-btn">Nutzernamen</button>
+            </div>
             
-            <div class="admin-reports__tabs">
+            <div class="admin-reports__tabs" style="display: none;">
                <button type="button" id="admin-reports-tab-meldungen" class="admin-reports__tab-btn active">Meldungen</button>
                <button type="button" id="admin-reports-tab-bugs" class="admin-reports__tab-btn">Bugs</button>
                <button type="button" id="admin-reports-tab-entbannungen" class="admin-reports__tab-btn">Freigaben</button>
@@ -612,6 +625,7 @@
             <div class="admin-reports__list" id="admin-reports-list"></div>
             <div class="admin-reports__list" id="admin-bug-reports-list" style="display: none;"></div>
             <div class="admin-reports__list" id="admin-unban-requests-list" style="display: none;"></div>
+            <div class="admin-reports__list" id="admin-category-users-list" style="display: none;"></div>
 
             <button type="button" class="login__button" id="admin-reports-close-btn">Schließen</button>
          </div>
