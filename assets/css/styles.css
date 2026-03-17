@@ -1463,18 +1463,6 @@ body.user-theme-active .profile-background__reset:disabled {
   transform: translateY(0.5px);
 }
 
-.public-profile__following-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: .15rem .45rem;
-  border-radius: 999px;
-  font-size: .7rem;
-  font-weight: var(--font-semi-bold);
-  color: var(--first-color);
-  background-color: var(--container-color);
-  border: 1px solid var(--border-color);
-}
-
 .public-profile__actions {
   display: inline-flex;
   align-items: baseline;
@@ -1620,11 +1608,6 @@ body.user-theme-active .profile-background__reset:disabled {
 }
 
 #public-profile-modal .info-modal__avatar {
-  border-color: var(--public-profile-accent-color);
-}
-
-#public-profile-modal .public-profile__following-badge {
-  color: var(--public-profile-accent-color);
   border-color: var(--public-profile-accent-color);
 }
 

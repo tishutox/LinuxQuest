@@ -400,7 +400,6 @@ const publicProfileZodiac = document.getElementById('public-profile-zodiac')
 const publicProfileBelief = document.getElementById('public-profile-belief')
 const publicProfileEarlySupporter = document.getElementById('public-profile-early-supporter')
 const publicProfileEmailLink = document.getElementById('public-profile-email-link')
-const publicProfileFollowingBadge = document.getElementById('public-profile-following-badge')
 const publicProfileFollowersCount = document.getElementById('public-profile-followers-count')
 const publicProfileFollowingCount = document.getElementById('public-profile-following-count')
 const publicProfileFollowersTrigger = document.getElementById('public-profile-followers-trigger')
@@ -1525,9 +1524,6 @@ function updateFollowButton() {
       publicProfileFollowIconBtn.innerHTML = '<i class="fi fi-rc-user-add"></i>'
       publicProfileFollowIconBtn.title = 'Folgen'
       publicProfileFollowIconBtn.setAttribute('aria-label', 'Folgen')
-      if (publicProfileFollowingBadge) {
-         publicProfileFollowingBadge.style.display = 'none'
-      }
       return
    }
 
@@ -1538,10 +1534,6 @@ function updateFollowButton() {
       : '<i class="fi fi-rc-user-add"></i>'
    publicProfileFollowIconBtn.title = isFollowing ? 'Entfolgen' : 'Folgen'
    publicProfileFollowIconBtn.setAttribute('aria-label', isFollowing ? 'Entfolgen' : 'Folgen')
-
-   if (publicProfileFollowingBadge) {
-      publicProfileFollowingBadge.style.display = isFollowing ? 'inline-flex' : 'none'
-   }
 }
 
 function updatePublicFollowStats() {
