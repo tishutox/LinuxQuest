@@ -597,27 +597,26 @@
          <i class="fi fi-rr-cross-small search__close" id="admin-user-list-close"></i>
       </div>
 
-      <div class="search" id="admin-reports-modal">
-         <form class="search__form admin-reports__form" id="admin-reports-form">
-            <i class="fi fi-rc-shield search__icon"></i>
-            <input type="search" id="admin-reports-search" class="search__input" placeholder="Welchen Nutzer möchtest du verwalten?" autocomplete="off">
-         </form>
+      <div class="login" id="admin-reports-modal">
+         <div class="login__form profile__form">
+            <h2 class="login__title" id="admin-reports-title">Meldungen</h2>
 
-         <div class="login__message" id="admin-reports-message"></div>
+            <div class="login__message" id="admin-reports-message"></div>
+            
+            <div class="admin-reports__tabs">
+               <button type="button" id="admin-reports-tab-meldungen" class="admin-reports__tab-btn active">Meldungen</button>
+               <button type="button" id="admin-reports-tab-bugs" class="admin-reports__tab-btn">Bugs</button>
+               <button type="button" id="admin-reports-tab-entbannungen" class="admin-reports__tab-btn">Freigaben</button>
+            </div>
 
-         <div class="admin-reports__categories">
-            <button type="button" id="admin-reports-tab-bugs" class="admin-reports__category-btn active">Bugs</button>
-            <button type="button" id="admin-reports-tab-entbannungen" class="admin-reports__category-btn">Freigaben</button>
-            <button type="button" id="admin-reports-tab-meldungen" class="admin-reports__category-btn">Meldungen</button>
-            <button type="button" id="admin-reports-tab-users" class="admin-reports__category-btn">Nutzernamen</button>
+            <div class="admin-reports__list" id="admin-reports-list"></div>
+            <div class="admin-reports__list" id="admin-bug-reports-list" style="display: none;"></div>
+            <div class="admin-reports__list" id="admin-unban-requests-list" style="display: none;"></div>
+
+            <button type="button" class="login__button" id="admin-reports-close-btn">Schließen</button>
          </div>
 
-         <div class="search__results admin-reports__results" id="admin-reports-list" style="display: none;"></div>
-         <div class="search__results admin-reports__results" id="admin-bug-reports-list" style="display: none;"></div>
-         <div class="search__results admin-reports__results" id="admin-unban-requests-list" style="display: none;"></div>
-         <div class="search__results admin-reports__results" id="admin-users-list" style="display: none;"></div>
-
-         <i class="fi fi-rr-cross-small search__close" id="admin-reports-close"></i>
+         <i class="fi fi-rr-cross-small login__close" id="admin-reports-close"></i>
       </div>
 
       <!--==================== MAIN ====================-->
