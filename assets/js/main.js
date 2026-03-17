@@ -2088,13 +2088,17 @@ publicProfileFollowBtn.addEventListener('click', async () => {
    }
 })
 
-publicProfileFollowersTrigger.addEventListener('click', async () => {
-   await openFollowList('followers')
-})
+if (publicProfileFollowersTrigger) {
+   publicProfileFollowersTrigger.addEventListener('click', async () => {
+      await openFollowList('followers')
+   })
+}
 
-publicProfileFollowingTrigger.addEventListener('click', async () => {
-   await openFollowList('following')
-})
+if (publicProfileFollowingTrigger) {
+   publicProfileFollowingTrigger.addEventListener('click', async () => {
+      await openFollowList('following')
+   })
+}
 
 ;[publicProfileEmailLink, publicProfileEarlySupporter, publicProfileZodiac, publicProfileBelief].forEach((element) => {
    if (!element) return
