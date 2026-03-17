@@ -372,9 +372,14 @@
 
             <div class="info-modal__avatar-wrap">
                <img src="" alt="Profilbild" class="info-modal__avatar" id="public-profile-avatar">
-               <button type="button" class="public-profile__action public-profile__action--report public-profile__action--report-float" id="public-profile-report-btn" title="Melden" aria-label="Melden">
-                  <i class="fi fi-rc-megaphone"></i>
-               </button>
+               <div class="public-profile__avatar-actions">
+                  <button type="button" class="public-profile__action public-profile__action--follow-float" id="public-profile-follow-icon-btn" title="Folgen" aria-label="Folgen" style="display:none;">
+                     <i class="fi fi-rc-user-add"></i>
+                  </button>
+                  <button type="button" class="public-profile__action public-profile__action--report public-profile__action--report-float" id="public-profile-report-btn" title="Melden" aria-label="Melden">
+                     <i class="fi fi-rc-megaphone"></i>
+                  </button>
+               </div>
             </div>
 
             <div class="public-profile__name-row" id="public-profile-name-row">
@@ -414,7 +419,6 @@
                <p class="public-profile__bio-text" id="public-profile-bio-text"></p>
             </div>
 
-            <button type="button" class="login__button" id="public-profile-follow-btn" style="display:none;">Folgen</button>
          </div>
 
          <i class="fi fi-rr-cross-small login__close" id="public-profile-close"></i>

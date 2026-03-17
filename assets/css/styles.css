@@ -1147,6 +1147,16 @@ body.user-theme-active #belief-modal #belief-picker-confession {
   margin-bottom: .9rem;
 }
 
+#public-profile-modal .public-profile__avatar-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  z-index: 2;
+}
+
 /* =============== REPORT BUTTON =============== */
 .public-profile__action--report {
   color: var(--text-color);
@@ -1155,7 +1165,8 @@ body.user-theme-active #belief-modal #belief-picker-confession {
   transition: color .3s;
 }
 
-#public-profile-modal .public-profile__action--report-float {
+#public-profile-modal .public-profile__action--report-float,
+#public-profile-modal .public-profile__action--follow-float {
   width: auto;
   height: auto;
   padding: 0;
@@ -1172,22 +1183,28 @@ body.user-theme-active #belief-modal #belief-picker-confession {
   color: hsl(0, 75%, 56%);
 }
 
-#public-profile-modal .public-profile__action--report-float {
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
-
-.public-profile__action--report-float {
+.public-profile__action--report-float,
+.public-profile__action--follow-float {
   pointer-events: none;
 }
 
-#public-profile-modal.show-login .public-profile__action--report-float {
+#public-profile-modal.show-login .public-profile__action--report-float,
+#public-profile-modal.show-login .public-profile__action--follow-float {
   pointer-events: auto;
+}
+
+.public-profile__action--follow-float {
+  color: var(--text-color);
+}
+
+#public-profile-modal .public-profile__action--follow-float i {
+  font-size: 1.23rem !important;
+  line-height: 1;
+  transform: none;
+}
+
+.public-profile__action--follow-float:hover {
+  color: var(--first-color);
 }
 
 .report-modal__description {
