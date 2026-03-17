@@ -599,26 +599,11 @@
 
       <div class="login" id="admin-reports-modal">
          <div class="login__form profile__form">
-            <!-- Search bar -->
-            <div class="admin-reports__search">
-               <i class="fi fi-rc-shield admin-reports__search-icon"></i>
-               <input type="search" id="admin-reports-search" class="admin-reports__search-input" placeholder="Welchen Nutzer möchtest du verwalten?" autocomplete="off">
-            </div>
-
-            <h2 class="login__title" id="admin-reports-title">Kategorien</h2>
+            <h2 class="login__title" id="admin-reports-title">Meldungen</h2>
 
             <div class="login__message" id="admin-reports-message"></div>
             
-            <!-- Category buttons -->
-            <div class="admin-reports__categories">
-               <button type="button" id="admin-reports-category-bugs" class="admin-reports__category-btn active">Bugs</button>
-               <button type="button" id="admin-reports-category-entbannungen" class="admin-reports__category-btn">Freigaben</button>
-               <button type="button" id="admin-reports-category-meldungen" class="admin-reports__category-btn">Meldungen</button>
-               <button type="button" id="admin-reports-category-users" class="admin-reports__category-btn">Nutzernamen</button>
-            </div>
-
-            <!-- Legacy tabs (will be hidden later) -->
-            <div class="admin-reports__tabs" style="display: none;">
+            <div class="admin-reports__tabs">
                <button type="button" id="admin-reports-tab-meldungen" class="admin-reports__tab-btn active">Meldungen</button>
                <button type="button" id="admin-reports-tab-bugs" class="admin-reports__tab-btn">Bugs</button>
                <button type="button" id="admin-reports-tab-entbannungen" class="admin-reports__tab-btn">Freigaben</button>
@@ -627,7 +612,6 @@
             <div class="admin-reports__list" id="admin-reports-list"></div>
             <div class="admin-reports__list" id="admin-bug-reports-list" style="display: none;"></div>
             <div class="admin-reports__list" id="admin-unban-requests-list" style="display: none;"></div>
-            <div class="admin-reports__list" id="admin-reports-users-list" style="display: none;"></div>
 
             <button type="button" class="login__button" id="admin-reports-close-btn">Schließen</button>
          </div>
