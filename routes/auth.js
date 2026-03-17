@@ -1293,7 +1293,7 @@ router.post('/update-profile', (req, res) => {
 
     const currentUserRecord = db.prepare('SELECT id, is_restricted FROM users WHERE id = ?').get(req.session.userId);
     if (currentUserRecord?.is_restricted === 1) {
-      return res.status(403).json({ error: 'Dein Profil ist eingeschränkt und kann nicht modifiziert werden. Du kannst ein Entbannungsticket einreichen.' });
+      return res.status(403).json({ error: 'Dein Profil ist eingeschränkt und kann nicht modifiziert werden. Du kannst ein Freigabeticket einreichen.' });
     }
 
     const { full_name, profile_name, pronouns, bio, birth_date, belief, confession, username, accent_color } = req.body;
@@ -1394,7 +1394,7 @@ router.delete('/delete-account', async (req, res) => {
 
     const currentUserRecord = db.prepare('SELECT id, is_restricted FROM users WHERE id = ?').get(req.session.userId);
     if (currentUserRecord?.is_restricted === 1) {
-      return res.status(403).json({ error: 'Dein Profil ist eingeschränkt und kann nicht gelöscht werden. Du kannst ein Entbannungsticket einreichen.' });
+      return res.status(403).json({ error: 'Dein Profil ist eingeschränkt und kann nicht gelöscht werden. Du kannst ein Freigabeticket einreichen.' });
     }
 
     const { password } = req.body;
@@ -1555,7 +1555,7 @@ router.post('/unban-request', (req, res) => {
       VALUES (?, ?)
     `).run(userRecord.id, trimmedReason);
 
-    return res.status(201).json({ message: 'Entbannungsanfrage erfolgreich eingereicht.' });
+    return res.status(201).json({ message: 'Freigabeanfrage erfolgreich eingereicht.' });
   } catch (err) {
     console.error('[UNBAN REQUEST ERROR]', err);
     return res.status(500).json({ error: 'Serverfehler beim Erstellen der Anfrage.' });
@@ -1687,7 +1687,7 @@ router.get('/admin/unban-requests', (req, res) => {
     }
 
     if (!canAccessAdminPanel(req)) {
-      return res.status(403).json({ error: 'Nur Administrator*innen und Moderator*innen können Entbannungen sehen.' });
+      return res.status(403).json({ error: 'Nur Administrator*innen und Moderator*innen können Freigaben sehen.' });
     }
 
     const requests = db.prepare(`
@@ -1714,7 +1714,7 @@ router.get('/admin/unban-requests', (req, res) => {
     return res.json({ requests: sanitizedRequests });
   } catch (err) {
     console.error('[ADMIN UNBAN REQUESTS ERROR]', err);
-    return res.status(500).json({ error: 'Serverfehler beim Abrufen der Entbannungsanfragen.' });
+    return res.status(500).json({ error: 'Serverfehler beim Abrufen der Freigabeanfragen.' });
   }
 });
 
@@ -1753,7 +1753,7 @@ router.patch('/admin/unban-requests/:id/resolve', (req, res) => {
     const user = db.prepare('SELECT username FROM users WHERE id = ?').get(unbanRequest.restricted_user_id);
 
     return res.json({
-      message: `Entbannungsanfrage für @${user.username} genehmigt. Der Nutzer ist nun nicht mehr eingeschränkt.`,
+      message: `Freigabeanfrage für @${user.username} genehmigt. Der Nutzer ist nun nicht mehr eingeschränkt.`,
       username: user.username
     });
   } catch (err) {

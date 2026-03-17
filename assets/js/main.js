@@ -597,14 +597,14 @@ async function openAdminReports(username, initialTab = 'meldungen') {
       const unbanData = await unbanResp.json()
 
       if (!unbanResp.ok) {
-         adminUnbanRequestsList.innerHTML = '<p class="admin-reports__empty">Keine Entbannungsanfragen geladen.</p>'
+         adminUnbanRequestsList.innerHTML = '<p class="admin-reports__empty">Keine Freigabeanfragen geladen.</p>'
          return
       }
 
       const requests = Array.isArray(unbanData.requests) ? unbanData.requests : []
       const viewerIsAdministrator = isAdminUser(currentUser)
       if (!requests.length) {
-         adminUnbanRequestsList.innerHTML = '<p class="admin-reports__empty">Keine Entbannungsanfragen vorhanden.</p>'
+         adminUnbanRequestsList.innerHTML = '<p class="admin-reports__empty">Keine Freigabeanfragen vorhanden.</p>'
          return
       }
 
@@ -1968,8 +1968,8 @@ function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = []) 
       return group
    }
 
-   const unbanRequestsGroup = createUserGroup('Aktuelle Entbannungstickets', unbanRequestUsers, {
-      reportsLabel: 'Entbannungstickets',
+   const unbanRequestsGroup = createUserGroup('Freigaben', unbanRequestUsers, {
+      reportsLabel: 'Freigaben',
       initialReportsTab: 'entbannungen'
    })
    adminUserListResults.appendChild(unbanRequestsGroup)
@@ -2361,7 +2361,7 @@ unbanRequestSubmitBtn?.addEventListener('click', async () => {
       if (!response.ok) {
          showMsg('unban-request-message', data.error || 'Anfrage konnte nicht gesendet werden.', 'error')
       } else {
-         showMsg('unban-request-message', data.message || 'Entbannungsanfrage erfolgreich gesendet.', 'success')
+         showMsg('unban-request-message', data.message || 'Freigabeanfrage erfolgreich gesendet.', 'success')
          setTimeout(() => {
             hideAll()
          }, 900)
