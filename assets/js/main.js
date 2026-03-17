@@ -459,12 +459,32 @@ const DEFAULT_MAIN_BACKGROUND_SRC = mainBackgroundImage?.getAttribute('src') || 
 
 const messageTimers = new Map()
 
-async function openAdminReports(username) {
+function setAdminReportsTab(tab = 'meldungen') {
+   const showUnbanTab = tab === 'entbannungen'
+
+   if (adminReportsList) {
+      adminReportsList.style.display = showUnbanTab ? 'none' : 'block'
+   }
+   if (adminUnbanRequestsList) {
+      adminUnbanRequestsList.style.display = showUnbanTab ? 'block' : 'none'
+   }
+
+   if (adminReportsTabMeldungen && adminReportsTabEntbannungen) {
+      adminReportsTabMeldungen.style.color = showUnbanTab ? 'var(--text-color)' : 'var(--title-color)'
+      adminReportsTabMeldungen.style.borderBottomColor = showUnbanTab ? 'transparent' : 'var(--first-color)'
+      adminReportsTabEntbannungen.style.color = showUnbanTab ? 'var(--title-color)' : 'var(--text-color)'
+      adminReportsTabEntbannungen.style.borderBottomColor = showUnbanTab ? 'var(--first-color)' : 'transparent'
+   }
+}
+
+async function openAdminReports(username, initialTab = 'meldungen') {
    if (!username) return
 
    clearMsg('admin-reports-message')
    adminReportsTitle.textContent = `Meldungen für @${username}`
    adminReportsList.innerHTML = ''
+   adminUnbanRequestsList.innerHTML = ''
+   setAdminReportsTab(initialTab)
 
    hideAll()
    adminReportsModal.classList.add('show-login')
@@ -1737,11 +1757,11 @@ function renderFollowList(users) {
    })
 }
 
-function renderAdminUserList(users, reportedUsers = []) {
+function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = []) {
    adminUserListResults.innerHTML = ''
    const viewerIsAdministrator = isAdminUser(currentUser)
 
-   function createUserGroup(title, userList) {
+   function createUserGroup(title, userList, options = {}) {
       const group = document.createElement('section')
       group.className = 'search-results__group'
 
@@ -1788,10 +1808,10 @@ function renderAdminUserList(users, reportedUsers = []) {
          const reportsButton = document.createElement('button')
          reportsButton.type = 'button'
          reportsButton.className = 'admin-user-list__reports'
-         reportsButton.textContent = 'Meldungen'
+         reportsButton.textContent = options.reportsLabel || 'Meldungen'
 
          reportsButton.addEventListener('click', async () => {
-            await openAdminReports(user.username)
+            await openAdminReports(user.username, options.initialReportsTab || 'meldungen')
          })
 
          actions.appendChild(reportsButton)
@@ -1949,6 +1969,12 @@ function renderAdminUserList(users, reportedUsers = []) {
       return group
    }
 
+   const unbanRequestsGroup = createUserGroup('Aktuelle Entbannungstickets', unbanRequestUsers, {
+      reportsLabel: 'Entbannungstickets',
+      initialReportsTab: 'entbannungen'
+   })
+   adminUserListResults.appendChild(unbanRequestsGroup)
+
    const reportsGroup = createUserGroup('Meldungen', reportedUsers)
    adminUserListResults.appendChild(reportsGroup)
 
@@ -1970,9 +1996,10 @@ async function loadAdminUserList(query = '') {
          ? `/api/auth/admin/users/with-open-reports?q=${encodeURIComponent(trimmedQuery)}`
          : '/api/auth/admin/users/with-open-reports'
 
-      const [usersResp, reportsResp] = await Promise.all([
+      const [usersResp, reportsResp, unbanRequestsResp] = await Promise.all([
          fetch(usersUrl, { credentials: 'include' }),
-         fetch(reportsUrl, { credentials: 'include' })
+         fetch(reportsUrl, { credentials: 'include' }),
+         fetch('/api/auth/admin/unban-requests', { credentials: 'include' })
       ])
 
       const usersData = await usersResp.json()
@@ -1983,11 +2010,32 @@ async function loadAdminUserList(query = '') {
       }
 
       const reportsData = reportsResp.ok ? await reportsResp.json() : { users: [] }
+      const unbanRequestsData = unbanRequestsResp.ok ? await unbanRequestsResp.json() : { requests: [] }
+
+      const allUsers = Array.isArray(usersData.users) ? usersData.users : []
+      const usersByUsername = new Map(
+         allUsers
+            .filter((user) => user?.username)
+            .map((user) => [String(user.username).trim().toLowerCase(), user])
+      )
+
+      const seenUsernames = new Set()
+      const unbanRequestUsers = (Array.isArray(unbanRequestsData.requests) ? unbanRequestsData.requests : [])
+         .map((request) => request?.username ? String(request.username).trim().toLowerCase() : '')
+         .filter(Boolean)
+         .filter((normalizedUsername) => {
+            if (seenUsernames.has(normalizedUsername)) return false
+            seenUsernames.add(normalizedUsername)
+            return true
+         })
+         .map((normalizedUsername) => usersByUsername.get(normalizedUsername))
+         .filter(Boolean)
 
       clearMsg('admin-user-list-message')
       renderAdminUserList(
-         Array.isArray(usersData.users) ? usersData.users : [],
-         Array.isArray(reportsData.users) ? reportsData.users : []
+         allUsers,
+         Array.isArray(reportsData.users) ? reportsData.users : [],
+         unbanRequestUsers
       )
    } catch (_) {
       showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
@@ -2222,21 +2270,11 @@ reportCancelBtn.addEventListener('click', hideAll)
 adminReportsCloseBtn.addEventListener('click', hideAll)
 
 adminReportsTabMeldungen?.addEventListener('click', () => {
-   adminReportsList.style.display = 'block'
-   adminUnbanRequestsList.style.display = 'none'
-   adminReportsTabMeldungen.style.color = 'var(--title-color)'
-   adminReportsTabMeldungen.style.borderBottomColor = 'var(--first-color)'
-   adminReportsTabEntbannungen.style.color = 'var(--text-color)'
-   adminReportsTabEntbannungen.style.borderBottomColor = 'transparent'
+   setAdminReportsTab('meldungen')
 })
 
 adminReportsTabEntbannungen?.addEventListener('click', () => {
-   adminReportsList.style.display = 'none'
-   adminUnbanRequestsList.style.display = 'block'
-   adminReportsTabMeldungen.style.color = 'var(--text-color)'
-   adminReportsTabMeldungen.style.borderBottomColor = 'transparent'
-   adminReportsTabEntbannungen.style.color = 'var(--title-color)'
-   adminReportsTabEntbannungen.style.borderBottomColor = 'var(--first-color)'
+   setAdminReportsTab('entbannungen')
 })
 
 reportReasonInput?.addEventListener('input', () => {
