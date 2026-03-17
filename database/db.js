@@ -2,6 +2,7 @@
 const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const fs   = require('fs');
+const { PROTECTED_EMAILS } = require('../protectedUsers');
 
 // DATA_DIR can be set to a Railway persistent volume path (e.g. /data)
 const dbDir = process.env.DATA_DIR
@@ -48,6 +49,7 @@ const hasBirthDateColumn = userColumns.some((column) => column.name === 'birth_d
 const hasBeliefColumn = userColumns.some((column) => column.name === 'belief');
 const hasConfessionColumn = userColumns.some((column) => column.name === 'confession');
 const hasEarlySupporterColumn = userColumns.some((column) => column.name === 'early_supporter');
+const hasRoleColumn = userColumns.some((column) => column.name === 'role');
 
 if (!hasLastActiveColumn) {
   db.exec('ALTER TABLE users ADD COLUMN last_active_at TEXT');
@@ -83,6 +85,28 @@ if (!hasConfessionColumn) {
 
 if (!hasEarlySupporterColumn) {
   db.exec('ALTER TABLE users ADD COLUMN early_supporter INTEGER DEFAULT 0');
+}
+
+if (!hasRoleColumn) {
+  db.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'");
+}
+
+db.exec(`
+  UPDATE users
+  SET role = CASE
+    WHEN LOWER(COALESCE(role, '')) IN ('user', 'moderator', 'administrator') THEN LOWER(role)
+    ELSE 'user'
+  END
+`);
+
+if (Array.isArray(PROTECTED_EMAILS) && PROTECTED_EMAILS.length) {
+  const normalizedProtectedEmails = PROTECTED_EMAILS.map((email) => String(email).trim().toLowerCase());
+  const placeholders = normalizedProtectedEmails.map(() => '?').join(', ');
+  db.prepare(`
+    UPDATE users
+    SET role = 'administrator'
+    WHERE LOWER(email) IN (${placeholders})
+  `).run(...normalizedProtectedEmails);
 }
 
 db.exec(`

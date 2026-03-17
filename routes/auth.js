@@ -86,6 +86,11 @@ const VERIFY_IP_WINDOW_MS = 10 * 60 * 1000;
 const VERIFY_IP_MAX_REQUESTS = 6;
 const verificationIpRequests = new Map();
 const EARLY_SUPPORTER_CUTOFF = '2026-06-18 00:00:00';
+const USER_ROLES = Object.freeze({
+  USER: 'user',
+  MODERATOR: 'moderator',
+  ADMINISTRATOR: 'administrator'
+});
 
 function getMailErrorMessage(error) {
   const message = typeof error?.message === 'string' ? error.message : '';
@@ -145,7 +150,7 @@ function touchUserActivity(userId) {
 
 function getPublicUserProfileByEmail(email) {
   return db.prepare(`
-    SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at
+    SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at
     FROM users
     WHERE email = ?
   `).get(normalizeEmail(email));
@@ -183,11 +188,41 @@ function filterDisallowedUsers(users) {
     : [];
 }
 
-function isAdminSessionUser(req) {
-  if (!req.session.userId) return false;
+function normalizeUserRole(roleValue) {
+  if (typeof roleValue !== 'string') return USER_ROLES.USER;
+  const normalized = roleValue.trim().toLowerCase();
+  if (normalized === USER_ROLES.ADMINISTRATOR) return USER_ROLES.ADMINISTRATOR;
+  if (normalized === USER_ROLES.MODERATOR) return USER_ROLES.MODERATOR;
+  return USER_ROLES.USER;
+}
 
-  const user = db.prepare('SELECT email FROM users WHERE id = ?').get(req.session.userId);
-  return Boolean(user?.email) && isProtectedEmail(user.email);
+function getRoleFromUserRecord(user) {
+  if (!user) return USER_ROLES.USER;
+  if (isProtectedEmail(user.email)) return USER_ROLES.ADMINISTRATOR;
+  return normalizeUserRole(user.role);
+}
+
+function withResolvedRole(user) {
+  if (!user) return user;
+  return {
+    ...user,
+    role: getRoleFromUserRecord(user)
+  };
+}
+
+function getSessionUserRole(req) {
+  if (!req.session.userId) return USER_ROLES.USER;
+  const user = db.prepare('SELECT email, role FROM users WHERE id = ?').get(req.session.userId);
+  return getRoleFromUserRecord(user);
+}
+
+function isAdminSessionUser(req) {
+  return getSessionUserRole(req) === USER_ROLES.ADMINISTRATOR;
+}
+
+function canAccessAdminPanel(req) {
+  const role = getSessionUserRole(req);
+  return role === USER_ROLES.ADMINISTRATOR || role === USER_ROLES.MODERATOR;
 }
 
 function normalizeAccentColor(colorValue) {
@@ -576,10 +611,10 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
 
     db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizeEmail(email));
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at FROM users WHERE id = ?')
                    .get(info.lastInsertRowid);
 
-    return res.status(201).json({ message: 'Konto erfolgreich erstellt!', user });
+    return res.status(201).json({ message: 'Konto erfolgreich erstellt!', user: withResolvedRole(user) });
 
   } catch (err) {
     console.error('[REGISTER ERROR]', err);
@@ -614,7 +649,7 @@ router.post('/login', async (req, res) => {
     grantEarlySupporterStatus(user.id);
 
     const refreshedUser = db.prepare(`
-      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at
+      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at
       FROM users
       WHERE id = ?
     `).get(user.id);
@@ -623,22 +658,7 @@ router.post('/login', async (req, res) => {
 
     return res.json({
       message: 'Erfolgreich angemeldet!',
-      user: {
-        id: refreshedUser.id,
-        username: refreshedUser.username,
-        profile_name: refreshedUser.profile_name,
-        pronouns: refreshedUser.pronouns,
-        bio: refreshedUser.bio,
-        full_name: refreshedUser.full_name,
-        email: refreshedUser.email,
-        avatar: refreshedUser.avatar,
-        birth_date: refreshedUser.birth_date,
-        belief: refreshedUser.belief,
-        confession: refreshedUser.confession,
-        accent_color: refreshedUser.accent_color,
-        early_supporter: refreshedUser.early_supporter,
-        created_at: refreshedUser.created_at
-      }
+      user: withResolvedRole(refreshedUser)
     });
 
   } catch (err) {
@@ -657,7 +677,7 @@ router.get('/me', (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Nicht authentifiziert.' });
 
   const user = db.prepare(
-    'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at FROM users WHERE id = ?'
+    'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at FROM users WHERE id = ?'
   ).get(req.session.userId);
 
   if (!user) return res.status(401).json({ error: 'Benutzer nicht gefunden.' });
@@ -667,7 +687,7 @@ router.get('/me', (req, res) => {
   // Check if username is valid; if not, frontend should show change modal
   const isValidUsername = USERNAME_REGEX.test(user.username);
 
-  return res.json({ user, needsUsernameUpdate: !isValidUsername });
+  return res.json({ user: withResolvedRole(user), needsUsernameUpdate: !isValidUsername });
 });
 
 router.get('/project-contacts', (_req, res) => {
@@ -742,7 +762,7 @@ router.get('/admin/users', (req, res) => {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
     }
 
-    if (!isAdminSessionUser(req)) {
+    if (!canAccessAdminPanel(req)) {
       return res.status(403).json({ error: 'Kein Zugriff auf den Admin-Bereich.' });
     }
 
@@ -751,13 +771,13 @@ router.get('/admin/users', (req, res) => {
 
     const users = query
       ? db.prepare(`
-          SELECT id, username, profile_name, full_name, email, avatar, accent_color
+          SELECT id, username, profile_name, full_name, email, avatar, accent_color, role
           FROM users
           WHERE username LIKE ? COLLATE NOCASE
           ORDER BY username COLLATE NOCASE ASC
         `).all(`%${query}%`)
       : db.prepare(`
-          SELECT id, username, profile_name, full_name, email, avatar, accent_color
+          SELECT id, username, profile_name, full_name, email, avatar, accent_color, role
           FROM users
           ORDER BY username COLLATE NOCASE ASC
         `).all();
@@ -771,6 +791,7 @@ router.get('/admin/users', (req, res) => {
       full_name: user.full_name,
       avatar: user.avatar,
       accent_color: user.accent_color,
+      role: getRoleFromUserRecord(user),
       isProtected: isProtectedEmail(user.email)
     }));
 
@@ -840,6 +861,53 @@ router.delete('/admin/users/:username', (req, res) => {
   }
 });
 
+router.patch('/admin/users/:username/moderator-toggle', (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    if (!isAdminSessionUser(req)) {
+      return res.status(403).json({ error: 'Nur Administrator*innen können Rollen ändern.' });
+    }
+
+    const username = typeof req.params.username === 'string' ? req.params.username.trim() : '';
+    if (!username) {
+      return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+    }
+
+    const targetUser = db.prepare(`
+      SELECT id, username, email, role
+      FROM users
+      WHERE username = ? COLLATE NOCASE
+    `).get(username);
+
+    if (!targetUser) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    const targetRole = getRoleFromUserRecord(targetUser);
+    if (targetRole === USER_ROLES.ADMINISTRATOR) {
+      return res.status(403).json({ error: 'Administrator*innen können nicht zur Moderatorrolle geändert werden.' });
+    }
+
+    const nextRole = targetRole === USER_ROLES.MODERATOR ? USER_ROLES.USER : USER_ROLES.MODERATOR;
+
+    db.prepare('UPDATE users SET role = ? WHERE id = ?').run(nextRole, targetUser.id);
+
+    return res.json({
+      message: nextRole === USER_ROLES.MODERATOR
+        ? `@${targetUser.username} wurde zu Moderator*in befördert.`
+        : `@${targetUser.username} wurde zur Nutzerrolle zurückgestuft.`,
+      role: nextRole,
+      username: targetUser.username
+    });
+  } catch (err) {
+    console.error('[ADMIN TOGGLE MODERATOR ERROR]', err);
+    return res.status(500).json({ error: 'Rolle konnte nicht geändert werden.' });
+  }
+});
+
 router.get('/public/:username', (req, res) => {
   try {
     const username = req.params.username?.trim();
@@ -853,7 +921,7 @@ router.get('/public/:username', (req, res) => {
     }
 
     const user = db.prepare(`
-      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at
+      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at
       FROM users
       WHERE username = ?
     `).get(username);
@@ -868,7 +936,7 @@ router.get('/public/:username', (req, res) => {
     const isFollowing = isOwnProfile ? false : isFollowingUser(viewerId, user.id);
 
     return res.json({
-      user,
+      user: withResolvedRole(user),
       follow: {
         followersCount,
         followingCount,
@@ -1054,10 +1122,10 @@ router.post('/update-username', (req, res) => {
     db.prepare("UPDATE users SET username = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(newUsername, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
-    return res.json({ message: 'Benutzername aktualisiert!', user });
+    return res.json({ message: 'Benutzername aktualisiert!', user: withResolvedRole(user) });
   } catch (err) {
     console.error('[UPDATE USERNAME ERROR]', err);
     return res.status(500).json({ error: 'Serverfehler.' });
@@ -1090,10 +1158,10 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 
     deleteOldAvatar(currentUser.avatar);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
-    return res.json({ message: 'Profilbild aktualisiert!', user });
+    return res.json({ message: 'Profilbild aktualisiert!', user: withResolvedRole(user) });
   } catch (err) {
     console.error('[UPDATE AVATAR ERROR]', err);
     return res.status(500).json({ error: 'Serverfehler.' });
@@ -1186,10 +1254,10 @@ router.post('/update-profile', (req, res) => {
     db.prepare("UPDATE users SET full_name = ?, profile_name = ?, pronouns = ?, bio = ?, birth_date = ?, belief = ?, confession = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
       .run(trimmedName, trimmedProfileName || null, normalizedPronouns, normalizedBio, normalizedBirthDate, normalizedBelief, normalizedConfession, trimmedUsername, normalizedAccentColor, req.session.userId);
 
-    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, early_supporter, created_at FROM users WHERE id = ?')
+    const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at FROM users WHERE id = ?')
                    .get(req.session.userId);
 
-    return res.json({ message: 'Profil aktualisiert!', user });
+    return res.json({ message: 'Profil aktualisiert!', user: withResolvedRole(user) });
   } catch (err) {
     console.error('[UPDATE PROFILE ERROR]', err);
     return res.status(500).json({ error: 'Serverfehler.' });
@@ -1340,9 +1408,8 @@ router.get('/admin/reports/:username', (req, res) => {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
     }
 
-    const requester = db.prepare('SELECT id, email FROM users WHERE id = ?').get(req.session.userId);
-    if (!requester?.email || !isProtectedEmail(requester.email)) {
-      return res.status(403).json({ error: 'Nur Admins können Meldungen sehen.' });
+    if (!canAccessAdminPanel(req)) {
+      return res.status(403).json({ error: 'Nur Administrator*innen und Moderator*innen können Meldungen sehen.' });
     }
 
     const username = (req.params.username || '').trim();
@@ -1379,9 +1446,8 @@ router.patch('/admin/reports/:reportId/close', (req, res) => {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
     }
 
-    const requester = db.prepare('SELECT id, email FROM users WHERE id = ?').get(req.session.userId);
-    if (!requester?.email || !isProtectedEmail(requester.email)) {
-      return res.status(403).json({ error: 'Nur Admins können Fälle schließen.' });
+    if (!isAdminSessionUser(req)) {
+      return res.status(403).json({ error: 'Nur Administrator*innen können Fälle schließen.' });
     }
 
     const reportId = parseInt(req.params.reportId, 10);
@@ -1410,9 +1476,8 @@ router.get('/admin/users/with-open-reports', (req, res) => {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
     }
 
-    const requester = db.prepare('SELECT id, email FROM users WHERE id = ?').get(req.session.userId);
-    if (!requester?.email || !isProtectedEmail(requester.email)) {
-      return res.status(403).json({ error: 'Nur Admins können Meldungen sehen.' });
+    if (!canAccessAdminPanel(req)) {
+      return res.status(403).json({ error: 'Nur Administrator*innen und Moderator*innen können Meldungen sehen.' });
     }
 
     const rawQuery = typeof req.query.q === 'string' ? req.query.q : '';
@@ -1420,7 +1485,7 @@ router.get('/admin/users/with-open-reports', (req, res) => {
 
     const users = query
       ? db.prepare(`
-          SELECT DISTINCT u.id, u.username, u.profile_name, u.full_name, u.email, u.avatar, u.accent_color
+          SELECT DISTINCT u.id, u.username, u.profile_name, u.full_name, u.email, u.avatar, u.accent_color, u.role
           FROM users u
           INNER JOIN reports r ON r.reported_user_id = u.id
           WHERE r.closed = 0
@@ -1428,7 +1493,7 @@ router.get('/admin/users/with-open-reports', (req, res) => {
           ORDER BY u.username COLLATE NOCASE ASC
         `).all(`%${query}%`)
       : db.prepare(`
-          SELECT DISTINCT u.id, u.username, u.profile_name, u.full_name, u.email, u.avatar, u.accent_color
+          SELECT DISTINCT u.id, u.username, u.profile_name, u.full_name, u.email, u.avatar, u.accent_color, u.role
           FROM users u
           INNER JOIN reports r ON r.reported_user_id = u.id
           WHERE r.closed = 0
@@ -1442,6 +1507,7 @@ router.get('/admin/users/with-open-reports', (req, res) => {
       full_name: user.full_name,
       avatar: user.avatar,
       accent_color: user.accent_color,
+      role: getRoleFromUserRecord(user),
       isProtected: isProtectedEmail(user.email)
     }));
 
