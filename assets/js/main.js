@@ -470,20 +470,24 @@ const DEFAULT_MAIN_BACKGROUND_SRC = mainBackgroundImage?.getAttribute('src') || 
 const messageTimers = new Map()
 
 function setAdminReportsTab(tab = 'meldungen') {
-   const showUnbanTab = tab === 'entbannungen'
+   const isMeldungen = tab === 'meldungen'
+   const isBugs = tab === 'bugs'
+   const isEntbannungen = tab === 'entbannungen'
 
    if (adminReportsList) {
-      adminReportsList.style.display = showUnbanTab ? 'none' : 'block'
+      adminReportsList.style.display = isMeldungen ? 'block' : 'none'
+   }
+   if (adminBugReportsList) {
+      adminBugReportsList.style.display = isBugs ? 'block' : 'none'
    }
    if (adminUnbanRequestsList) {
-      adminUnbanRequestsList.style.display = showUnbanTab ? 'block' : 'none'
+      adminUnbanRequestsList.style.display = isEntbannungen ? 'block' : 'none'
    }
 
-   if (adminReportsTabMeldungen && adminReportsTabEntbannungen) {
-      adminReportsTabMeldungen.style.color = showUnbanTab ? 'var(--text-color)' : 'var(--title-color)'
-      adminReportsTabMeldungen.style.borderBottomColor = showUnbanTab ? 'transparent' : 'var(--first-color)'
-      adminReportsTabEntbannungen.style.color = showUnbanTab ? 'var(--title-color)' : 'var(--text-color)'
-      adminReportsTabEntbannungen.style.borderBottomColor = showUnbanTab ? 'var(--first-color)' : 'transparent'
+   if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannungen) {
+      adminReportsTabMeldungen.classList.toggle('active', isMeldungen)
+      adminReportsTabBugs.classList.toggle('active', isBugs)
+      adminReportsTabEntbannungen.classList.toggle('active', isEntbannungen)
    }
 }
 
@@ -493,6 +497,7 @@ async function openAdminReports(username, initialTab = 'meldungen') {
    clearMsg('admin-reports-message')
    adminReportsTitle.textContent = `Tickets für @${username}`
    adminReportsList.innerHTML = ''
+   adminBugReportsList.innerHTML = ''
    adminUnbanRequestsList.innerHTML = ''
    setAdminReportsTab(initialTab)
 
@@ -691,6 +696,11 @@ async function openAdminReports(username, initialTab = 'meldungen') {
       })
    } catch (_) {
       showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
+   }
+
+   // Load bug reports if tabs shows bugs
+   if (initialTab === 'bugs') {
+      await loadAdminBugReports()
    }
 }
 
@@ -2151,7 +2161,7 @@ function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = [], 
    }
 
    const bugsGroup = createUserGroup('Bugs', bugReportUsers, {
-      reportsLabel: 'Bugs',
+      reportsLabel: 'Tickets',
       initialReportsTab: 'bugs'
    })
    adminUserListResults.appendChild(bugsGroup)
@@ -2165,7 +2175,7 @@ function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = [], 
    const reportsGroup = createUserGroup('Meldungen', reportedUsers)
    adminUserListResults.appendChild(reportsGroup)
 
-   adminUserListResults.appendChild(createUserGroup('Usernames', users))
+   adminUserListResults.appendChild(createUserGroup('Nutzernamen', users))
 }
 
 async function loadAdminUserList(query = '') {
