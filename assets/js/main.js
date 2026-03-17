@@ -1563,10 +1563,8 @@ function updatePublicProfileView(payload) {
    updatePublicFollowStats()
    updateFollowButton()
 
-   const isRestrictedUser = Boolean(user?.is_restricted === 1)
-   const isOwnRestrictedProfile = isRestrictedUser && currentPublicProfileFollowState.isOwnProfile
-   
-   if (isOwnRestrictedProfile && currentUser && !unbanRequestModal.classList.contains('show-login')) {
+   // Show unban modal if current user is restricted (regardless of which profile they're viewing)
+   if (currentUser?.is_restricted === 1 && !unbanRequestModal.classList.contains('show-login')) {
       hideAll()
       unbanRequestReasonInput.value = ''
       updateCounter(unbanRequestReasonCounter, '', 500)
@@ -1833,7 +1831,29 @@ function renderAdminUserList(users, reportedUsers = []) {
             actions.appendChild(roleButton)
          }
 
-         if ((viewerIsAdministrator || canAccessAdminPanel(currentUser)) && !user.isProtected && targetRole !== USER_ROLES.ADMINISTRATOR) {
+         const canRestrict = () => {
+            // Cannot restrict protected users
+            if (user.isProtected) return false
+            
+            // Cannot restrict oneself
+            if (currentUser?.id === user.id) return false
+            
+            const viewerRole = normalizeUserRole(currentUser?.role)
+            
+            // Moderators can only restrict normal users
+            if (viewerRole === USER_ROLES.MODERATOR) {
+               return targetRole === USER_ROLES.USER
+            }
+            
+            // Admins can restrict normal users and moderators (but not other admins)
+            if (viewerIsAdministrator) {
+               return targetRole !== USER_ROLES.ADMINISTRATOR
+            }
+            
+            return false
+         }
+
+         if (canRestrict()) {
             const restrictButton = document.createElement('button')
             restrictButton.type = 'button'
             restrictButton.className = 'admin-user-list__restrict'

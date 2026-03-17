@@ -934,9 +934,26 @@ router.patch('/admin/users/:username/restrict', (req, res) => {
       return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
     }
 
+    // Cannot restrict oneself
+    if (targetUser.id === req.session.userId) {
+      return res.status(403).json({ error: 'Du kannst dich selbst nicht einschränken.' });
+    }
+
+    const viewerRole = getSessionUserRole(req);
     const targetRole = getRoleFromUserRecord(targetUser);
-    if (targetRole === USER_ROLES.ADMINISTRATOR) {
-      return res.status(403).json({ error: 'Administrator*innen können nicht eingeschränkt werden.' });
+
+    // Moderators can only restrict normal users
+    if (viewerRole === USER_ROLES.MODERATOR) {
+      if (targetRole !== USER_ROLES.USER) {
+        return res.status(403).json({ error: 'Moderator*innen können nur normale Nutzer einschränken.' });
+      }
+    }
+
+    // Admins cannot restrict other admins
+    if (viewerRole === USER_ROLES.ADMINISTRATOR) {
+      if (targetRole === USER_ROLES.ADMINISTRATOR) {
+        return res.status(403).json({ error: 'Administrator*innen können nicht eingeschränkt werden.' });
+      }
     }
 
     const isProtected = isProtectedEmail(targetUser.email);
