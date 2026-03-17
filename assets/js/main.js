@@ -667,6 +667,7 @@ async function openAdminReports(username) {
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
 let currentUser = null
+let restrictionCheckInterval = null
 let isDraggingAccentWheel = false
 let accentPickerState = {
    hue: 270,
@@ -2091,9 +2092,50 @@ function setLoggedIn(user) {
    navAvatar.src = getAvatarUrl(user)
    updateProfileView(user)
    refreshProjectContacts()
+   startRestrictionCheck()
 }
 
 function setLoggedOut() {
+   function startRestrictionCheck() {
+      if (restrictionCheckInterval) return // Already polling
+   
+      let lastRestrictionStatus = currentUser?.is_restricted ? 1 : 0
+   
+      restrictionCheckInterval = setInterval(async () => {
+         try {
+            const response = await fetch('/api/auth/me', { credentials: 'include' })
+            if (!response.ok) return // Skip on error, retry next interval
+         
+            const data = await response.json()
+            const currentRestrictionStatus = data.user?.is_restricted ? 1 : 0
+         
+            // If status changed from unrestricted to restricted, show modal immediately
+            if (lastRestrictionStatus === 0 && currentRestrictionStatus === 1) {
+               currentUser = data.user // Update currentUser with new data
+               hideAll()
+               unbanRequestReasonInput.value = ''
+               updateCounter(unbanRequestReasonCounter, '', 500)
+               clearMsg('unban-request-message')
+               unbanRequestModal.classList.add('show-login')
+            }
+         
+            lastRestrictionStatus = currentRestrictionStatus
+            currentUser = data.user // Keep currentUser in sync
+         } catch (err) {
+            console.error('[RESTRICTION CHECK ERROR]', err)
+            // Silently skip this interval, will retry next time
+         }
+      }, 4000) // Poll every 4 seconds
+   }
+
+   function stopRestrictionCheck() {
+      if (restrictionCheckInterval) {
+         clearInterval(restrictionCheckInterval)
+         restrictionCheckInterval = null
+      }
+   }
+
+   stopRestrictionCheck()
    currentUser = null
    applyUserAccentColor(null)
    applyMainBackground(null)

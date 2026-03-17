@@ -677,7 +677,7 @@ router.get('/me', (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Nicht authentifiziert.' });
 
   const user = db.prepare(
-    'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at FROM users WHERE id = ?'
+    'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at, is_restricted FROM users WHERE id = ?'
   ).get(req.session.userId);
 
   if (!user) return res.status(401).json({ error: 'Benutzer nicht gefunden.' });
@@ -962,12 +962,28 @@ router.patch('/admin/users/:username/restrict', (req, res) => {
     }
 
     const nextRestrictionStatus = targetUser.is_restricted === 1 ? 0 : 1;
-    db.prepare('UPDATE users SET is_restricted = ? WHERE id = ?').run(nextRestrictionStatus, targetUser.id);
+    
+    // If restricting a mod or admin, automatically downgrade them to user
+    let downgradedRole = null;
+    if (nextRestrictionStatus === 1 && (targetRole === USER_ROLES.MODERATOR || targetRole === USER_ROLES.ADMINISTRATOR)) {
+      db.prepare('UPDATE users SET is_restricted = ?, role = ? WHERE id = ?').run(nextRestrictionStatus, USER_ROLES.USER, targetUser.id);
+      downgradedRole = targetRole;
+    } else {
+      db.prepare('UPDATE users SET is_restricted = ? WHERE id = ?').run(nextRestrictionStatus, targetUser.id);
+    }
+
+    let message = nextRestrictionStatus === 1
+      ? `@${targetUser.username} wurde eingeschränkt.`
+      : `@${targetUser.username} wurde freigegeben.`;
+    
+    if (downgradedRole === USER_ROLES.MODERATOR) {
+      message += ' Rolle wurde von Moderator*in zu Nutzer degradiert.';
+    } else if (downgradedRole === USER_ROLES.ADMINISTRATOR) {
+      message += ' Rolle wurde von Administrator*in zu Nutzer degradiert.';
+    }
 
     return res.json({
-      message: nextRestrictionStatus === 1
-        ? `@${targetUser.username} wurde eingeschränkt.`
-        : `@${targetUser.username} wurde freigegeben.`,
+      message,
       restricted: nextRestrictionStatus === 1,
       username: targetUser.username
     });
