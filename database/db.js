@@ -201,4 +201,18 @@ db.exec(`
 db.exec('CREATE INDEX IF NOT EXISTS idx_restriction_requests_user_id ON restriction_requests(restricted_user_id)');
 db.exec('CREATE INDEX IF NOT EXISTS idx_restriction_requests_closed ON restriction_requests(closed)');
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS bug_reports (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    reported_user_id INTEGER NOT NULL,
+    description      TEXT NOT NULL,
+    closed           INTEGER NOT NULL DEFAULT 0,
+    created_at       TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (reported_user_id) REFERENCES users(id) ON DELETE CASCADE
+  )
+`);
+
+db.exec('CREATE INDEX IF NOT EXISTS idx_bug_reports_user_id ON bug_reports(reported_user_id)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_bug_reports_closed ON bug_reports(closed)');
+
 module.exports = db;

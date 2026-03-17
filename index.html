@@ -445,6 +445,28 @@
          <i class="fi fi-rr-cross-small login__close" id="report-close"></i>
       </div>
 
+      <!--==================== BUG REPORT MODAL ====================-->
+      <div class="login" id="bug-report-modal">
+         <div class="login__form profile__form">
+            <h2 class="login__title">Bug melden</h2>
+
+            <div class="login__message" id="bug-report-message"></div>
+
+            <div>
+               <label for="bug-report-reason-input" class="login__label">Beschreibung (erforderlich)</label>
+               <textarea id="bug-report-reason-input" class="login__input profile__bio-input" maxlength="1000" placeholder="Bitte beschreibe den Bug ausführlich..."></textarea>
+               <p class="profile__input-counter" id="bug-report-reason-counter">0/1000</p>
+            </div>
+
+            <div class="report-modal__actions">
+               <button type="button" class="login__button profile__delete-button" id="bug-report-cancel-btn">Schließen</button>
+               <button type="button" class="login__button" id="bug-report-submit-btn">Bug melden</button>
+            </div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" id="bug-report-close"></i>
+      </div>
+
       <!--==================== UNBAN REQUEST MODAL ====================-->
       <div class="login" id="unban-request-modal">
          <div class="login__form profile__form">
@@ -583,10 +605,12 @@
             
             <div style="display: flex; gap: .5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: .5rem;">
                <button type="button" id="admin-reports-tab-meldungen" class="login__button" style="flex: 1; font-size: .85rem; padding: .4rem; background: transparent; border: none; color: var(--title-color); border-bottom: 2px solid var(--first-color); margin-bottom: -.5rem;">Meldungen</button>
+               <button type="button" id="admin-reports-tab-bugs" class="login__button" style="flex: 1; font-size: .85rem; padding: .4rem; background: transparent; border: none; color: var(--text-color); border-bottom: 2px solid transparent; margin-bottom: -.5rem;">Bugs</button>
                <button type="button" id="admin-reports-tab-entbannungen" class="login__button" style="flex: 1; font-size: .85rem; padding: .4rem; background: transparent; border: none; color: var(--text-color); border-bottom: 2px solid transparent; margin-bottom: -.5rem;">Freigaben</button>
             </div>
 
             <div class="admin-reports__list" id="admin-reports-list"></div>
+            <div class="admin-reports__list" id="admin-bug-reports-list" style="display: none;"></div>
             <div class="admin-reports__list" id="admin-unban-requests-list" style="display: none;"></div>
 
             <button type="button" class="login__button" id="admin-reports-close-btn">Schließen</button>

@@ -1762,6 +1762,102 @@ router.patch('/admin/unban-requests/:id/resolve', (req, res) => {
   }
 });
 
+// ─── REPORT BUG ───────────────────────────────────────────────────────────────
+router.post('/report-bug', (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Du musst angemeldet sein, um einen Bug zu melden.' });
+    }
+
+    const { description } = req.body;
+    const trimmedDescription = typeof description === 'string' ? description.trim() : '';
+
+    if (!trimmedDescription) {
+      return res.status(400).json({ error: 'Bitte beschreibe den Bug.' });
+    }
+
+    if (trimmedDescription.length > 1000) {
+      return res.status(400).json({ error: 'Die Beschreibung darf maximal 1000 Zeichen lang sein.' });
+    }
+
+    const user = db.prepare('SELECT id FROM users WHERE id = ?').get(req.session.userId);
+    if (!user) {
+      return res.status(401).json({ error: 'Ungültige Session.' });
+    }
+
+    db.prepare(`
+      INSERT INTO bug_reports (reported_user_id, description)
+      VALUES (?, ?)
+    `).run(req.session.userId, trimmedDescription);
+
+    return res.status(201).json({ message: 'Bug erfolgreich gemeldet.' });
+  } catch (err) {
+    console.error('[REPORT BUG ERROR]', err);
+    return res.status(500).json({ error: 'Serverfehler beim Melden des Bugs.' });
+  }
+});
+
+// ─── GET ADMIN BUG REPORTS ────────────────────────────────────────────────────
+router.get('/admin/bug-reports', (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    if (!canAccessAdminPanel(req)) {
+      return res.status(403).json({ error: 'Kein Zugriff auf den Admin-Bereich.' });
+    }
+
+    const reports = db.prepare(`
+      SELECT
+        b.id,
+        b.description,
+        b.closed,
+        b.created_at,
+        u.username,
+        u.full_name
+      FROM bug_reports b
+      JOIN users u ON u.id = b.reported_user_id
+      ORDER BY b.closed ASC, datetime(b.created_at) DESC
+    `).all();
+
+    return res.json({ reports });
+  } catch (err) {
+    console.error('[GET ADMIN BUG REPORTS ERROR]', err);
+    return res.status(500).json({ error: 'Serverfehler beim Abrufen der Bug Reports.' });
+  }
+});
+
+// ─── CLOSE BUG REPORT (ADMIN) ──────────────────────────────────────────────────
+router.patch('/admin/bug-reports/:bugId/close', (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    if (!isAdminSessionUser(req)) {
+      return res.status(403).json({ error: 'Nur Administrator*innen können Bug Reports schließen.' });
+    }
+
+    const bugId = parseInt(req.params.bugId, 10);
+    if (!Number.isInteger(bugId) || bugId <= 0) {
+      return res.status(400).json({ error: 'Ungültige Bug ID.' });
+    }
+
+    const bugReport = db.prepare('SELECT id FROM bug_reports WHERE id = ?').get(bugId);
+    if (!bugReport) {
+      return res.status(404).json({ error: 'Bug Report nicht gefunden.' });
+    }
+
+    db.prepare('UPDATE bug_reports SET closed = 1 WHERE id = ?').run(bugId);
+
+    return res.json({ message: 'Bug Report geschlossen.' });
+  } catch (err) {
+    console.error('[CLOSE BUG REPORT ERROR]', err);
+    return res.status(500).json({ error: 'Serverfehler beim Schließen des Bug Reports.' });
+  }
+});
+
 module.exports = router;
 
 

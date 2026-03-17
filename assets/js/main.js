@@ -178,6 +178,7 @@ const loginPanel      = document.getElementById('login'),
       beliefModal = document.getElementById('belief-modal'),
       publicProfileModal = document.getElementById('public-profile-modal'),
       reportModal = document.getElementById('report-modal'),
+      bugReportModal = document.getElementById('bug-report-modal'),
       adminReportsModal = document.getElementById('admin-reports-modal'),
    followListModal = document.getElementById('follow-list-modal'),
    adminUserListModal = document.getElementById('admin-user-list-modal'),
@@ -195,6 +196,7 @@ const loginPanel      = document.getElementById('login'),
       beliefClose = document.getElementById('belief-close'),
       publicProfileClose = document.getElementById('public-profile-close'),
       reportClose = document.getElementById('report-close'),
+      bugReportClose = document.getElementById('bug-report-close'),
       unbanRequestModal = document.getElementById('unban-request-modal'),
       unbanRequestClose = document.getElementById('unban-request-close'),
       adminReportsClose = document.getElementById('admin-reports-close'),
@@ -230,10 +232,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -281,6 +283,7 @@ birthDateClose.addEventListener('click', () => birthDateModal.classList.remove('
 beliefClose.addEventListener('click', () => beliefModal.classList.remove('show-login'))
 publicProfileClose.addEventListener('click', hideAll)
 reportClose.addEventListener('click', hideAll)
+bugReportClose.addEventListener('click', hideAll)
 unbanRequestClose.addEventListener('click', hideAll)
 adminReportsClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
@@ -413,6 +416,11 @@ const reportReasonCounter = document.getElementById('report-reason-counter')
 const reportSubmitBtn = document.getElementById('report-submit-btn')
 const reportCancelBtn = document.getElementById('report-cancel-btn')
 const reportMessage = document.getElementById('report-message')
+const bugReportReasonInput = document.getElementById('bug-report-reason-input')
+const bugReportReasonCounter = document.getElementById('bug-report-reason-counter')
+const bugReportSubmitBtn = document.getElementById('bug-report-submit-btn')
+const bugReportCancelBtn = document.getElementById('bug-report-cancel-btn')
+const bugReportMessage = document.getElementById('bug-report-message')
 const unbanRequestReasonInput = document.getElementById('unban-request-reason-input')
 const unbanRequestReasonCounter = document.getElementById('unban-request-reason-counter')
 const unbanRequestSubmitBtn = document.getElementById('unban-request-submit-btn')
@@ -423,7 +431,9 @@ const adminReportsMessage = document.getElementById('admin-reports-message')
 const adminReportsList = document.getElementById('admin-reports-list')
 const adminReportsCloseBtn = document.getElementById('admin-reports-close-btn')
 const adminReportsTabMeldungen = document.getElementById('admin-reports-tab-meldungen')
+const adminReportsTabBugs = document.getElementById('admin-reports-tab-bugs')
 const adminReportsTabEntbannungen = document.getElementById('admin-reports-tab-entbannungen')
+const adminBugReportsList = document.getElementById('admin-bug-reports-list')
 const adminUnbanRequestsList = document.getElementById('admin-unban-requests-list')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
@@ -704,6 +714,188 @@ const BIRTH_DATE_MAX_YEAR = 2100
 let beliefPickerState = {
    belief: '',
    confession: ''
+}
+
+/*=============== BUG REPORT MODAL ===============*/
+const navLogo = document.querySelector('.nav__logo')
+navLogo.addEventListener('click', (e) => {
+   e.preventDefault()
+   if (!currentUser) {
+      showMsg('bug-report-message', 'Bitte melde dich an, um einen Bug zu melden.', 'error')
+      return
+   }
+   hideAll()
+   bugReportReasonInput.value = ''
+   bugReportReasonCounter.textContent = '0/1000'
+   clearMsg('bug-report-message')
+   bugReportModal.classList.add('show-login')
+})
+
+bugReportReasonInput.addEventListener('input', () => {
+   bugReportReasonCounter.textContent = `${bugReportReasonInput.value.length}/1000`
+})
+
+bugReportCancelBtn.addEventListener('click', hideAll)
+
+bugReportSubmitBtn.addEventListener('click', async () => {
+   const description = bugReportReasonInput.value.trim()
+   
+   if (!description) {
+      showMsg('bug-report-message', 'Bitte beschreibe den Bug.', 'error')
+      return
+   }
+
+   bugReportSubmitBtn.disabled = true
+   bugReportSubmitBtn.textContent = 'Wird gesendet...'
+
+   try {
+      const response = await fetch('/api/auth/report-bug', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ description })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+         showMsg('bug-report-message', data.error || 'Bug konnte nicht gemeldet werden.', 'error')
+         bugReportSubmitBtn.disabled = false
+         bugReportSubmitBtn.textContent = 'Bug melden'
+         return
+      }
+
+      showMsg('bug-report-message', 'Bug erfolgreich gemeldet! Danke für die Rückmeldung.', 'success')
+      setTimeout(() => {
+         hideAll()
+         bugReportReasonInput.value = ''
+         bugReportReasonCounter.textContent = '0/1000'
+         bugReportSubmitBtn.disabled = false
+         bugReportSubmitBtn.textContent = 'Bug melden'
+      }, 2000)
+   } catch (err) {
+      showMsg('bug-report-message', 'Serverfehler. Bitte versuche es später erneut.', 'error')
+      bugReportSubmitBtn.disabled = false
+      bugReportSubmitBtn.textContent = 'Bug melden'
+   }
+})
+
+/*=============== ADMIN PANEL – BUG REPORTS ===============*/
+async function loadAdminBugReports() {
+   try {
+      const response = await fetch('/api/auth/admin/bug-reports')
+      if (!response.ok) {
+         showMsg('admin-reports-message', 'Bug Reports konnten nicht geladen werden.', 'error')
+         return
+      }
+
+      const data = await response.json()
+      adminBugReportsList.innerHTML = ''
+
+      if (!data.reports || data.reports.length === 0) {
+         adminBugReportsList.innerHTML = '<p style="text-align: center; color: var(--text-color); padding: 1rem;">Keine offenen Bug Reports</p>'
+         return
+      }
+
+      data.reports.forEach((report) => {
+         const item = document.createElement('div')
+         item.style.cssText = 'margin-bottom: 1rem; padding: 1rem; background: var(--bg-container); border-radius: .5rem; border: 1px solid var(--border-color);'
+         
+         const createdAt = new Date(report.created_at).toLocaleDateString('de-DE')
+         const statusText = report.closed ? '✓ Geschlossen' : 'Offen'
+         const statusColor = report.closed ? 'var(--first-color)' : 'var(--text-color)'
+         
+         item.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: .5rem;">
+               <div>
+                  <p style="margin: 0; font-weight: bold; color: var(--title-color);">${report.username || 'Unbekannt'}</p>
+                  <p style="margin: .25rem 0; font-size: .85rem; color: var(--text-color);">${createdAt}</p>
+               </div>
+               <span style="font-size: .75rem; color: ${statusColor}; font-weight: bold;">${statusText}</span>
+            </div>
+            <p style="margin: .5rem 0; white-space: pre-wrap; word-break: break-word; color: var(--text-color); max-height: 150px; overflow-y: auto;">${report.description}</p>
+         `
+
+         if (!report.closed) {
+            const closeBtn = document.createElement('button')
+            closeBtn.type = 'button'
+            closeBtn.className = 'login__button'
+            closeBtn.style.cssText = 'width: 100%; margin-top: .5rem; font-size: .85rem; padding: .4rem;'
+            closeBtn.textContent = 'Abhaken'
+            closeBtn.addEventListener('click', async () => {
+               closeBtn.disabled = true
+               closeBtn.textContent = 'Wird gespeichert...'
+
+               try {
+                  const response = await fetch(`/api/auth/admin/bug-reports/${report.id}/close`, {
+                     method: 'PATCH'
+                  })
+
+                  if (response.ok) {
+                     loadAdminBugReports()
+                  } else {
+                     showMsg('admin-reports-message', 'Bug Report konnte nicht geschlossen werden.', 'error')
+                     closeBtn.disabled = false
+                     closeBtn.textContent = 'Abhaken'
+                  }
+               } catch (err) {
+                  showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
+                  closeBtn.disabled = false
+                  closeBtn.textContent = 'Abhaken'
+               }
+            })
+            item.appendChild(closeBtn)
+         }
+
+         adminBugReportsList.appendChild(item)
+      })
+   } catch (_) {
+      showMsg('admin-reports-message', 'Serverfehler beim Laden der Bug Reports.', 'error')
+   }
+}
+
+// Admin reports tab handling
+if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannungen) {
+   adminReportsTabMeldungen.addEventListener('click', () => {
+      adminReportsTabMeldungen.style.color = 'var(--title-color)'
+      adminReportsTabMeldungen.style.borderBottomColor = 'var(--first-color)'
+      adminReportsTabBugs.style.color = 'var(--text-color)'
+      adminReportsTabBugs.style.borderBottomColor = 'transparent'
+      adminReportsTabEntbannungen.style.color = 'var(--text-color)'
+      adminReportsTabEntbannungen.style.borderBottomColor = 'transparent'
+      adminReportsList.style.display = 'block'
+      adminBugReportsList.style.display = 'none'
+      adminUnbanRequestsList.style.display = 'none'
+      adminReportsTitle.textContent = 'Meldungen'
+      loadAdminReports()
+   })
+
+   adminReportsTabBugs.addEventListener('click', () => {
+      adminReportsTabMeldungen.style.color = 'var(--text-color)'
+      adminReportsTabMeldungen.style.borderBottomColor = 'transparent'
+      adminReportsTabBugs.style.color = 'var(--title-color)'
+      adminReportsTabBugs.style.borderBottomColor = 'var(--first-color)'
+      adminReportsTabEntbannungen.style.color = 'var(--text-color)'
+      adminReportsTabEntbannungen.style.borderBottomColor = 'transparent'
+      adminReportsList.style.display = 'none'
+      adminBugReportsList.style.display = 'block'
+      adminUnbanRequestsList.style.display = 'none'
+      adminReportsTitle.textContent = 'Bugs'
+      loadAdminBugReports()
+   })
+
+   adminReportsTabEntbannungen.addEventListener('click', () => {
+      adminReportsTabMeldungen.style.color = 'var(--text-color)'
+      adminReportsTabMeldungen.style.borderBottomColor = 'transparent'
+      adminReportsTabBugs.style.color = 'var(--text-color)'
+      adminReportsTabBugs.style.borderBottomColor = 'transparent'
+      adminReportsTabEntbannungen.style.color = 'var(--title-color)'
+      adminReportsTabEntbannungen.style.borderBottomColor = 'var(--first-color)'
+      adminReportsList.style.display = 'none'
+      adminBugReportsList.style.display = 'none'
+      adminUnbanRequestsList.style.display = 'block'
+      adminReportsTitle.textContent = 'Freigaben'
+      loadAdminUnbanRequests()
+   })
 }
 let currentPublicProfileUser = null
 let adminUserListDebounceTimer = null
