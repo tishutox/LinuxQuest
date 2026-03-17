@@ -202,6 +202,25 @@ function getRoleFromUserRecord(user) {
   return normalizeUserRole(user.role);
 }
 
+function enforceRestrictedUserRole(user) {
+  if (!user?.id) return USER_ROLES.USER;
+
+  const role = getRoleFromUserRecord(user);
+  if (user.is_restricted !== 1) return role;
+  if (isProtectedEmail(user.email)) return role;
+
+  if (role === USER_ROLES.MODERATOR || role === USER_ROLES.ADMINISTRATOR) {
+    try {
+      db.prepare('UPDATE users SET role = ? WHERE id = ?').run(USER_ROLES.USER, user.id);
+    } catch (err) {
+      console.error('[RESTRICTED ROLE ENFORCEMENT ERROR]', err);
+    }
+    return USER_ROLES.USER;
+  }
+
+  return role;
+}
+
 function withResolvedRole(user) {
   if (!user) return user;
   return {
@@ -212,8 +231,8 @@ function withResolvedRole(user) {
 
 function getSessionUserRole(req) {
   if (!req.session.userId) return USER_ROLES.USER;
-  const user = db.prepare('SELECT email, role FROM users WHERE id = ?').get(req.session.userId);
-  return getRoleFromUserRecord(user);
+  const user = db.prepare('SELECT id, email, role, is_restricted FROM users WHERE id = ?').get(req.session.userId);
+  return enforceRestrictedUserRole(user);
 }
 
 function isAdminSessionUser(req) {
@@ -649,16 +668,21 @@ router.post('/login', async (req, res) => {
     grantEarlySupporterStatus(user.id);
 
     const refreshedUser = db.prepare(`
-      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at
+      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at, is_restricted
       FROM users
       WHERE id = ?
     `).get(user.id);
+
+    const resolvedRole = enforceRestrictedUserRole(refreshedUser);
 
     req.session.userId = user.id;
 
     return res.json({
       message: 'Erfolgreich angemeldet!',
-      user: withResolvedRole(refreshedUser)
+      user: {
+        ...withResolvedRole(refreshedUser),
+        role: resolvedRole
+      }
     });
 
   } catch (err) {
@@ -686,8 +710,15 @@ router.get('/me', (req, res) => {
 
   // Check if username is valid; if not, frontend should show change modal
   const isValidUsername = USERNAME_REGEX.test(user.username);
+  const resolvedRole = enforceRestrictedUserRole(user);
 
-  return res.json({ user: withResolvedRole(user), needsUsernameUpdate: !isValidUsername });
+  return res.json({
+    user: {
+      ...withResolvedRole(user),
+      role: resolvedRole
+    },
+    needsUsernameUpdate: !isValidUsername
+  });
 });
 
 router.get('/project-contacts', (_req, res) => {

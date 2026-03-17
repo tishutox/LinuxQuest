@@ -481,7 +481,7 @@ async function openAdminReports(username, initialTab = 'meldungen') {
    if (!username) return
 
    clearMsg('admin-reports-message')
-   adminReportsTitle.textContent = `Meldungen für @${username}`
+   adminReportsTitle.textContent = `Tickets für @${username}`
    adminReportsList.innerHTML = ''
    adminUnbanRequestsList.innerHTML = ''
    setAdminReportsTab(initialTab)
@@ -504,9 +504,7 @@ async function openAdminReports(username, initialTab = 'meldungen') {
       const viewerIsAdministrator = isAdminUser(currentUser)
       if (!reports.length) {
          adminReportsList.innerHTML = '<p class="admin-reports__empty">Keine Meldungen vorhanden.</p>'
-         return
-      }
-
+      } else {
       reports.forEach((report) => {
          const isClosed = report.closed === 1
 
@@ -586,6 +584,7 @@ async function openAdminReports(username, initialTab = 'meldungen') {
 
          adminReportsList.appendChild(item)
       })
+      }
    } catch (_) {
       showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
    }
@@ -1808,7 +1807,7 @@ function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = []) 
          const reportsButton = document.createElement('button')
          reportsButton.type = 'button'
          reportsButton.className = 'admin-user-list__reports'
-         reportsButton.textContent = options.reportsLabel || 'Meldungen'
+         reportsButton.textContent = options.reportsLabel || 'Tickets'
 
          reportsButton.addEventListener('click', async () => {
             await openAdminReports(user.username, options.initialReportsTab || 'meldungen')
