@@ -442,6 +442,11 @@ const adminUserListSearch = document.getElementById('admin-user-list-search')
 const adminUserListMessage = document.getElementById('admin-user-list-message')
 const adminUserListResults = document.getElementById('admin-user-list-results')
 const adminUserListForm = document.getElementById('admin-user-list-form')
+// Category buttons
+const adminUserListCategoryBugs = document.getElementById('admin-user-list-category-bugs')
+const adminUserListCategoryFreigaben = document.getElementById('admin-user-list-category-freigaben')
+const adminUserListCategoryMeldungen = document.getElementById('admin-user-list-category-meldungen')
+const adminUserListCategoryUsers = document.getElementById('admin-user-list-category-users')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de'
@@ -2687,6 +2692,48 @@ adminUserListForm.addEventListener('submit', (event) => {
    event.preventDefault()
    loadAdminUserList(adminUserListSearch.value)
 })
+
+// Category button handlers
+if (adminUserListCategoryBugs && adminUserListCategoryMeldungen && adminUserListCategoryFreigaben && adminUserListCategoryUsers) {
+   const deactivateAllUserListCategories = () => {
+      adminUserListCategoryBugs.classList.remove('active')
+      adminUserListCategoryMeldungen.classList.remove('active')
+      adminUserListCategoryFreigaben.classList.remove('active')
+      adminUserListCategoryUsers.classList.remove('active')
+   }
+
+   adminUserListCategoryBugs.addEventListener('click', () => {
+      deactivateAllUserListCategories()
+      adminUserListCategoryBugs.classList.add('active')
+      adminUserListResults.innerHTML = ''
+      adminUserListSearch.value = ''
+      loadAdminBugReports()
+   })
+
+   adminUserListCategoryMeldungen.addEventListener('click', () => {
+      deactivateAllUserListCategories()
+      adminUserListCategoryMeldungen.classList.add('active')
+      adminUserListResults.innerHTML = ''
+      adminUserListSearch.value = ''
+      loadAdminReports()
+   })
+
+   adminUserListCategoryFreigaben.addEventListener('click', () => {
+      deactivateAllUserListCategories()
+      adminUserListCategoryFreigaben.classList.add('active')
+      adminUserListResults.innerHTML = ''
+      adminUserListSearch.value = ''
+      loadAdminUnbanRequests()
+   })
+
+   adminUserListCategoryUsers.addEventListener('click', () => {
+      deactivateAllUserListCategories()
+      adminUserListCategoryUsers.classList.add('active')
+      adminUserListResults.innerHTML = ''
+      adminUserListSearch.value = ''
+      adminUserListSearch.focus()
+   })
+}
 
 async function openSharedProfileFromUrl() {
    const sharedUsername = getSharedUsernameFromPath()
