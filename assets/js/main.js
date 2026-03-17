@@ -435,13 +435,6 @@ const adminReportsTabBugs = document.getElementById('admin-reports-tab-bugs')
 const adminReportsTabEntbannungen = document.getElementById('admin-reports-tab-entbannungen')
 const adminBugReportsList = document.getElementById('admin-bug-reports-list')
 const adminUnbanRequestsList = document.getElementById('admin-unban-requests-list')
-// New category elements
-const adminReportsCategoryBugs = document.getElementById('admin-reports-category-bugs')
-const adminReportsCategoryFreigaben = document.getElementById('admin-reports-category-freigaben')
-const adminReportsCategoryMeldungen = document.getElementById('admin-reports-category-meldungen')
-const adminReportsCategoryUsers = document.getElementById('admin-reports-category-users')
-const adminCategoryUsersList = document.getElementById('admin-category-users-list')
-const adminReportsSearch = document.getElementById('admin-reports-search')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
 const followListContainer = document.getElementById('follow-list-container')
@@ -894,75 +887,6 @@ if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannung
       adminReportsTitle.textContent = 'Freigaben'
       loadAdminUnbanRequests()
    })
-}
-
-// Admin category buttons handling
-if (adminReportsCategoryBugs && adminReportsCategoryMeldungen && adminReportsCategoryFreigaben && adminReportsCategoryUsers) {
-   // Helper function to hide all lists and deactivate buttons
-   const hideAllAndDeactivate = () => {
-      adminReportsList.style.display = 'none'
-      adminBugReportsList.style.display = 'none'
-      adminUnbanRequestsList.style.display = 'none'
-      adminCategoryUsersList.style.display = 'none'
-      adminReportsCategoryBugs.classList.remove('active')
-      adminReportsCategoryMeldungen.classList.remove('active')
-      adminReportsCategoryFreigaben.classList.remove('active')
-      adminReportsCategoryUsers.classList.remove('active')
-   }
-
-   adminReportsCategoryBugs.addEventListener('click', () => {
-      hideAllAndDeactivate()
-      adminReportsCategoryBugs.classList.add('active')
-      adminBugReportsList.style.display = 'block'
-      loadAdminBugReports()
-   })
-
-   adminReportsCategoryMeldungen.addEventListener('click', () => {
-      hideAllAndDeactivate()
-      adminReportsCategoryMeldungen.classList.add('active')
-      adminReportsList.style.display = 'block'
-      loadAdminReports()
-   })
-
-   adminReportsCategoryFreigaben.addEventListener('click', () => {
-      hideAllAndDeactivate()
-      adminReportsCategoryFreigaben.classList.add('active')
-      adminUnbanRequestsList.style.display = 'block'
-      loadAdminUnbanRequests()
-   })
-
-   adminReportsCategoryUsers.addEventListener('click', () => {
-      hideAllAndDeactivate()
-      adminReportsCategoryUsers.classList.add('active')
-      adminCategoryUsersList.style.display = 'block'
-   })
-
-   // Search functionality
-   if (adminReportsSearch) {
-      adminReportsSearch.addEventListener('input', (e) => {
-         const query = e.target.value.trim()
-         
-         if (!query) {
-            adminCategoryUsersList.innerHTML = ''
-            return
-         }
-
-         fetch(`/api/auth/admin/users?q=${encodeURIComponent(query)}`)
-            .then(res => res.json())
-            .then(data => {
-               if (data.users && Array.isArray(data.users)) {
-                  adminCategoryUsersList.innerHTML = ''
-                  data.users.forEach(user => {
-                     const item = document.createElement('div')
-                     item.className = 'admin-reports__item'
-                     item.innerHTML = `@${user.username} - ${user.full_name || ''}`
-                     adminCategoryUsersList.appendChild(item)
-                  })
-               }
-            })
-            .catch(err => console.error('Error fetching users:', err))
-      })
-   }
 }
 let currentPublicProfileUser = null
 let adminUserListDebounceTimer = null
