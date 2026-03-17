@@ -435,6 +435,13 @@ const adminReportsTabBugs = document.getElementById('admin-reports-tab-bugs')
 const adminReportsTabEntbannungen = document.getElementById('admin-reports-tab-entbannungen')
 const adminBugReportsList = document.getElementById('admin-bug-reports-list')
 const adminUnbanRequestsList = document.getElementById('admin-unban-requests-list')
+// New category button variables
+const adminReportsCategoryBugs = document.getElementById('admin-reports-category-bugs')
+const adminReportsCategoryEntbannungen = document.getElementById('admin-reports-category-entbannungen')
+const adminReportsCategoryMeldungen = document.getElementById('admin-reports-category-meldungen')
+const adminReportsCategoryUsers = document.getElementById('admin-reports-category-users')
+const adminReportsUsersList = document.getElementById('admin-reports-users-list')
+const adminReportsSearch = document.getElementById('admin-reports-search')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
 const followListContainer = document.getElementById('follow-list-container')
@@ -862,6 +869,7 @@ if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannung
       adminReportsList.style.display = 'block'
       adminBugReportsList.style.display = 'none'
       adminUnbanRequestsList.style.display = 'none'
+      adminReportsUsersList.style.display = 'none'
       adminReportsTitle.textContent = 'Meldungen'
       loadAdminReports()
    })
@@ -873,6 +881,7 @@ if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannung
       adminReportsList.style.display = 'none'
       adminBugReportsList.style.display = 'block'
       adminUnbanRequestsList.style.display = 'none'
+      adminReportsUsersList.style.display = 'none'
       adminReportsTitle.textContent = 'Bugs'
       loadAdminBugReports()
    })
@@ -884,9 +893,92 @@ if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannung
       adminReportsList.style.display = 'none'
       adminBugReportsList.style.display = 'none'
       adminUnbanRequestsList.style.display = 'block'
+      adminReportsUsersList.style.display = 'none'
       adminReportsTitle.textContent = 'Freigaben'
       loadAdminUnbanRequests()
    })
+}
+
+// Admin reports category buttons (new interface)
+if (adminReportsCategoryBugs && adminReportsCategoryMeldungen && adminReportsCategoryEntbannungen && adminReportsCategoryUsers) {
+   const deactivateAllCategories = () => {
+      adminReportsCategoryBugs.classList.remove('active')
+      adminReportsCategoryMeldungen.classList.remove('active')
+      adminReportsCategoryEntbannungen.classList.remove('active')
+      adminReportsCategoryUsers.classList.remove('active')
+      adminReportsList.style.display = 'none'
+      adminBugReportsList.style.display = 'none'
+      adminUnbanRequestsList.style.display = 'none'
+      adminReportsUsersList.style.display = 'none'
+   }
+
+   adminReportsCategoryBugs.addEventListener('click', () => {
+      deactivateAllCategories()
+      adminReportsCategoryBugs.classList.add('active')
+      adminBugReportsList.style.display = 'block'
+      loadAdminBugReports()
+   })
+
+   adminReportsCategoryMeldungen.addEventListener('click', () => {
+      deactivateAllCategories()
+      adminReportsCategoryMeldungen.classList.add('active')
+      adminReportsList.style.display = 'block'
+      loadAdminReports()
+   })
+
+   adminReportsCategoryEntbannungen.addEventListener('click', () => {
+      deactivateAllCategories()
+      adminReportsCategoryEntbannungen.classList.add('active')
+      adminUnbanRequestsList.style.display = 'block'
+      loadAdminUnbanRequests()
+   })
+
+   adminReportsCategoryUsers.addEventListener('click', () => {
+      deactivateAllCategories()
+      adminReportsCategoryUsers.classList.add('active')
+      adminReportsUsersList.style.display = 'block'
+      adminReportsSearch.focus()
+   })
+
+   // Search functionality for Users category
+   if (adminReportsSearch) {
+      adminReportsSearch.addEventListener('input', (e) => {
+         const query = e.target.value.trim()
+         
+         // Only search when Users category is active
+         if (!adminReportsCategoryUsers.classList.contains('active')) {
+            return
+         }
+
+         if (!query) {
+            adminReportsUsersList.innerHTML = ''
+            return
+         }
+
+         fetch(`/api/auth/admin/users?q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+               if (data.users && Array.isArray(data.users)) {
+                  adminReportsUsersList.innerHTML = ''
+                  data.users.forEach(user => {
+                     const item = document.createElement('div')
+                     item.className = 'admin-reports__item'
+                     item.innerHTML = `
+                        <div class="admin-reports__user-row">
+                           <img src="${user.avatar ? '/' + user.avatar : 'assets/img/default-avatar.png'}" alt="${user.username}" class="admin-reports__user-avatar">
+                           <div class="admin-reports__user-info">
+                              <span class="admin-reports__user-name">@${user.username}</span>
+                              <span class="admin-reports__user-full-name">${user.full_name || ''}</span>
+                           </div>
+                        </div>
+                     `
+                     adminReportsUsersList.appendChild(item)
+                  })
+               }
+            })
+            .catch(err => console.error('Error searching users:', err))
+      })
+   }
 }
 let currentPublicProfileUser = null
 let adminUserListDebounceTimer = null
