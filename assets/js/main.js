@@ -401,7 +401,8 @@ const publicProfileFollowersCount = document.getElementById('public-profile-foll
 const publicProfileFollowingCount = document.getElementById('public-profile-following-count')
 const publicProfileFollowersTrigger = document.getElementById('public-profile-followers-trigger')
 const publicProfileFollowingTrigger = document.getElementById('public-profile-following-trigger')
-const publicProfileFollowBtn = document.getElementById('public-profile-follow-btn')
+const publicProfileFollowInlineBtn = document.getElementById('public-profile-follow-inline-btn')
+const publicProfileUnfollowInlineBtn = document.getElementById('public-profile-unfollow-inline-btn')
 const publicProfileBioBox = document.getElementById('public-profile-bio-box')
 const publicProfileBioText = document.getElementById('public-profile-bio-text')
 const publicProfileReportBtn = document.getElementById('public-profile-report-btn')
@@ -1383,26 +1384,84 @@ function updateBackgroundControls(user) {
    }
 
 function updateFollowButton() {
-   if (!publicProfileFollowBtn) return
+   if (!publicProfileFollowInlineBtn || !publicProfileUnfollowInlineBtn) return
 
    const { canFollow, isFollowing, isOwnProfile } = currentPublicProfileFollowState
 
    if (isOwnProfile || !canFollow) {
-      publicProfileFollowBtn.style.display = 'none'
-      publicProfileFollowBtn.disabled = false
-      publicProfileFollowBtn.textContent = 'Folgen'
+      publicProfileFollowInlineBtn.style.display = 'none'
+      publicProfileUnfollowInlineBtn.style.display = 'none'
       if (publicProfileFollowingBadge) {
          publicProfileFollowingBadge.style.display = 'none'
       }
       return
    }
 
-   publicProfileFollowBtn.style.display = 'block'
-   publicProfileFollowBtn.disabled = false
-   publicProfileFollowBtn.textContent = isFollowing ? 'Entfolgen' : 'Folgen'
+   publicProfileFollowInlineBtn.style.display = isFollowing ? 'none' : 'inline-flex'
+   publicProfileUnfollowInlineBtn.style.display = isFollowing ? 'inline-flex' : 'none'
 
    if (publicProfileFollowingBadge) {
       publicProfileFollowingBadge.style.display = isFollowing ? 'inline-flex' : 'none'
+   }
+}
+
+async function handleFollowUser(username) {
+   if (!username) return
+
+   if (!currentUser) {
+      showPublicProfileNotice('Bitte melde dich an, um Profile zu folgen.', 'error', 4000)
+      return
+   }
+
+   publicProfileFollowInlineBtn.disabled = true
+
+   try {
+      const response = await fetch(`/api/auth/follow/${encodeURIComponent(username)}`, {
+         method: 'POST',
+         credentials: 'include'
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+         showPublicProfileNotice(data.error || 'Aktion konnte nicht ausgeführt werden.', 'error', 4000)
+      } else {
+         showPublicProfileNotice(data.message || 'Gefolgt.', 'success', 2500)
+         await openPublicProfileByUsername(username)
+      }
+   } catch (_) {
+      showPublicProfileNotice('Server nicht erreichbar.', 'error', 4000)
+   } finally {
+      publicProfileFollowInlineBtn.disabled = false
+   }
+}
+
+async function handleUnfollowUser(username) {
+   if (!username) return
+
+   if (!currentUser) {
+      showPublicProfileNotice('Bitte melde dich an, um Profile zu entfolgen.', 'error', 4000)
+      return
+   }
+
+   publicProfileUnfollowInlineBtn.disabled = true
+
+   try {
+      const response = await fetch(`/api/auth/follow/${encodeURIComponent(username)}`, {
+         method: 'DELETE',
+         credentials: 'include'
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+         showPublicProfileNotice(data.error || 'Aktion konnte nicht ausgeführt werden.', 'error', 4000)
+      } else {
+         showPublicProfileNotice(data.message || 'Entfolgt.', 'success', 2500)
+         await openPublicProfileByUsername(username)
+      }
+   } catch (_) {
+      showPublicProfileNotice('Server nicht erreichbar.', 'error', 4000)
+   } finally {
+      publicProfileUnfollowInlineBtn.disabled = false
    }
 }
 
@@ -2055,45 +2114,22 @@ reportSubmitBtn?.addEventListener('click', async () => {
    }
 })
 
-publicProfileFollowBtn.addEventListener('click', async () => {
-   if (!currentPublicProfileUser?.username) return
-
-   const username = currentPublicProfileUser.username
-   const willFollow = !currentPublicProfileFollowState.isFollowing
-
-   if (!currentUser) {
-      showPublicProfileNotice('Bitte melde dich an, um Profile zu folgen.', 'error', 4000)
-      return
-   }
-
-   publicProfileFollowBtn.disabled = true
-
-   try {
-      const response = await fetch(`/api/auth/follow/${encodeURIComponent(username)}`, {
-         method: willFollow ? 'POST' : 'DELETE',
-         credentials: 'include'
-      })
-
-      const data = await response.json()
-      if (!response.ok) {
-         showPublicProfileNotice(data.error || 'Aktion konnte nicht ausgeführt werden.', 'error', 4000)
-      } else {
-         showPublicProfileNotice(data.message || (willFollow ? 'Gefolgt.' : 'Entfolgt.'), 'success', 2500)
-         await openPublicProfileByUsername(username)
-      }
-   } catch (_) {
-      showPublicProfileNotice('Server nicht erreichbar.', 'error', 4000)
-   } finally {
-      publicProfileFollowBtn.disabled = false
-   }
-})
-
 publicProfileFollowersTrigger.addEventListener('click', async () => {
    await openFollowList('followers')
 })
 
 publicProfileFollowingTrigger.addEventListener('click', async () => {
    await openFollowList('following')
+})
+
+publicProfileFollowInlineBtn.addEventListener('click', async () => {
+   if (!currentPublicProfileUser) return
+   await handleFollowUser(currentPublicProfileUser.username)
+})
+
+publicProfileUnfollowInlineBtn.addEventListener('click', async () => {
+   if (!currentPublicProfileUser) return
+   await handleUnfollowUser(currentPublicProfileUser.username)
 })
 
 ;[publicProfileEmailLink, publicProfileEarlySupporter, publicProfileZodiac, publicProfileBelief].forEach((element) => {
