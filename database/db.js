@@ -50,6 +50,7 @@ const hasBeliefColumn = userColumns.some((column) => column.name === 'belief');
 const hasConfessionColumn = userColumns.some((column) => column.name === 'confession');
 const hasEarlySupporterColumn = userColumns.some((column) => column.name === 'early_supporter');
 const hasRoleColumn = userColumns.some((column) => column.name === 'role');
+const hasIsRestrictedColumn = userColumns.some((column) => column.name === 'is_restricted');
 
 if (!hasLastActiveColumn) {
   db.exec('ALTER TABLE users ADD COLUMN last_active_at TEXT');
@@ -89,6 +90,10 @@ if (!hasEarlySupporterColumn) {
 
 if (!hasRoleColumn) {
   db.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'");
+}
+
+if (!hasIsRestrictedColumn) {
+  db.exec('ALTER TABLE users ADD COLUMN is_restricted INTEGER NOT NULL DEFAULT 0');
 }
 
 db.exec(`
@@ -178,5 +183,22 @@ db.exec('CREATE INDEX IF NOT EXISTS idx_reports_reporter_user_id ON reports(repo
 try {
   db.exec('ALTER TABLE reports ADD COLUMN closed INTEGER NOT NULL DEFAULT 0');
 } catch (_) { /* column already exists */ }
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS restriction_requests (
+    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+    restricted_user_id   INTEGER NOT NULL,
+    reason               TEXT DEFAULT NULL,
+    created_at           TEXT DEFAULT (datetime('now')),
+    closed               INTEGER NOT NULL DEFAULT 0,
+    closed_at            TEXT DEFAULT NULL,
+    resolved_by_admin_id INTEGER DEFAULT NULL,
+    FOREIGN KEY (restricted_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (resolved_by_admin_id) REFERENCES users(id) ON DELETE SET NULL
+  )
+`);
+
+db.exec('CREATE INDEX IF NOT EXISTS idx_restriction_requests_user_id ON restriction_requests(restricted_user_id)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_restriction_requests_closed ON restriction_requests(closed)');
 
 module.exports = db;

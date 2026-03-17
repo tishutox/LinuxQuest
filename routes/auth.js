@@ -771,13 +771,13 @@ router.get('/admin/users', (req, res) => {
 
     const users = query
       ? db.prepare(`
-          SELECT id, username, profile_name, full_name, email, avatar, accent_color, role
+          SELECT id, username, profile_name, full_name, email, avatar, accent_color, role, is_restricted
           FROM users
           WHERE username LIKE ? COLLATE NOCASE
           ORDER BY username COLLATE NOCASE ASC
         `).all(`%${query}%`)
       : db.prepare(`
-          SELECT id, username, profile_name, full_name, email, avatar, accent_color, role
+          SELECT id, username, profile_name, full_name, email, avatar, accent_color, role, is_restricted
           FROM users
           ORDER BY username COLLATE NOCASE ASC
         `).all();
@@ -792,7 +792,8 @@ router.get('/admin/users', (req, res) => {
       avatar: user.avatar,
       accent_color: user.accent_color,
       role: getRoleFromUserRecord(user),
-      isProtected: isProtectedEmail(user.email)
+      isProtected: isProtectedEmail(user.email),
+      isRestricted: user.is_restricted === 1
     }));
 
     return res.json({ query, users: sanitizedUsers });
@@ -908,6 +909,57 @@ router.patch('/admin/users/:username/moderator-toggle', (req, res) => {
   }
 });
 
+router.patch('/admin/users/:username/restrict', (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    if (!canAccessAdminPanel(req)) {
+      return res.status(403).json({ error: 'Nur Administrator*innen und Moderator*innen können Nutzer einschränken.' });
+    }
+
+    const username = typeof req.params.username === 'string' ? req.params.username.trim() : '';
+    if (!username) {
+      return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+    }
+
+    const targetUser = db.prepare(`
+      SELECT id, username, email, role, is_restricted
+      FROM users
+      WHERE username = ? COLLATE NOCASE
+    `).get(username);
+
+    if (!targetUser) {
+      return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+    }
+
+    const targetRole = getRoleFromUserRecord(targetUser);
+    if (targetRole === USER_ROLES.ADMINISTRATOR) {
+      return res.status(403).json({ error: 'Administrator*innen können nicht eingeschränkt werden.' });
+    }
+
+    const isProtected = isProtectedEmail(targetUser.email);
+    if (isProtected) {
+      return res.status(403).json({ error: 'Geschützte Nutzer können nicht eingeschränkt werden.' });
+    }
+
+    const nextRestrictionStatus = targetUser.is_restricted === 1 ? 0 : 1;
+    db.prepare('UPDATE users SET is_restricted = ? WHERE id = ?').run(nextRestrictionStatus, targetUser.id);
+
+    return res.json({
+      message: nextRestrictionStatus === 1
+        ? `@${targetUser.username} wurde eingeschränkt.`
+        : `@${targetUser.username} wurde freigegeben.`,
+      restricted: nextRestrictionStatus === 1,
+      username: targetUser.username
+    });
+  } catch (err) {
+    console.error('[ADMIN TOGGLE RESTRICT ERROR]', err);
+    return res.status(500).json({ error: 'Einschränkung konnte nicht geändert werden.' });
+  }
+});
+
 router.get('/public/:username', (req, res) => {
   try {
     const username = req.params.username?.trim();
@@ -921,7 +973,7 @@ router.get('/public/:username', (req, res) => {
     }
 
     const user = db.prepare(`
-      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at
+      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at, is_restricted
       FROM users
       WHERE username = ?
     `).get(username);
@@ -1171,11 +1223,16 @@ router.post('/update-avatar', upload.single('avatar'), (req, res) => {
 // ─── UPDATE PROFILE (NAME + USERNAME) ───────────────────────────────────────
 router.post('/update-profile', (req, res) => {
   try {
-    const { full_name, profile_name, pronouns, bio, birth_date, belief, confession, username, accent_color } = req.body;
-
     if (!req.session.userId) {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
     }
+
+    const currentUserRecord = db.prepare('SELECT id, is_restricted FROM users WHERE id = ?').get(req.session.userId);
+    if (currentUserRecord?.is_restricted === 1) {
+      return res.status(403).json({ error: 'Dein Profil ist eingeschränkt und kann nicht modifiziert werden. Du kannst ein Entbannungsticket einreichen.' });
+    }
+
+    const { full_name, profile_name, pronouns, bio, birth_date, belief, confession, username, accent_color } = req.body;
 
     if (!full_name || !username) {
       return res.status(400).json({ error: 'Vollständiger Name und Benutzername sind erforderlich.' });
@@ -1267,11 +1324,16 @@ router.post('/update-profile', (req, res) => {
 // ─── DELETE ACCOUNT ───────────────────────────────────────────────────────────
 router.delete('/delete-account', async (req, res) => {
   try {
-    const { password } = req.body;
-
     if (!req.session.userId) {
       return res.status(401).json({ error: 'Nicht authentifiziert.' });
     }
+
+    const currentUserRecord = db.prepare('SELECT id, is_restricted FROM users WHERE id = ?').get(req.session.userId);
+    if (currentUserRecord?.is_restricted === 1) {
+      return res.status(403).json({ error: 'Dein Profil ist eingeschränkt und kann nicht gelöscht werden. Du kannst ein Entbannungsticket einreichen.' });
+    }
+
+    const { password } = req.body;
 
     if (!password) {
       return res.status(400).json({ error: 'Passwort ist erforderlich.' });
@@ -1401,6 +1463,41 @@ router.post('/report/:username', (req, res) => {
   }
 });
 
+// ─── POST UNBAN REQUEST ───────────────────────────────────────────────────────
+router.post('/unban-request', (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Du musst angemeldet sein, um eine Anfrage zu stellen.' });
+    }
+
+    const { reason } = req.body;
+    const trimmedReason = typeof reason === 'string' ? reason.trim() : '';
+
+    if (!trimmedReason) {
+      return res.status(400).json({ error: 'Ein Grund ist erforderlich.' });
+    }
+
+    const userRecord = db.prepare('SELECT id, is_restricted FROM users WHERE id = ?').get(req.session.userId);
+    if (!userRecord) {
+      return res.status(401).json({ error: 'Ungültige Session.' });
+    }
+
+    if (userRecord.is_restricted !== 1) {
+      return res.status(400).json({ error: 'Du kannst keine Anfrage einreichen, wenn dein Profil nicht eingeschränkt ist.' });
+    }
+
+    db.prepare(`
+      INSERT INTO restriction_requests (restricted_user_id, reason)
+      VALUES (?, ?)
+    `).run(userRecord.id, trimmedReason);
+
+    return res.status(201).json({ message: 'Entbannungsanfrage erfolgreich eingereicht.' });
+  } catch (err) {
+    console.error('[UNBAN REQUEST ERROR]', err);
+    return res.status(500).json({ error: 'Serverfehler beim Erstellen der Anfrage.' });
+  }
+});
+
 // ─── GET ADMIN REPORTS FOR USER ───────────────────────────────────────────────
 router.get('/admin/reports/:username', (req, res) => {
   try {
@@ -1515,6 +1612,89 @@ router.get('/admin/users/with-open-reports', (req, res) => {
   } catch (err) {
     console.error('[ADMIN USERS WITH OPEN REPORTS ERROR]', err);
     return res.status(500).json({ error: 'Serverfehler beim Abrufen der Nutzer mit Meldungen.' });
+  }
+});
+
+// ─── GET ADMIN UNBAN REQUESTS ─────────────────────────────────────────────────
+router.get('/admin/unban-requests', (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    if (!canAccessAdminPanel(req)) {
+      return res.status(403).json({ error: 'Nur Administrator*innen und Moderator*innen können Entbannungen sehen.' });
+    }
+
+    const requests = db.prepare(`
+      SELECT rr.id, rr.restricted_user_id, rr.reason, rr.created_at, rr.closed,
+             u.id AS user_id, u.username, u.profile_name, u.full_name, u.avatar, u.accent_color
+      FROM restriction_requests rr
+      INNER JOIN users u ON rr.restricted_user_id = u.id
+      WHERE rr.closed = 0
+      ORDER BY rr.created_at DESC
+    `).all();
+
+    const sanitizedRequests = requests.map((req) => ({
+      id: req.id,
+      userId: req.user_id,
+      username: req.username,
+      profile_name: req.profile_name,
+      full_name: req.full_name,
+      avatar: req.avatar,
+      accent_color: req.accent_color,
+      reason: req.reason,
+      createdAt: req.created_at
+    }));
+
+    return res.json({ requests: sanitizedRequests });
+  } catch (err) {
+    console.error('[ADMIN UNBAN REQUESTS ERROR]', err);
+    return res.status(500).json({ error: 'Serverfehler beim Abrufen der Entbannungsanfragen.' });
+  }
+});
+
+// ─── PATCH RESOLVE UNBAN REQUEST ──────────────────────────────────────────────
+router.patch('/admin/unban-requests/:id/resolve', (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    if (!canAccessAdminPanel(req)) {
+      return res.status(403).json({ error: 'Nur Administrator*innen und Moderator*innen können Anfragen genehmigen.' });
+    }
+
+    const requestId = Number(req.params.id);
+    if (!Number.isInteger(requestId) || requestId <= 0) {
+      return res.status(400).json({ error: 'Ungültige Request-ID.' });
+    }
+
+    const unbanRequest = db.prepare('SELECT id, restricted_user_id, closed FROM restriction_requests WHERE id = ?').get(requestId);
+    if (!unbanRequest) {
+      return res.status(404).json({ error: 'Anfrage nicht gefunden.' });
+    }
+
+    if (unbanRequest.closed === 1) {
+      return res.status(400).json({ error: 'Diese Anfrage wurde bereits bearbeitet.' });
+    }
+
+    // Remove restriction from user
+    db.prepare('UPDATE users SET is_restricted = 0 WHERE id = ?').run(unbanRequest.restricted_user_id);
+
+    // Mark request as resolved
+    db.prepare('UPDATE restriction_requests SET closed = 1, closed_at = datetime(\'now\'), resolved_by_admin_id = ? WHERE id = ?')
+      .run(req.session.userId, requestId);
+
+    const user = db.prepare('SELECT username FROM users WHERE id = ?').get(unbanRequest.restricted_user_id);
+
+    return res.json({
+      message: `Entbannungsanfrage für @${user.username} genehmigt. Der Nutzer ist nun nicht mehr eingeschränkt.`,
+      username: user.username
+    });
+  } catch (err) {
+    console.error('[RESOLVE UNBAN REQUEST ERROR]', err);
+    return res.status(500).json({ error: 'Serverfehler beim Genehmigen der Anfrage.' });
   }
 });
 

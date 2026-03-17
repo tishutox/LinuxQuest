@@ -195,6 +195,8 @@ const loginPanel      = document.getElementById('login'),
       beliefClose = document.getElementById('belief-close'),
       publicProfileClose = document.getElementById('public-profile-close'),
       reportClose = document.getElementById('report-close'),
+      unbanRequestModal = document.getElementById('unban-request-modal'),
+      unbanRequestClose = document.getElementById('unban-request-close'),
       adminReportsClose = document.getElementById('admin-reports-close'),
       followListClose = document.getElementById('follow-list-close'),
       adminUserListClose = document.getElementById('admin-user-list-close')
@@ -279,6 +281,7 @@ birthDateClose.addEventListener('click', () => birthDateModal.classList.remove('
 beliefClose.addEventListener('click', () => beliefModal.classList.remove('show-login'))
 publicProfileClose.addEventListener('click', hideAll)
 reportClose.addEventListener('click', hideAll)
+unbanRequestClose.addEventListener('click', hideAll)
 adminReportsClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
 adminUserListClose.addEventListener('click', hideAll)
@@ -410,10 +413,18 @@ const reportReasonCounter = document.getElementById('report-reason-counter')
 const reportSubmitBtn = document.getElementById('report-submit-btn')
 const reportCancelBtn = document.getElementById('report-cancel-btn')
 const reportMessage = document.getElementById('report-message')
+const unbanRequestReasonInput = document.getElementById('unban-request-reason-input')
+const unbanRequestReasonCounter = document.getElementById('unban-request-reason-counter')
+const unbanRequestSubmitBtn = document.getElementById('unban-request-submit-btn')
+const unbanRequestCancelBtn = document.getElementById('unban-request-cancel-btn')
+const unbanRequestMessage = document.getElementById('unban-request-message')
 const adminReportsTitle = document.getElementById('admin-reports-title')
 const adminReportsMessage = document.getElementById('admin-reports-message')
 const adminReportsList = document.getElementById('admin-reports-list')
 const adminReportsCloseBtn = document.getElementById('admin-reports-close-btn')
+const adminReportsTabMeldungen = document.getElementById('admin-reports-tab-meldungen')
+const adminReportsTabEntbannungen = document.getElementById('admin-reports-tab-entbannungen')
+const adminUnbanRequestsList = document.getElementById('admin-unban-requests-list')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
 const followListContainer = document.getElementById('follow-list-container')
@@ -554,6 +565,100 @@ async function openAdminReports(username) {
          }
 
          adminReportsList.appendChild(item)
+      })
+   } catch (_) {
+      showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
+   }
+
+   // Load unban requests
+   try {
+      const unbanResp = await fetch('/api/auth/admin/unban-requests', {
+         credentials: 'include'
+      })
+      const unbanData = await unbanResp.json()
+
+      if (!unbanResp.ok) {
+         adminUnbanRequestsList.innerHTML = '<p class="admin-reports__empty">Keine Entbannungsanfragen geladen.</p>'
+         return
+      }
+
+      const requests = Array.isArray(unbanData.requests) ? unbanData.requests : []
+      const viewerIsAdministrator = isAdminUser(currentUser)
+      if (!requests.length) {
+         adminUnbanRequestsList.innerHTML = '<p class="admin-reports__empty">Keine Entbannungsanfragen vorhanden.</p>'
+         return
+      }
+
+      requests.forEach((request) => {
+         const item = document.createElement('div')
+         item.className = 'admin-reports__item'
+
+         const itemHeader = document.createElement('div')
+         itemHeader.className = 'admin-reports__item-header'
+
+         const userBtn = document.createElement('button')
+         userBtn.type = 'button'
+         userBtn.className = 'admin-reports__reporter admin-reports__reporter-button'
+         const userName = request.full_name ? `${request.full_name} (@${request.username || 'unbekannt'})` : `@${request.username || 'unbekannt'}`
+         userBtn.textContent = userName
+
+         if (request.username) {
+            userBtn.addEventListener('click', async () => {
+               await openPublicProfileByUsername(request.username)
+            })
+         } else {
+            userBtn.disabled = true
+         }
+
+         itemHeader.appendChild(userBtn)
+
+         const reason = document.createElement('div')
+         reason.className = 'admin-reports__reason'
+         reason.textContent = request.reason || 'Kein Grund angegeben.'
+
+         const date = document.createElement('div')
+         date.className = 'admin-reports__date'
+         const createdAt = request.createdAt ? new Date(request.createdAt) : null
+         date.textContent = createdAt && !Number.isNaN(createdAt.getTime())
+            ? createdAt.toLocaleString('de-DE')
+            : 'Zeit unbekannt'
+
+         item.appendChild(itemHeader)
+         item.appendChild(reason)
+         item.appendChild(date)
+
+         if (viewerIsAdministrator) {
+            const approveBtn = document.createElement('button')
+            approveBtn.type = 'button'
+            approveBtn.className = 'admin-reports__close-btn'
+            approveBtn.textContent = 'Freigeben'
+            approveBtn.addEventListener('click', async () => {
+               approveBtn.disabled = true
+               approveBtn.textContent = 'Wird freigegeben…'
+               try {
+                  const approveResp = await fetch(`/api/auth/admin/unban-requests/${request.id}/resolve`, {
+                     method: 'PATCH',
+                     credentials: 'include'
+                  })
+                  const approveData = await approveResp.json()
+                  if (!approveResp.ok) {
+                     showMsg('admin-reports-message', approveData.error || 'Anfrage konnte nicht genehmigt werden.', 'error')
+                     approveBtn.disabled = false
+                     approveBtn.textContent = 'Freigeben'
+                  } else {
+                     showMsg('admin-reports-message', approveData.message || 'Anfrage genehmigt.', 'success')
+                     await openAdminReports(username)
+                  }
+               } catch (_) {
+                  showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
+                  approveBtn.disabled = false
+                  approveBtn.textContent = 'Freigeben'
+               }
+            })
+            item.appendChild(approveBtn)
+         }
+
+         adminUnbanRequestsList.appendChild(item)
       })
    } catch (_) {
       showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
@@ -1458,6 +1563,17 @@ function updatePublicProfileView(payload) {
    updatePublicFollowStats()
    updateFollowButton()
 
+   const isRestrictedUser = Boolean(user?.is_restricted === 1)
+   const isOwnRestrictedProfile = isRestrictedUser && currentPublicProfileFollowState.isOwnProfile
+   
+   if (isOwnRestrictedProfile && currentUser && !unbanRequestModal.classList.contains('show-login')) {
+      hideAll()
+      unbanRequestReasonInput.value = ''
+      updateCounter(unbanRequestReasonCounter, '', 500)
+      clearMsg('unban-request-message')
+      unbanRequestModal.classList.add('show-login')
+   }
+
    const viewedRole = getUserRole(user)
    const viewedHasStaffBadge = viewedRole === USER_ROLES.ADMINISTRATOR || viewedRole === USER_ROLES.MODERATOR
    const viewerCanAccessAdminPanel = canAccessAdminPanel(currentUser)
@@ -1715,6 +1831,38 @@ function renderAdminUserList(users, reportedUsers = []) {
             })
 
             actions.appendChild(roleButton)
+         }
+
+         if ((viewerIsAdministrator || canAccessAdminPanel(currentUser)) && !user.isProtected && targetRole !== USER_ROLES.ADMINISTRATOR) {
+            const restrictButton = document.createElement('button')
+            restrictButton.type = 'button'
+            restrictButton.className = 'admin-user-list__restrict'
+            restrictButton.textContent = user.isRestricted ? 'Freigeben' : 'Nutzer einschränken'
+
+            restrictButton.addEventListener('click', async () => {
+               restrictButton.disabled = true
+               try {
+                  const response = await fetch(`/api/auth/admin/users/${encodeURIComponent(user.username)}/restrict`, {
+                     method: 'PATCH',
+                     credentials: 'include'
+                  })
+
+                  const data = await response.json()
+                  if (!response.ok) {
+                     showMsg('admin-user-list-message', data.error || 'Einschränkung konnte nicht geändert werden.', 'error')
+                     restrictButton.disabled = false
+                     return
+                  }
+
+                  showMsg('admin-user-list-message', data.message || 'Einschränkung aktualisiert.', 'success')
+                  await loadAdminUserList(adminUserListSearch.value)
+               } catch (_) {
+                  showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
+                  restrictButton.disabled = false
+               }
+            })
+
+            actions.appendChild(restrictButton)
          }
 
          if (user.isProtected) {
@@ -2011,8 +2159,32 @@ publicProfileReportBtn.addEventListener('click', () => {
 reportCancelBtn.addEventListener('click', hideAll)
 adminReportsCloseBtn.addEventListener('click', hideAll)
 
+adminReportsTabMeldungen?.addEventListener('click', () => {
+   adminReportsList.style.display = 'block'
+   adminUnbanRequestsList.style.display = 'none'
+   adminReportsTabMeldungen.style.color = 'var(--title-color)'
+   adminReportsTabMeldungen.style.borderBottomColor = 'var(--first-color)'
+   adminReportsTabEntbannungen.style.color = 'var(--text-color)'
+   adminReportsTabEntbannungen.style.borderBottomColor = 'transparent'
+})
+
+adminReportsTabEntbannungen?.addEventListener('click', () => {
+   adminReportsList.style.display = 'none'
+   adminUnbanRequestsList.style.display = 'block'
+   adminReportsTabMeldungen.style.color = 'var(--text-color)'
+   adminReportsTabMeldungen.style.borderBottomColor = 'transparent'
+   adminReportsTabEntbannungen.style.color = 'var(--title-color)'
+   adminReportsTabEntbannungen.style.borderBottomColor = 'var(--first-color)'
+})
+
 reportReasonInput?.addEventListener('input', () => {
    updateCounter(reportReasonCounter, reportReasonInput.value, 200)
+})
+
+unbanRequestCancelBtn?.addEventListener('click', hideAll)
+
+unbanRequestReasonInput?.addEventListener('input', () => {
+   updateCounter(unbanRequestReasonCounter, unbanRequestReasonInput.value, 500)
 })
 
 reportSubmitBtn?.addEventListener('click', async () => {
@@ -2058,6 +2230,48 @@ reportSubmitBtn?.addEventListener('click', async () => {
    } finally {
       reportSubmitBtn.disabled = false
       reportSubmitBtn.textContent = 'Melden'
+   }
+})
+
+unbanRequestSubmitBtn?.addEventListener('click', async () => {
+   if (!currentUser) {
+      showMsg('unban-request-message', 'Du musst angemeldet sein, um einen Antrag einzureichen.', 'error')
+      return
+   }
+
+   unbanRequestSubmitBtn.disabled = true
+   unbanRequestSubmitBtn.textContent = 'Wird gesendet…'
+
+   try {
+      const reason = (unbanRequestReasonInput?.value || '').trim()
+      if (!reason) {
+         showMsg('unban-request-message', 'Bitte gib einen Grund an.', 'error')
+         unbanRequestSubmitBtn.disabled = false
+         unbanRequestSubmitBtn.textContent = 'Anfrage einreichen'
+         return
+      }
+
+      const response = await fetch('/api/auth/unban-request', {
+         method: 'POST',
+         credentials: 'include',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ reason })
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+         showMsg('unban-request-message', data.error || 'Anfrage konnte nicht gesendet werden.', 'error')
+      } else {
+         showMsg('unban-request-message', data.message || 'Entbannungsanfrage erfolgreich gesendet.', 'success')
+         setTimeout(() => {
+            hideAll()
+         }, 900)
+      }
+   } catch (_) {
+      showMsg('unban-request-message', 'Server nicht erreichbar.', 'error')
+   } finally {
+      unbanRequestSubmitBtn.disabled = false
+      unbanRequestSubmitBtn.textContent = 'Anfrage einreichen'
    }
 })
 
