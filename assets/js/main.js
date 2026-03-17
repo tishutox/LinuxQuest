@@ -426,15 +426,16 @@ const unbanRequestReasonCounter = document.getElementById('unban-request-reason-
 const unbanRequestSubmitBtn = document.getElementById('unban-request-submit-btn')
 const unbanRequestCancelBtn = document.getElementById('unban-request-cancel-btn')
 const unbanRequestMessage = document.getElementById('unban-request-message')
-const adminReportsTitle = document.getElementById('admin-reports-title')
 const adminReportsMessage = document.getElementById('admin-reports-message')
 const adminReportsList = document.getElementById('admin-reports-list')
-const adminReportsCloseBtn = document.getElementById('admin-reports-close-btn')
 const adminReportsTabMeldungen = document.getElementById('admin-reports-tab-meldungen')
 const adminReportsTabBugs = document.getElementById('admin-reports-tab-bugs')
 const adminReportsTabEntbannungen = document.getElementById('admin-reports-tab-entbannungen')
+const adminReportsTabUsers = document.getElementById('admin-reports-tab-users')
 const adminBugReportsList = document.getElementById('admin-bug-reports-list')
 const adminUnbanRequestsList = document.getElementById('admin-unban-requests-list')
+const adminUsersList = document.getElementById('admin-users-list')
+const adminReportsSearch = document.getElementById('admin-reports-search')
 const followListTitle = document.getElementById('follow-list-title')
 const followListMessage = document.getElementById('follow-list-message')
 const followListContainer = document.getElementById('follow-list-container')
@@ -854,40 +855,109 @@ async function loadAdminBugReports() {
 }
 
 // Admin reports tab handling
-if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannungen) {
-   adminReportsTabMeldungen.addEventListener('click', () => {
-      adminReportsTabMeldungen.classList.add('active')
-      adminReportsTabBugs.classList.remove('active')
-      adminReportsTabEntbannungen.classList.remove('active')
-      adminReportsList.style.display = 'block'
+// Admin reports category handling
+if (adminReportsTabBugs && adminReportsTabEntbannungen && adminReportsTabMeldungen && adminReportsTabUsers) {
+   // Hide all lists initially
+   const hideAllAdminLists = () => {
+      adminReportsList.style.display = 'none'
       adminBugReportsList.style.display = 'none'
       adminUnbanRequestsList.style.display = 'none'
-      adminReportsTitle.textContent = 'Meldungen'
-      loadAdminReports()
-   })
+      adminUsersList.style.display = 'none'
+   }
 
-   adminReportsTabBugs.addEventListener('click', () => {
-      adminReportsTabMeldungen.classList.remove('active')
-      adminReportsTabBugs.classList.add('active')
+   // Remove active class from all buttons
+   const removeAllActive = () => {
+      adminReportsTabBugs.classList.remove('active')
       adminReportsTabEntbannungen.classList.remove('active')
-      adminReportsList.style.display = 'none'
+      adminReportsTabMeldungen.classList.remove('active')
+      adminReportsTabUsers.classList.remove('active')
+   }
+
+   // Bugs category
+   adminReportsTabBugs.addEventListener('click', () => {
+      removeAllActive()
+      hideAllAdminLists()
+      adminReportsTabBugs.classList.add('active')
       adminBugReportsList.style.display = 'block'
-      adminUnbanRequestsList.style.display = 'none'
-      adminReportsTitle.textContent = 'Bugs'
       loadAdminBugReports()
    })
 
+   // Freigaben category
    adminReportsTabEntbannungen.addEventListener('click', () => {
-      adminReportsTabMeldungen.classList.remove('active')
-      adminReportsTabBugs.classList.remove('active')
+      removeAllActive()
+      hideAllAdminLists()
       adminReportsTabEntbannungen.classList.add('active')
-      adminReportsList.style.display = 'none'
-      adminBugReportsList.style.display = 'none'
       adminUnbanRequestsList.style.display = 'block'
-      adminReportsTitle.textContent = 'Freigaben'
       loadAdminUnbanRequests()
    })
+
+   // Meldungen category
+   adminReportsTabMeldungen.addEventListener('click', () => {
+      removeAllActive()
+      hideAllAdminLists()
+      adminReportsTabMeldungen.classList.add('active')
+      adminReportsList.style.display = 'block'
+      loadAdminReports()
+   })
+
+   // Nutzernamen category
+   adminReportsTabUsers.addEventListener('click', () => {
+      removeAllActive()
+      hideAllAdminLists()
+      adminReportsTabUsers.classList.add('active')
+      adminUsersList.style.display = 'block'
+   })
+
+   // Search functionality for users
+   if (adminReportsSearch) {
+      adminReportsSearch.addEventListener('input', (e) => {
+         const query = e.target.value.trim()
+         
+         // Only show users list when searching in Users tab
+         if (adminReportsTabUsers.classList.contains('active')) {
+            if (!query) {
+               adminUsersList.innerHTML = ''
+               return
+            }
+
+            fetch(`/api/auth/admin/users?q=${encodeURIComponent(query)}`)
+               .then(res => res.json())
+               .then(data => {
+                  adminUsersList.innerHTML = ''
+                  if (!data.users || data.users.length === 0) {
+                     adminUsersList.innerHTML = '<p style="text-align: center; color: var(--text-color); padding: 1rem;">Keine Nutzer gefunden</p>'
+                     return
+                  }
+
+                  data.users.forEach(user => {
+                     const item = document.createElement('div')
+                     item.style.cssText = 'padding: 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background .3s;'
+                     item.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: .5rem;">
+                           <img src="${user.avatar ? '/' + user.avatar : 'assets/img/default-avatar.png'}" alt="" style="width: 2rem; height: 2rem; border-radius: 50%; object-fit: cover;">
+                           <div>
+                              <p style="margin: 0; font-weight: bold; color: var(--title-color);">@${user.username}</p>
+                              <p style="margin: 0; font-size: .85rem; color: var(--text-color);">${user.full_name}</p>
+                           </div>
+                        </div>
+                     `
+                     item.addEventListener('mouseenter', () => {
+                        item.style.background = 'var(--bg-container)'
+                     })
+                     item.addEventListener('mouseleave', () => {
+                        item.style.background = 'transparent'
+                     })
+                     adminUsersList.appendChild(item)
+                  })
+               })
+               .catch(err => {
+                  showMsg('admin-reports-message', 'Fehler beim Laden der Nutzer.', 'error')
+               })
+         }
+      })
+   }
 }
+
 let currentPublicProfileUser = null
 let adminUserListDebounceTimer = null
 let activePublicProfileTooltip = null
