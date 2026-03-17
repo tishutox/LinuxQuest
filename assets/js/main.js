@@ -358,6 +358,7 @@ const profileBirthDateInput = document.getElementById('profile-birth-date-input'
 const birthDatePrevMonthBtn = document.getElementById('birth-date-prev-month')
 const birthDateNextMonthBtn = document.getElementById('birth-date-next-month')
 const birthDateCurrentMonth = document.getElementById('birth-date-current-month')
+const birthDateYearInput = document.getElementById('birth-date-year-input')
 const birthDateCalendarGrid = document.getElementById('birth-date-calendar-grid')
 const birthDateClearBtn = document.getElementById('birth-date-clear-btn')
 const birthDateApplyBtn = document.getElementById('birth-date-apply-btn')
@@ -698,6 +699,9 @@ let birthDatePickerView = {
    year: new Date().getFullYear(),
    selectedDate: ''
 }
+
+const BIRTH_DATE_MIN_YEAR = 1900
+const BIRTH_DATE_MAX_YEAR = 2100
 let beliefPickerState = {
    belief: '',
    confession: ''
@@ -1010,6 +1014,9 @@ function renderBirthDateCalendar() {
    if (!birthDateCalendarGrid || !birthDateCurrentMonth) return
 
    birthDateCurrentMonth.textContent = getMonthLabel(birthDatePickerView.month, birthDatePickerView.year)
+   if (birthDateYearInput) {
+      birthDateYearInput.value = String(birthDatePickerView.year)
+   }
    birthDateCalendarGrid.innerHTML = ''
 
    const firstOfMonth = new Date(birthDatePickerView.year, birthDatePickerView.month - 1, 1)
@@ -2554,6 +2561,15 @@ birthDateNextMonthBtn.addEventListener('click', () => {
    } else {
       birthDatePickerView.month += 1
    }
+   renderBirthDateCalendar()
+})
+
+birthDateYearInput.addEventListener('input', () => {
+   const yearValue = Number.parseInt(birthDateYearInput.value, 10)
+   if (!Number.isInteger(yearValue)) return
+   if (yearValue < BIRTH_DATE_MIN_YEAR || yearValue > BIRTH_DATE_MAX_YEAR) return
+
+   birthDatePickerView.year = yearValue
    renderBirthDateCalendar()
 })
 

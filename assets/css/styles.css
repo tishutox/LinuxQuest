@@ -958,6 +958,22 @@ body.user-theme-active .nav__avatar {
   text-transform: capitalize;
 }
 
+.birth-date-picker__month-wrap {
+  display: grid;
+  gap: .3rem;
+}
+
+.birth-date-picker__year-input {
+  width: 100%;
+  min-height: 2rem;
+  border-radius: .45rem;
+  border: 1px solid var(--border-color);
+  background: var(--container-color);
+  color: var(--text-color);
+  text-align: center;
+  font-weight: var(--font-medium);
+}
+
 .birth-date-picker__weekdays,
 .birth-date-picker__grid {
   display: grid;

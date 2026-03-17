@@ -509,7 +509,10 @@
                <button type="button" class="birth-date-picker__nav" id="birth-date-prev-month" aria-label="Vorheriger Monat">
                   <i class="fi fi-rr-angle-small-left"></i>
                </button>
-               <p class="birth-date-picker__month" id="birth-date-current-month"></p>
+               <div class="birth-date-picker__month-wrap">
+                  <p class="birth-date-picker__month" id="birth-date-current-month"></p>
+                  <input type="number" id="birth-date-year-input" class="birth-date-picker__year-input" min="1900" max="2100" step="1" inputmode="numeric" aria-label="Jahr eingeben">
+               </div>
                <button type="button" class="birth-date-picker__nav" id="birth-date-next-month" aria-label="Nächster Monat">
                   <i class="fi fi-rr-angle-small-right"></i>
                </button>
