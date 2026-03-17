@@ -532,6 +532,56 @@ img {
   opacity: .7;
 }
 
+.admin-reports__item-header {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+.admin-reports__item-header .admin-reports__reporter {
+  flex: 1;
+}
+
+.admin-reports__closed-badge {
+  flex-shrink: 0;
+  font-size: .7rem;
+  font-weight: var(--font-semi-bold);
+  color: var(--body-color);
+  background-color: var(--text-color);
+  opacity: .7;
+  border-radius: 1rem;
+  padding: .1rem .55rem;
+}
+
+.admin-reports__item--closed {
+  opacity: .55;
+}
+
+.admin-reports__close-btn {
+  margin-top: .5rem;
+  width: 100%;
+  padding: .35rem .7rem;
+  font-size: .8rem;
+  font-weight: var(--font-semi-bold);
+  color: var(--body-color);
+  background-color: var(--first-color);
+  border: none;
+  border-radius: .5rem;
+  cursor: pointer;
+  transition: background-color .2s, opacity .2s;
+}
+
+.admin-reports__close-btn:hover {
+  background-color: var(--first-color-alt, var(--first-color));
+  opacity: .9;
+}
+
+.admin-reports__close-btn:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
 /* Show search */
 .show-search {
   opacity: 1;

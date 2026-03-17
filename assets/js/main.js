@@ -471,8 +471,13 @@ async function openAdminReports(username) {
       }
 
       reports.forEach((report) => {
+         const isClosed = report.closed === 1
+
          const item = document.createElement('div')
-         item.className = 'admin-reports__item'
+         item.className = 'admin-reports__item' + (isClosed ? ' admin-reports__item--closed' : '')
+
+         const itemHeader = document.createElement('div')
+         itemHeader.className = 'admin-reports__item-header'
 
          const reporter = document.createElement('button')
          reporter.type = 'button'
@@ -488,6 +493,15 @@ async function openAdminReports(username) {
             reporter.disabled = true
          }
 
+         if (isClosed) {
+            const closedBadge = document.createElement('span')
+            closedBadge.className = 'admin-reports__closed-badge'
+            closedBadge.textContent = 'Geschlossen'
+            itemHeader.appendChild(closedBadge)
+         }
+
+         itemHeader.appendChild(reporter)
+
          const reason = document.createElement('div')
          reason.className = 'admin-reports__reason'
          reason.textContent = report.reason || 'Kein Grund angegeben.'
@@ -499,9 +513,40 @@ async function openAdminReports(username) {
             ? createdAt.toLocaleString('de-DE')
             : 'Zeit unbekannt'
 
-         item.appendChild(reporter)
+         item.appendChild(itemHeader)
          item.appendChild(reason)
          item.appendChild(date)
+
+         if (!isClosed) {
+            const closeBtn = document.createElement('button')
+            closeBtn.type = 'button'
+            closeBtn.className = 'admin-reports__close-btn'
+            closeBtn.textContent = 'Fall schließen'
+            closeBtn.addEventListener('click', async () => {
+               closeBtn.disabled = true
+               closeBtn.textContent = 'Schließt…'
+               try {
+                  const closeResp = await fetch(`/api/auth/admin/reports/${report.id}/close`, {
+                     method: 'PATCH',
+                     credentials: 'include'
+                  })
+                  const closeData = await closeResp.json()
+                  if (!closeResp.ok) {
+                     showMsg('admin-reports-message', closeData.error || 'Fall konnte nicht geschlossen werden.', 'error')
+                     closeBtn.disabled = false
+                     closeBtn.textContent = 'Fall schließen'
+                  } else {
+                     await openAdminReports(username)
+                  }
+               } catch (_) {
+                  showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
+                  closeBtn.disabled = false
+                  closeBtn.textContent = 'Fall schließen'
+               }
+            })
+            item.appendChild(closeBtn)
+         }
+
          adminReportsList.appendChild(item)
       })
    } catch (_) {
@@ -1545,27 +1590,28 @@ function renderFollowList(users) {
    })
 }
 
-function renderAdminUserList(users) {
+function renderAdminUserList(users, reportedUsers = []) {
    adminUserListResults.innerHTML = ''
 
-   const group = document.createElement('section')
-   group.className = 'search-results__group'
+   function createUserGroup(title, userList) {
+      const group = document.createElement('section')
+      group.className = 'search-results__group'
 
-   const heading = document.createElement('h3')
-   heading.className = 'search-results__title'
-   heading.textContent = 'Usernames'
-   group.appendChild(heading)
+      const heading = document.createElement('h3')
+      heading.className = 'search-results__title'
+      heading.textContent = title
+      group.appendChild(heading)
 
-   const list = document.createElement('div')
-   list.className = 'search-results__list'
+      const list = document.createElement('div')
+      list.className = 'search-results__list'
 
-   if (!users.length) {
-      const empty = document.createElement('p')
-      empty.className = 'search-results__empty'
-      empty.textContent = 'Keine User gefunden.'
-      list.appendChild(empty)
-   } else {
-      users.forEach((user) => {
+      if (!userList.length) {
+         const empty = document.createElement('p')
+         empty.className = 'search-results__empty'
+         empty.textContent = 'Keine User gefunden.'
+         list.appendChild(empty)
+      } else {
+         userList.forEach((user) => {
          const wrap = document.createElement('div')
          wrap.className = 'admin-user-list__item-wrap'
 
@@ -1657,10 +1703,16 @@ function renderAdminUserList(users) {
          wrap.appendChild(actions)
          list.appendChild(wrap)
       })
+      }
+
+      group.appendChild(list)
+      return group
    }
 
-   group.appendChild(list)
-   adminUserListResults.appendChild(group)
+   adminUserListResults.appendChild(createUserGroup('Usernames', users))
+
+   const reportsGroup = createUserGroup('Meldungen', reportedUsers)
+   adminUserListResults.appendChild(reportsGroup)
 }
 
 async function loadAdminUserList(query = '') {
@@ -1671,26 +1723,35 @@ async function loadAdminUserList(query = '') {
    const trimmedQuery = typeof query === 'string' ? query.trim() : ''
 
    try {
-      const targetUrl = trimmedQuery
+      const usersUrl = trimmedQuery
          ? `/api/auth/admin/users?q=${encodeURIComponent(trimmedQuery)}`
          : '/api/auth/admin/users'
+      const reportsUrl = trimmedQuery
+         ? `/api/auth/admin/users/with-open-reports?q=${encodeURIComponent(trimmedQuery)}`
+         : '/api/auth/admin/users/with-open-reports'
 
-      const response = await fetch(targetUrl, {
-         credentials: 'include'
-      })
+      const [usersResp, reportsResp] = await Promise.all([
+         fetch(usersUrl, { credentials: 'include' }),
+         fetch(reportsUrl, { credentials: 'include' })
+      ])
 
-      const data = await response.json()
-      if (!response.ok) {
-         showMsg('admin-user-list-message', data.error || 'Userliste konnte nicht geladen werden.', 'error')
-         renderAdminUserList([])
+      const usersData = await usersResp.json()
+      if (!usersResp.ok) {
+         showMsg('admin-user-list-message', usersData.error || 'Userliste konnte nicht geladen werden.', 'error')
+         renderAdminUserList([], [])
          return
       }
 
+      const reportsData = reportsResp.ok ? await reportsResp.json() : { users: [] }
+
       clearMsg('admin-user-list-message')
-      renderAdminUserList(Array.isArray(data.users) ? data.users : [])
+      renderAdminUserList(
+         Array.isArray(usersData.users) ? usersData.users : [],
+         Array.isArray(reportsData.users) ? reportsData.users : []
+      )
    } catch (_) {
       showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
-      renderAdminUserList([])
+      renderAdminUserList([], [])
    }
 }
 
@@ -1701,7 +1762,7 @@ async function openAdminUserListModal() {
 
    adminUserListSearch.value = ''
    clearMsg('admin-user-list-message')
-   renderAdminUserList([])
+   renderAdminUserList([], [])
 
    hideAll()
    adminUserListModal.classList.add('show-search')

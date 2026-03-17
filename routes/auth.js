@@ -1352,19 +1352,100 @@ router.get('/admin/reports/:username', (req, res) => {
       SELECT
         r.id,
         r.reason,
+        r.closed,
         r.created_at,
         u.username AS reporter_username,
         u.full_name AS reporter_full_name
       FROM reports r
       JOIN users u ON u.id = r.reporter_user_id
       WHERE r.reported_user_id = ?
-      ORDER BY datetime(r.created_at) DESC
+      ORDER BY r.closed ASC, datetime(r.created_at) DESC
     `).all(reportedUser.id);
 
     return res.json({ reports });
   } catch (err) {
     console.error('[GET ADMIN REPORTS ERROR]', err);
     return res.status(500).json({ error: 'Serverfehler beim Abrufen der Meldungen.' });
+  }
+});
+
+// ─── CLOSE A REPORT (ADMIN) ───────────────────────────────────────────────────
+router.patch('/admin/reports/:reportId/close', (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    const requester = db.prepare('SELECT id, email FROM users WHERE id = ?').get(req.session.userId);
+    if (!requester?.email || !isProtectedEmail(requester.email)) {
+      return res.status(403).json({ error: 'Nur Admins können Fälle schließen.' });
+    }
+
+    const reportId = parseInt(req.params.reportId, 10);
+    if (!Number.isInteger(reportId) || reportId <= 0) {
+      return res.status(400).json({ error: 'Ungültige Meldungs-ID.' });
+    }
+
+    const report = db.prepare('SELECT id FROM reports WHERE id = ?').get(reportId);
+    if (!report) {
+      return res.status(404).json({ error: 'Meldung nicht gefunden.' });
+    }
+
+    db.prepare('UPDATE reports SET closed = 1 WHERE id = ?').run(reportId);
+
+    return res.json({ message: 'Fall erfolgreich geschlossen.' });
+  } catch (err) {
+    console.error('[CLOSE REPORT ERROR]', err);
+    return res.status(500).json({ error: 'Serverfehler beim Schließen des Falls.' });
+  }
+});
+
+// ─── GET USERS WITH OPEN REPORTS (ADMIN) ─────────────────────────────────────
+router.get('/admin/users/with-open-reports', (req, res) => {
+  try {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Nicht authentifiziert.' });
+    }
+
+    const requester = db.prepare('SELECT id, email FROM users WHERE id = ?').get(req.session.userId);
+    if (!requester?.email || !isProtectedEmail(requester.email)) {
+      return res.status(403).json({ error: 'Nur Admins können Meldungen sehen.' });
+    }
+
+    const rawQuery = typeof req.query.q === 'string' ? req.query.q : '';
+    const query = rawQuery.trim();
+
+    const users = query
+      ? db.prepare(`
+          SELECT DISTINCT u.id, u.username, u.profile_name, u.full_name, u.email, u.avatar, u.accent_color
+          FROM users u
+          INNER JOIN reports r ON r.reported_user_id = u.id
+          WHERE r.closed = 0
+            AND u.username LIKE ? COLLATE NOCASE
+          ORDER BY u.username COLLATE NOCASE ASC
+        `).all(`%${query}%`)
+      : db.prepare(`
+          SELECT DISTINCT u.id, u.username, u.profile_name, u.full_name, u.email, u.avatar, u.accent_color
+          FROM users u
+          INNER JOIN reports r ON r.reported_user_id = u.id
+          WHERE r.closed = 0
+          ORDER BY u.username COLLATE NOCASE ASC
+        `).all();
+
+    const sanitizedUsers = users.map((user) => ({
+      id: user.id,
+      username: user.username,
+      profile_name: user.profile_name,
+      full_name: user.full_name,
+      avatar: user.avatar,
+      accent_color: user.accent_color,
+      isProtected: isProtectedEmail(user.email)
+    }));
+
+    return res.json({ query, users: sanitizedUsers });
+  } catch (err) {
+    console.error('[ADMIN USERS WITH OPEN REPORTS ERROR]', err);
+    return res.status(500).json({ error: 'Serverfehler beim Abrufen der Nutzer mit Meldungen.' });
   }
 });
 

@@ -150,4 +150,9 @@ db.exec(`
 db.exec('CREATE INDEX IF NOT EXISTS idx_reports_reported_user_id ON reports(reported_user_id)');
 db.exec('CREATE INDEX IF NOT EXISTS idx_reports_reporter_user_id ON reports(reporter_user_id)');
 
+// Migration: add closed column if it does not exist yet
+try {
+  db.exec('ALTER TABLE reports ADD COLUMN closed INTEGER NOT NULL DEFAULT 0');
+} catch (_) { /* column already exists */ }
+
 module.exports = db;
