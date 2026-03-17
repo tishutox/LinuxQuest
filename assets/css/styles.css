@@ -158,10 +158,9 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 1.25rem;
-  color: var(--title-color);
-  font-weight: var(--font-semi-bold);
   font-size: 1.25rem;
+  line-height: 1;
+  color: var(--title-color);
   cursor: pointer;
   transition: color .4s;
 }
