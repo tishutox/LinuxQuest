@@ -1938,7 +1938,7 @@ function renderFollowList(users) {
    })
 }
 
-function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = []) {
+function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = [], bugReportUsers = []) {
    adminUserListResults.innerHTML = ''
    const viewerIsAdministrator = isAdminUser(currentUser)
 
@@ -2150,6 +2150,12 @@ function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = []) 
       return group
    }
 
+   const bugsGroup = createUserGroup('Bugs', bugReportUsers, {
+      reportsLabel: 'Bugs',
+      initialReportsTab: 'bugs'
+   })
+   adminUserListResults.appendChild(bugsGroup)
+
    const unbanRequestsGroup = createUserGroup('Freigaben', unbanRequestUsers, {
       reportsLabel: 'Freigaben',
       initialReportsTab: 'entbannungen'
@@ -2177,10 +2183,11 @@ async function loadAdminUserList(query = '') {
          ? `/api/auth/admin/users/with-open-reports?q=${encodeURIComponent(trimmedQuery)}`
          : '/api/auth/admin/users/with-open-reports'
 
-      const [usersResp, reportsResp, unbanRequestsResp] = await Promise.all([
+      const [usersResp, reportsResp, unbanRequestsResp, bugReportsResp] = await Promise.all([
          fetch(usersUrl, { credentials: 'include' }),
          fetch(reportsUrl, { credentials: 'include' }),
-         fetch('/api/auth/admin/unban-requests', { credentials: 'include' })
+         fetch('/api/auth/admin/unban-requests', { credentials: 'include' }),
+         fetch('/api/auth/admin/bug-reports', { credentials: 'include' })
       ])
 
       const usersData = await usersResp.json()
@@ -2192,6 +2199,7 @@ async function loadAdminUserList(query = '') {
 
       const reportsData = reportsResp.ok ? await reportsResp.json() : { users: [] }
       const unbanRequestsData = unbanRequestsResp.ok ? await unbanRequestsResp.json() : { requests: [] }
+      const bugReportsData = bugReportsResp.ok ? await bugReportsResp.json() : { reports: [] }
 
       const allUsers = Array.isArray(usersData.users) ? usersData.users : []
       const usersByUsername = new Map(
@@ -2212,11 +2220,25 @@ async function loadAdminUserList(query = '') {
          .map((normalizedUsername) => usersByUsername.get(normalizedUsername))
          .filter(Boolean)
 
+      const seenBugUsernames = new Set()
+      const bugReportUsers = (Array.isArray(bugReportsData.reports) ? bugReportsData.reports : [])
+         .filter((report) => report?.closed === 0 || report?.closed === false)
+         .map((report) => report?.username ? String(report.username).trim().toLowerCase() : '')
+         .filter(Boolean)
+         .filter((normalizedUsername) => {
+            if (seenBugUsernames.has(normalizedUsername)) return false
+            seenBugUsernames.add(normalizedUsername)
+            return true
+         })
+         .map((normalizedUsername) => usersByUsername.get(normalizedUsername))
+         .filter(Boolean)
+
       clearMsg('admin-user-list-message')
       renderAdminUserList(
          allUsers,
          Array.isArray(reportsData.users) ? reportsData.users : [],
-         unbanRequestUsers
+         unbanRequestUsers,
+         bugReportUsers
       )
    } catch (_) {
       showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
