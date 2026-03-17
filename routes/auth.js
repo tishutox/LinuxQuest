@@ -811,12 +811,13 @@ router.delete('/admin/users/:username', (req, res) => {
       return res.json({ message: `Nutzer @${username} war bereits entfernt.` });
     }
 
-    const deleteUserTransaction = db.transaction(() => {
-      const deleteEmailVerificationsByEmail = db.prepare('DELETE FROM email_verifications WHERE LOWER(email) = LOWER(?)');
-      const deletePasswordResetByEmail = db.prepare('DELETE FROM password_reset_verifications WHERE LOWER(email) = LOWER(?)');
-      const deleteUserFollows = db.prepare('DELETE FROM follows WHERE follower_id = ? OR following_id = ?');
-      const deleteUserById = db.prepare('DELETE FROM users WHERE id = ?');
+    const deleteEmailVerificationsByEmail = db.prepare('DELETE FROM email_verifications WHERE LOWER(email) = LOWER(?)');
+    const deletePasswordResetByEmail = db.prepare('DELETE FROM password_reset_verifications WHERE LOWER(email) = LOWER(?)');
+    const deleteUserFollows = db.prepare('DELETE FROM follows WHERE follower_id = ? OR following_id = ?');
+    const deleteUserById = db.prepare('DELETE FROM users WHERE id = ?');
 
+    db.exec('BEGIN');
+    try {
       usersToDelete.forEach((user) => {
         if (user.email) {
           deleteEmailVerificationsByEmail.run(user.email);
@@ -825,9 +826,11 @@ router.delete('/admin/users/:username', (req, res) => {
         deleteUserFollows.run(user.id, user.id);
         deleteUserById.run(user.id);
       });
-    });
-
-    deleteUserTransaction();
+      db.exec('COMMIT');
+    } catch (txErr) {
+      db.exec('ROLLBACK');
+      throw txErr;
+    }
     usersToDelete.forEach((user) => deleteOldAvatar(user.avatar));
 
     return res.json({ message: `Nutzer @${usersToDelete[0].username} wurde gelöscht.` });
