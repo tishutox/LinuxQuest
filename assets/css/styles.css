@@ -1005,7 +1005,7 @@ body.user-theme-active .birth-date-picker__day.is-selected {
 
 @media screen and (max-width: 1023px) {
   .belief-picker__religion i {
-    transform: translateY(.34em);
+    transform: translateY(-.12em);
   }
 }
 

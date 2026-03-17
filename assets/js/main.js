@@ -1709,10 +1709,10 @@ function renderAdminUserList(users, reportedUsers = []) {
       return group
    }
 
-   adminUserListResults.appendChild(createUserGroup('Usernames', users))
-
    const reportsGroup = createUserGroup('Meldungen', reportedUsers)
    adminUserListResults.appendChild(reportsGroup)
+
+   adminUserListResults.appendChild(createUserGroup('Usernames', users))
 }
 
 async function loadAdminUserList(query = '') {
