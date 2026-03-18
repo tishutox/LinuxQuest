@@ -468,6 +468,7 @@ const mainBackgroundImage = document.querySelector('.main__bg')
 const DEFAULT_MAIN_BACKGROUND_SRC = mainBackgroundImage?.getAttribute('src') || 'assets/img/bg-image.png'
 
 const messageTimers = new Map()
+let currentAdminReportsUsername = ''
 
 function setAdminReportsTab(tab = 'meldungen') {
    const isMeldungen = tab === 'meldungen'
@@ -493,6 +494,7 @@ function setAdminReportsTab(tab = 'meldungen') {
 
 async function openAdminReports(username, initialTab = 'meldungen') {
    if (!username) return
+   currentAdminReportsUsername = username
 
    clearMsg('admin-reports-message')
    adminReportsTitle.textContent = `Tickets für @${username}`
@@ -800,40 +802,59 @@ async function loadAdminBugReports() {
 
       const data = await response.json()
       adminBugReportsList.innerHTML = ''
+      const viewerIsAdministrator = isAdminUser(currentUser)
 
       if (!data.reports || data.reports.length === 0) {
-         adminBugReportsList.innerHTML = '<p style="text-align: center; color: var(--text-color); padding: 1rem;">Keine offenen Bug Reports</p>'
+         adminBugReportsList.innerHTML = '<p class="admin-reports__empty">Keine Bug Reports vorhanden.</p>'
          return
       }
 
       data.reports.forEach((report) => {
+         const isClosed = report.closed === 1
          const item = document.createElement('div')
-         item.style.cssText = 'margin-bottom: 1rem; padding: 1rem; background: var(--bg-container); border-radius: .5rem; border: 1px solid var(--border-color);'
-         
-         const createdAt = new Date(report.created_at).toLocaleDateString('de-DE')
-         const statusText = report.closed ? '✓ Geschlossen' : 'Offen'
-         const statusColor = report.closed ? 'var(--first-color)' : 'var(--text-color)'
-         
-         item.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: .5rem;">
-               <div>
-                  <p style="margin: 0; font-weight: bold; color: var(--title-color);">${report.username || 'Unbekannt'}</p>
-                  <p style="margin: .25rem 0; font-size: .85rem; color: var(--text-color);">${createdAt}</p>
-               </div>
-               <span style="font-size: .75rem; color: ${statusColor}; font-weight: bold;">${statusText}</span>
-            </div>
-            <p style="margin: .5rem 0; white-space: pre-wrap; word-break: break-word; color: var(--text-color); max-height: 150px; overflow-y: auto;">${report.description}</p>
-         `
+         item.className = 'admin-reports__item' + (isClosed ? ' admin-reports__item--closed' : '')
 
-         if (!report.closed) {
+         const itemHeader = document.createElement('div')
+         itemHeader.className = 'admin-reports__item-header'
+
+         const reporter = document.createElement('div')
+         reporter.className = 'admin-reports__reporter'
+         reporter.textContent = report.full_name
+            ? `${report.full_name} (@${report.username || 'unbekannt'})`
+            : `@${report.username || 'unbekannt'}`
+
+         if (isClosed) {
+            const closedBadge = document.createElement('span')
+            closedBadge.className = 'admin-reports__closed-badge'
+            closedBadge.textContent = 'Geschlossen'
+            itemHeader.appendChild(closedBadge)
+         }
+
+         itemHeader.appendChild(reporter)
+
+         const reason = document.createElement('div')
+         reason.className = 'admin-reports__reason'
+         reason.textContent = report.description || 'Keine Beschreibung angegeben.'
+
+         const date = document.createElement('div')
+         date.className = 'admin-reports__date'
+         const createdAt = report.created_at ? new Date(report.created_at) : null
+         date.textContent = createdAt && !Number.isNaN(createdAt.getTime())
+            ? createdAt.toLocaleString('de-DE')
+            : 'Zeit unbekannt'
+
+         item.appendChild(itemHeader)
+         item.appendChild(reason)
+         item.appendChild(date)
+
+         if (!isClosed && viewerIsAdministrator) {
             const closeBtn = document.createElement('button')
             closeBtn.type = 'button'
-            closeBtn.className = 'login__button'
-            closeBtn.style.cssText = 'width: 100%; margin-top: .5rem; font-size: .85rem; padding: .4rem;'
-            closeBtn.textContent = 'Abhaken'
+            closeBtn.className = 'admin-reports__close-btn'
+            closeBtn.textContent = 'Fall schließen'
             closeBtn.addEventListener('click', async () => {
                closeBtn.disabled = true
-               closeBtn.textContent = 'Wird gespeichert...'
+               closeBtn.textContent = 'Schließt…'
 
                try {
                   const response = await fetch(`/api/auth/admin/bug-reports/${report.id}/close`, {
@@ -845,12 +866,12 @@ async function loadAdminBugReports() {
                   } else {
                      showMsg('admin-reports-message', 'Bug Report konnte nicht geschlossen werden.', 'error')
                      closeBtn.disabled = false
-                     closeBtn.textContent = 'Abhaken'
+                     closeBtn.textContent = 'Fall schließen'
                   }
                } catch (err) {
                   showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
                   closeBtn.disabled = false
-                  closeBtn.textContent = 'Abhaken'
+                  closeBtn.textContent = 'Fall schließen'
                }
             })
             item.appendChild(closeBtn)
@@ -865,37 +886,19 @@ async function loadAdminBugReports() {
 
 // Admin reports tab handling
 if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannungen) {
-   adminReportsTabMeldungen.addEventListener('click', () => {
-      adminReportsTabMeldungen.classList.add('active')
-      adminReportsTabBugs.classList.remove('active')
-      adminReportsTabEntbannungen.classList.remove('active')
-      adminReportsList.style.display = 'block'
-      adminBugReportsList.style.display = 'none'
-      adminUnbanRequestsList.style.display = 'none'
-      adminReportsTitle.textContent = 'Meldungen'
-      loadAdminReports()
+   adminReportsTabMeldungen.addEventListener('click', async () => {
+      if (!currentAdminReportsUsername) return
+      await openAdminReports(currentAdminReportsUsername, 'meldungen')
    })
 
-   adminReportsTabBugs.addEventListener('click', () => {
-      adminReportsTabMeldungen.classList.remove('active')
-      adminReportsTabBugs.classList.add('active')
-      adminReportsTabEntbannungen.classList.remove('active')
-      adminReportsList.style.display = 'none'
-      adminBugReportsList.style.display = 'block'
-      adminUnbanRequestsList.style.display = 'none'
-      adminReportsTitle.textContent = 'Bugs'
-      loadAdminBugReports()
+   adminReportsTabBugs.addEventListener('click', async () => {
+      if (!currentAdminReportsUsername) return
+      await openAdminReports(currentAdminReportsUsername, 'bugs')
    })
 
-   adminReportsTabEntbannungen.addEventListener('click', () => {
-      adminReportsTabMeldungen.classList.remove('active')
-      adminReportsTabBugs.classList.remove('active')
-      adminReportsTabEntbannungen.classList.add('active')
-      adminReportsList.style.display = 'none'
-      adminBugReportsList.style.display = 'none'
-      adminUnbanRequestsList.style.display = 'block'
-      adminReportsTitle.textContent = 'Freigaben'
-      loadAdminUnbanRequests()
+   adminReportsTabEntbannungen.addEventListener('click', async () => {
+      if (!currentAdminReportsUsername) return
+      await openAdminReports(currentAdminReportsUsername, 'entbannungen')
    })
 }
 let currentPublicProfileUser = null
