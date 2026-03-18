@@ -1671,6 +1671,21 @@ body.user-theme-active .profile-background__reset:disabled {
   box-shadow: 0 4px 24px color-mix(in srgb, var(--public-profile-accent-color) 55%, transparent);
 }
 
+#public-profile-report-btn,
+#public-profile-follow-icon-btn {
+  font-size: var(--nav-icon-size) !important;
+  line-height: 1 !important;
+}
+
+#public-profile-report-btn i,
+#public-profile-report-btn i::before,
+#public-profile-follow-icon-btn i,
+#public-profile-follow-icon-btn i::before {
+  font-size: var(--nav-icon-size) !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+
 .follow-list {
   display: grid;
   gap: .5rem;
