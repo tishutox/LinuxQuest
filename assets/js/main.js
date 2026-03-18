@@ -807,6 +807,92 @@ bugReportSubmitBtn.addEventListener('click', async () => {
 })
 
 /*=============== ADMIN PANEL – BUG REPORTS ===============*/
+function getVisibleBugReports(reports, targetUsername = '') {
+   const normalizedTargetUsername = typeof targetUsername === 'string'
+      ? targetUsername.trim().toLowerCase()
+      : ''
+
+   const allReports = Array.isArray(reports) ? reports : []
+   if (!normalizedTargetUsername) return allReports
+
+   return allReports.filter((report) => {
+      const reportUsername = typeof report?.username === 'string' ? report.username.trim().toLowerCase() : ''
+      return reportUsername === normalizedTargetUsername
+   })
+}
+
+function createAdminBugReportItem(report, viewerIsAdministrator, targetUsername) {
+   const isClosed = report.closed === 1
+   const item = document.createElement('div')
+   item.className = 'admin-reports__item' + (isClosed ? ' admin-reports__item--closed' : '')
+
+   const itemHeader = document.createElement('div')
+   itemHeader.className = 'admin-reports__item-header'
+
+   const reporter = document.createElement('div')
+   reporter.className = 'admin-reports__reporter'
+   reporter.textContent = report.full_name
+      ? `${report.full_name} (@${report.username || 'unbekannt'})`
+      : `@${report.username || 'unbekannt'}`
+
+   if (isClosed) {
+      const closedBadge = document.createElement('span')
+      closedBadge.className = 'admin-reports__closed-badge'
+      closedBadge.textContent = 'Geschlossen'
+      itemHeader.appendChild(closedBadge)
+   }
+
+   itemHeader.appendChild(reporter)
+
+   const reason = document.createElement('div')
+   reason.className = 'admin-reports__reason'
+   reason.textContent = report.description || 'Keine Beschreibung angegeben.'
+
+   const date = document.createElement('div')
+   date.className = 'admin-reports__date'
+   const createdAt = report.created_at ? new Date(report.created_at) : null
+   date.textContent = createdAt && !Number.isNaN(createdAt.getTime())
+      ? createdAt.toLocaleString('de-DE')
+      : 'Zeit unbekannt'
+
+   item.appendChild(itemHeader)
+   item.appendChild(reason)
+   item.appendChild(date)
+
+   if (!isClosed && viewerIsAdministrator) {
+      const closeBtn = document.createElement('button')
+      closeBtn.type = 'button'
+      closeBtn.className = 'admin-reports__close-btn'
+      closeBtn.textContent = 'Fall schließen'
+      closeBtn.addEventListener('click', async () => {
+         closeBtn.disabled = true
+         closeBtn.textContent = 'Schließt…'
+
+         try {
+            const response = await fetch(`/api/auth/admin/bug-reports/${report.id}/close`, {
+               method: 'PATCH',
+               credentials: 'include'
+            })
+
+            if (response.ok) {
+               loadAdminBugReports(targetUsername)
+            } else {
+               showMsg('admin-reports-message', 'Bug Report konnte nicht geschlossen werden.', 'error')
+               closeBtn.disabled = false
+               closeBtn.textContent = 'Fall schließen'
+            }
+         } catch (err) {
+            showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
+            closeBtn.disabled = false
+            closeBtn.textContent = 'Fall schließen'
+         }
+      })
+      item.appendChild(closeBtn)
+   }
+
+   return item
+}
+
 async function loadAdminBugReports(targetUsername = '') {
    try {
       const response = await fetch('/api/auth/admin/bug-reports', {
@@ -820,16 +906,7 @@ async function loadAdminBugReports(targetUsername = '') {
       const data = await response.json()
       adminBugReportsList.innerHTML = ''
       const viewerIsAdministrator = isAdminUser(currentUser)
-      const normalizedTargetUsername = typeof targetUsername === 'string'
-         ? targetUsername.trim().toLowerCase()
-         : ''
-      const allReports = Array.isArray(data.reports) ? data.reports : []
-      const visibleReports = normalizedTargetUsername
-         ? allReports.filter((report) => {
-            const reportUsername = typeof report?.username === 'string' ? report.username.trim().toLowerCase() : ''
-            return reportUsername === normalizedTargetUsername
-         })
-         : allReports
+      const visibleReports = getVisibleBugReports(data.reports, targetUsername)
 
       if (!visibleReports.length) {
          adminBugReportsList.innerHTML = '<p class="admin-reports__empty">Keine Bug Reports vorhanden.</p>'
@@ -837,75 +914,7 @@ async function loadAdminBugReports(targetUsername = '') {
       }
 
       visibleReports.forEach((report) => {
-         const isClosed = report.closed === 1
-         const item = document.createElement('div')
-         item.className = 'admin-reports__item' + (isClosed ? ' admin-reports__item--closed' : '')
-
-         const itemHeader = document.createElement('div')
-         itemHeader.className = 'admin-reports__item-header'
-
-         const reporter = document.createElement('div')
-         reporter.className = 'admin-reports__reporter'
-         reporter.textContent = report.full_name
-            ? `${report.full_name} (@${report.username || 'unbekannt'})`
-            : `@${report.username || 'unbekannt'}`
-
-         if (isClosed) {
-            const closedBadge = document.createElement('span')
-            closedBadge.className = 'admin-reports__closed-badge'
-            closedBadge.textContent = 'Geschlossen'
-            itemHeader.appendChild(closedBadge)
-         }
-
-         itemHeader.appendChild(reporter)
-
-         const reason = document.createElement('div')
-         reason.className = 'admin-reports__reason'
-         reason.textContent = report.description || 'Keine Beschreibung angegeben.'
-
-         const date = document.createElement('div')
-         date.className = 'admin-reports__date'
-         const createdAt = report.created_at ? new Date(report.created_at) : null
-         date.textContent = createdAt && !Number.isNaN(createdAt.getTime())
-            ? createdAt.toLocaleString('de-DE')
-            : 'Zeit unbekannt'
-
-         item.appendChild(itemHeader)
-         item.appendChild(reason)
-         item.appendChild(date)
-
-         if (!isClosed && viewerIsAdministrator) {
-            const closeBtn = document.createElement('button')
-            closeBtn.type = 'button'
-            closeBtn.className = 'admin-reports__close-btn'
-            closeBtn.textContent = 'Fall schließen'
-            closeBtn.addEventListener('click', async () => {
-               closeBtn.disabled = true
-               closeBtn.textContent = 'Schließt…'
-
-               try {
-                  const response = await fetch(`/api/auth/admin/bug-reports/${report.id}/close`, {
-                     method: 'PATCH',
-                     credentials: 'include'
-                  })
-
-                  if (response.ok) {
-                     loadAdminBugReports(targetUsername)
-                  } else {
-                     showMsg('admin-reports-message', 'Bug Report konnte nicht geschlossen werden.', 'error')
-                     closeBtn.disabled = false
-                     closeBtn.textContent = 'Fall schließen'
-                  }
-               } catch (err) {
-                  showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
-                  closeBtn.disabled = false
-                  closeBtn.textContent = 'Fall schließen'
-               }
-            })
-            item.appendChild(closeBtn)
-         }
-
-         adminBugReportsList.appendChild(item)
+         adminBugReportsList.appendChild(createAdminBugReportItem(report, viewerIsAdministrator, targetUsername))
       })
    } catch (_) {
       showMsg('admin-reports-message', 'Serverfehler beim Laden der Bug Reports.', 'error')
