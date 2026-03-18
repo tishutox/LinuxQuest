@@ -2357,6 +2357,43 @@ function updateProfileView(user) {
    }
 }
 
+function startRestrictionCheck() {
+   if (restrictionCheckInterval) return
+
+   let lastRestrictionStatus = currentUser?.is_restricted ? 1 : 0
+
+   restrictionCheckInterval = setInterval(async () => {
+      try {
+         const response = await fetch('/api/auth/me', { credentials: 'include' })
+         if (!response.ok) return
+
+         const data = await response.json()
+         const currentRestrictionStatus = data.user?.is_restricted ? 1 : 0
+
+         if (lastRestrictionStatus === 0 && currentRestrictionStatus === 1) {
+            currentUser = data.user
+            hideAll()
+            unbanRequestReasonInput.value = ''
+            updateCounter(unbanRequestReasonCounter, '', 500)
+            clearMsg('unban-request-message')
+            unbanRequestModal.classList.add('show-login')
+         }
+
+         lastRestrictionStatus = currentRestrictionStatus
+         currentUser = data.user
+      } catch (err) {
+         console.error('[RESTRICTION CHECK ERROR]', err)
+      }
+   }, 4000)
+}
+
+function stopRestrictionCheck() {
+   if (restrictionCheckInterval) {
+      clearInterval(restrictionCheckInterval)
+      restrictionCheckInterval = null
+   }
+}
+
 function setLoggedIn(user) {
    currentUser = user
    applyUserAccentColor(user?.accent_color)
@@ -2371,45 +2408,6 @@ function setLoggedIn(user) {
 }
 
 function setLoggedOut() {
-   function startRestrictionCheck() {
-      if (restrictionCheckInterval) return // Already polling
-   
-      let lastRestrictionStatus = currentUser?.is_restricted ? 1 : 0
-   
-      restrictionCheckInterval = setInterval(async () => {
-         try {
-            const response = await fetch('/api/auth/me', { credentials: 'include' })
-            if (!response.ok) return // Skip on error, retry next interval
-         
-            const data = await response.json()
-            const currentRestrictionStatus = data.user?.is_restricted ? 1 : 0
-         
-            // If status changed from unrestricted to restricted, show modal immediately
-            if (lastRestrictionStatus === 0 && currentRestrictionStatus === 1) {
-               currentUser = data.user // Update currentUser with new data
-               hideAll()
-               unbanRequestReasonInput.value = ''
-               updateCounter(unbanRequestReasonCounter, '', 500)
-               clearMsg('unban-request-message')
-               unbanRequestModal.classList.add('show-login')
-            }
-         
-            lastRestrictionStatus = currentRestrictionStatus
-            currentUser = data.user // Keep currentUser in sync
-         } catch (err) {
-            console.error('[RESTRICTION CHECK ERROR]', err)
-            // Silently skip this interval, will retry next time
-         }
-      }, 4000) // Poll every 4 seconds
-   }
-
-   function stopRestrictionCheck() {
-      if (restrictionCheckInterval) {
-         clearInterval(restrictionCheckInterval)
-         restrictionCheckInterval = null
-      }
-   }
-
    stopRestrictionCheck()
    currentUser = null
    applyUserAccentColor(null)
@@ -2495,14 +2493,6 @@ publicProfileReportBtn.addEventListener('click', () => {
 
 reportCancelBtn.addEventListener('click', hideAll)
 adminReportsCloseBtn.addEventListener('click', hideAll)
-
-adminReportsTabMeldungen?.addEventListener('click', () => {
-   setAdminReportsTab('meldungen')
-})
-
-adminReportsTabEntbannungen?.addEventListener('click', () => {
-   setAdminReportsTab('entbannungen')
-})
 
 reportReasonInput?.addEventListener('input', () => {
    updateCounter(reportReasonCounter, reportReasonInput.value, 200)
