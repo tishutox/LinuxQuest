@@ -151,6 +151,50 @@ Hinweis: Wenn `RESEND_API_KEY` gesetzt ist, werden `SMTP_*`-Variablen ignoriert.
 - Auf Railway sollte für persistente Daten ein `DATA_DIR` gesetzt werden.
 - Server-Logs zeigen beim Start, ob Mailversand korrekt konfiguriert ist.
 
+## Smoke-Test nach Router-Cleanup
+
+Diese Checkliste prüft die zuletzt modularisierten Auth-Routen (`auth.core`, `auth.profile`, `auth.admin`) schnell manuell im Browser.
+
+### Vorbereitung
+1. Server starten: `npm run dev` (oder `npm start`).
+2. App öffnen: `http://localhost:3000`.
+3. Zwei Accounts bereithalten:
+	- normaler User
+	- Admin/Moderator für Ticket-Ansicht
+
+### User-Flow (Core)
+1. **Login** mit gültigen Daten.
+	- Erwartung: Erfolgreiche Anmeldung, kein Fehler-Toast.
+2. **Session prüfen** durch Seiten-Reload oder geschützte Ansicht.
+	- Erwartung: Nutzer bleibt eingeloggt (`/me` funktioniert intern).
+3. **Bug melden** (Profil/Modal → Bug-Formular) mit Text < 1000 Zeichen.
+	- Erwartung: Erfolgsmeldung „Bug erfolgreich gemeldet.“
+4. **Negativtest Bug** mit leerem Text.
+	- Erwartung: Validierungsfehler „Bitte beschreibe den Bug.“
+
+### User-Flow (Profile/Public)
+1. Öffentliches Profil öffnen (`/public/:username` via UI).
+	- Erwartung: Profil lädt weiterhin normal.
+2. Folgen/Entfolgen testen.
+	- Erwartung: Zähler aktualisieren sich wie zuvor.
+
+### Admin-Flow (Tickets)
+1. Als Admin/Moderator anmelden.
+2. Person-Tickets öffnen und Tabs prüfen:
+	- **Meldungen** lädt Einträge oder leeren Zustand ohne Fehler.
+	- **Bugs** lädt Einträge oder leeren Zustand ohne Fehler.
+	- **Freigaben** lädt Einträge oder leeren Zustand ohne Fehler.
+3. Optional je einen Eintrag schließen/entscheiden.
+	- Erwartung: Eintrag verschwindet aus Liste, UI bleibt stabil.
+
+### Quick-API-Checks (optional, DevTools)
+- `POST /api/auth/login` → `200` bei gültigen Daten.
+- `GET /api/auth/me` → `200` mit Session, sonst `401`.
+- `POST /api/auth/report-bug` → `201` bei gültiger Meldung.
+- `GET /api/auth/admin/bug-reports/:username` → `200` für Admin/Moderator.
+
+Wenn alle Punkte grün sind, ist der Router-Cleanup funktional konsistent.
+
 ## Roadmap (kurz)
 - Weitere Suchkategorien/Objekttypen
 - Ausbau der Ergebnisse und Relevanzlogik
