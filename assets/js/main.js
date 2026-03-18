@@ -615,94 +615,92 @@ async function openAdminReports(username, initialTab = 'meldungen') {
 
       if (!unbanResp.ok) {
          adminUnbanRequestsList.innerHTML = '<p class="admin-reports__empty">Keine Freigabeanfragen geladen.</p>'
-         return
-      }
-
-      const requests = Array.isArray(unbanData.requests) ? unbanData.requests : []
-      const viewerIsAdministrator = isAdminUser(currentUser)
-      if (!requests.length) {
-         adminUnbanRequestsList.innerHTML = '<p class="admin-reports__empty">Keine Freigabeanfragen vorhanden.</p>'
-         return
-      }
-
-      requests.forEach((request) => {
-         const item = document.createElement('div')
-         item.className = 'admin-reports__item'
-
-         const itemHeader = document.createElement('div')
-         itemHeader.className = 'admin-reports__item-header'
-
-         const userBtn = document.createElement('button')
-         userBtn.type = 'button'
-         userBtn.className = 'admin-reports__reporter admin-reports__reporter-button'
-         const userName = request.full_name ? `${request.full_name} (@${request.username || 'unbekannt'})` : `@${request.username || 'unbekannt'}`
-         userBtn.textContent = userName
-
-         if (request.username) {
-            userBtn.addEventListener('click', async () => {
-               await openPublicProfileByUsername(request.username)
-            })
+      } else {
+         const requests = Array.isArray(unbanData.requests) ? unbanData.requests : []
+         const viewerIsAdministrator = isAdminUser(currentUser)
+         if (!requests.length) {
+            adminUnbanRequestsList.innerHTML = '<p class="admin-reports__empty">Keine Freigabeanfragen vorhanden.</p>'
          } else {
-            userBtn.disabled = true
-         }
+            requests.forEach((request) => {
+               const item = document.createElement('div')
+               item.className = 'admin-reports__item'
 
-         itemHeader.appendChild(userBtn)
+               const itemHeader = document.createElement('div')
+               itemHeader.className = 'admin-reports__item-header'
 
-         const reason = document.createElement('div')
-         reason.className = 'admin-reports__reason'
-         reason.textContent = request.reason || 'Kein Grund angegeben.'
+               const userBtn = document.createElement('button')
+               userBtn.type = 'button'
+               userBtn.className = 'admin-reports__reporter admin-reports__reporter-button'
+               const userName = request.full_name ? `${request.full_name} (@${request.username || 'unbekannt'})` : `@${request.username || 'unbekannt'}`
+               userBtn.textContent = userName
 
-         const date = document.createElement('div')
-         date.className = 'admin-reports__date'
-         const createdAt = request.createdAt ? new Date(request.createdAt) : null
-         date.textContent = createdAt && !Number.isNaN(createdAt.getTime())
-            ? createdAt.toLocaleString('de-DE')
-            : 'Zeit unbekannt'
-
-         item.appendChild(itemHeader)
-         item.appendChild(reason)
-         item.appendChild(date)
-
-         if (viewerIsAdministrator) {
-            const approveBtn = document.createElement('button')
-            approveBtn.type = 'button'
-            approveBtn.className = 'admin-reports__close-btn'
-            approveBtn.textContent = 'Freigeben'
-            approveBtn.addEventListener('click', async () => {
-               approveBtn.disabled = true
-               approveBtn.textContent = 'Wird freigegeben…'
-               try {
-                  const approveResp = await fetch(`/api/auth/admin/unban-requests/${request.id}/resolve`, {
-                     method: 'PATCH',
-                     credentials: 'include'
+               if (request.username) {
+                  userBtn.addEventListener('click', async () => {
+                     await openPublicProfileByUsername(request.username)
                   })
-                  const approveData = await approveResp.json()
-                  if (!approveResp.ok) {
-                     showMsg('admin-reports-message', approveData.error || 'Anfrage konnte nicht genehmigt werden.', 'error')
-                     approveBtn.disabled = false
-                     approveBtn.textContent = 'Freigeben'
-                  } else {
-                     showMsg('admin-reports-message', approveData.message || 'Anfrage genehmigt.', 'success')
-                     await openAdminReports(username)
-                  }
-               } catch (_) {
-                  showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
-                  approveBtn.disabled = false
-                  approveBtn.textContent = 'Freigeben'
+               } else {
+                  userBtn.disabled = true
                }
-            })
-            item.appendChild(approveBtn)
-         }
 
-         adminUnbanRequestsList.appendChild(item)
-      })
+               itemHeader.appendChild(userBtn)
+
+               const reason = document.createElement('div')
+               reason.className = 'admin-reports__reason'
+               reason.textContent = request.reason || 'Kein Grund angegeben.'
+
+               const date = document.createElement('div')
+               date.className = 'admin-reports__date'
+               const createdAt = request.createdAt ? new Date(request.createdAt) : null
+               date.textContent = createdAt && !Number.isNaN(createdAt.getTime())
+                  ? createdAt.toLocaleString('de-DE')
+                  : 'Zeit unbekannt'
+
+               item.appendChild(itemHeader)
+               item.appendChild(reason)
+               item.appendChild(date)
+
+               if (viewerIsAdministrator) {
+                  const approveBtn = document.createElement('button')
+                  approveBtn.type = 'button'
+                  approveBtn.className = 'admin-reports__close-btn'
+                  approveBtn.textContent = 'Freigeben'
+                  approveBtn.addEventListener('click', async () => {
+                     approveBtn.disabled = true
+                     approveBtn.textContent = 'Wird freigegeben…'
+                     try {
+                        const approveResp = await fetch(`/api/auth/admin/unban-requests/${request.id}/resolve`, {
+                           method: 'PATCH',
+                           credentials: 'include'
+                        })
+                        const approveData = await approveResp.json()
+                        if (!approveResp.ok) {
+                           showMsg('admin-reports-message', approveData.error || 'Anfrage konnte nicht genehmigt werden.', 'error')
+                           approveBtn.disabled = false
+                           approveBtn.textContent = 'Freigeben'
+                        } else {
+                           showMsg('admin-reports-message', approveData.message || 'Anfrage genehmigt.', 'success')
+                           await openAdminReports(username)
+                        }
+                     } catch (_) {
+                        showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
+                        approveBtn.disabled = false
+                        approveBtn.textContent = 'Freigeben'
+                     }
+                  })
+                  item.appendChild(approveBtn)
+               }
+
+               adminUnbanRequestsList.appendChild(item)
+            })
+         }
+      }
    } catch (_) {
       showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
    }
 
    // Load bug reports if tabs shows bugs
    if (initialTab === 'bugs') {
-      await loadAdminBugReports()
+      await loadAdminBugReports(username)
    }
 }
 
@@ -792,7 +790,7 @@ bugReportSubmitBtn.addEventListener('click', async () => {
 })
 
 /*=============== ADMIN PANEL – BUG REPORTS ===============*/
-async function loadAdminBugReports() {
+async function loadAdminBugReports(targetUsername = '') {
    try {
       const response = await fetch('/api/auth/admin/bug-reports', {
          credentials: 'include'
@@ -805,13 +803,23 @@ async function loadAdminBugReports() {
       const data = await response.json()
       adminBugReportsList.innerHTML = ''
       const viewerIsAdministrator = isAdminUser(currentUser)
+      const normalizedTargetUsername = typeof targetUsername === 'string'
+         ? targetUsername.trim().toLowerCase()
+         : ''
+      const allReports = Array.isArray(data.reports) ? data.reports : []
+      const visibleReports = normalizedTargetUsername
+         ? allReports.filter((report) => {
+            const reportUsername = typeof report?.username === 'string' ? report.username.trim().toLowerCase() : ''
+            return reportUsername === normalizedTargetUsername
+         })
+         : allReports
 
-      if (!data.reports || data.reports.length === 0) {
+      if (!visibleReports.length) {
          adminBugReportsList.innerHTML = '<p class="admin-reports__empty">Keine Bug Reports vorhanden.</p>'
          return
       }
 
-      data.reports.forEach((report) => {
+      visibleReports.forEach((report) => {
          const isClosed = report.closed === 1
          const item = document.createElement('div')
          item.className = 'admin-reports__item' + (isClosed ? ' admin-reports__item--closed' : '')
@@ -865,7 +873,7 @@ async function loadAdminBugReports() {
                   })
 
                   if (response.ok) {
-                     loadAdminBugReports()
+                     loadAdminBugReports(targetUsername)
                   } else {
                      showMsg('admin-reports-message', 'Bug Report konnte nicht geschlossen werden.', 'error')
                      closeBtn.disabled = false
