@@ -2604,6 +2604,7 @@ function updateProfileView(user) {
    profileAvatarImage.src  = getAvatarUrl(user)
    const avatarArtistUrl = normalizeAvatarArtistUrl(user?.avatar_artist_url)
    profileAvatarArtistUrlInput.value = avatarArtistUrl
+   profileAvatarButton.dataset.artistUrl = avatarArtistUrl
    profileAvatarButton.title = avatarArtistUrl ? 'Original vom Artist öffnen' : 'Profilbild ändern'
    profileFullNameInput.value = user.full_name
    profileDisplayNameInput.value = getProfileDisplayName(user)
@@ -2723,6 +2724,7 @@ function setLoggedOut() {
    profileDisplayName.textContent = ''
    profileDisplayName.style.display = 'none'
    profileUsername.textContent = ''
+   profileAvatarButton.dataset.artistUrl = ''
    profileAvatarButton.title = 'Profilbild ändern'
    profileShareLinkInput.value = ''
    if (profileBackgroundInput) {
@@ -3069,9 +3071,17 @@ async function openSharedProfileFromUrl() {
 
 profileBtn.addEventListener('click', showProfileModal)
 profileAvatarButton.addEventListener('click', () => {
-   const avatarArtistUrl = normalizeAvatarArtistUrl(profileAvatarArtistUrlInput.value || currentUser?.avatar_artist_url)
+   const avatarArtistUrl = normalizeAvatarArtistUrl(
+      profileAvatarButton.dataset.artistUrl
+      || profileAvatarArtistUrlInput.value
+      || currentUser?.avatar_artist_url
+   )
+
    if (avatarArtistUrl) {
-      window.open(avatarArtistUrl, '_blank', 'noopener,noreferrer')
+      const popupWindow = window.open(avatarArtistUrl, '_blank', 'noopener,noreferrer')
+      if (!popupWindow) {
+         window.location.href = avatarArtistUrl
+      }
       return
    }
 
