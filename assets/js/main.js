@@ -337,6 +337,7 @@ function clearMsg(id) {
 const navUser     = document.getElementById('nav-user')
 const navAvatar   = document.getElementById('nav-avatar')
 const navUsername = document.getElementById('nav-username')
+const navAdminToolsBtn = document.getElementById('nav-admin-tools')
 const profileBtn  = document.getElementById('profile-btn')
 const logoutBtn   = document.getElementById('logout-btn')
 const profileAvatarInput  = document.getElementById('profile-avatar-input')
@@ -758,6 +759,13 @@ navLogo.addEventListener('click', (e) => {
    bugReportModal.classList.add('show-login')
 })
 
+if (navAdminToolsBtn) {
+   navAdminToolsBtn.addEventListener('click', async (event) => {
+      event.preventDefault()
+      await openAdminUserListModal()
+   })
+}
+
 bugReportReasonInput.addEventListener('input', () => {
    bugReportReasonCounter.textContent = `${bugReportReasonInput.value.length}/1000`
 })
@@ -1029,6 +1037,11 @@ function isAdminUser(user) {
 function canAccessAdminPanel(user) {
    const role = getUserRole(user)
    return role === USER_ROLES.ADMINISTRATOR || role === USER_ROLES.MODERATOR
+}
+
+function updateNavAdminToolsVisibility(user) {
+   if (!navAdminToolsBtn) return
+   navAdminToolsBtn.style.display = canAccessAdminPanel(user) ? 'inline-flex' : 'none'
 }
 
 function getDefaultAccentColor() {
@@ -2424,6 +2437,7 @@ function setLoggedIn(user) {
    currentUser = user
    applyUserAccentColor(user?.accent_color)
    applyStoredBackgroundForUser(user)
+   updateNavAdminToolsVisibility(user)
    loginBtn.style.display   = 'none'
    navUser.style.display    = 'flex'
    navUsername.textContent  = user.username
@@ -2438,6 +2452,7 @@ function setLoggedOut() {
    currentUser = null
    applyUserAccentColor(null)
    applyMainBackground(null)
+   updateNavAdminToolsVisibility(null)
    loginBtn.style.display  = ''
    navUser.style.display   = 'none'
    navAvatar.src           = ''

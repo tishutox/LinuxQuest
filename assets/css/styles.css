@@ -155,7 +155,14 @@ img {
   font-family: "M PLUS Rounded 1c", sans-serif;
 }
 
-.nav__logo {
+.nav__brand-actions {
+  display: inline-flex;
+  align-items: center;
+  column-gap: .8rem;
+}
+
+.nav__logo,
+.nav__admin-tools {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -169,6 +176,11 @@ img {
 .nav__logo .fi-rc-bug {
   display: inline-block;
   transform: translateY(.03em);
+}
+
+.nav__admin-tools .fi-rc-shield {
+  display: inline-block;
+  transform: translateY(.02em);
 }
 
 .nav__logo-img {
@@ -197,7 +209,7 @@ img {
   transition: color .4s;
 }
 
-:is(.nav__logo, .nav__search, .nav__login, .nav__toggle, .nav__link):hover {
+:is(.nav__logo, .nav__admin-tools, .nav__search, .nav__login, .nav__toggle, .nav__link):hover {
   color: var(--first-color);
 }
 
