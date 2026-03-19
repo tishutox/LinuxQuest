@@ -176,17 +176,17 @@ img {
 
 .nav__logo .fi-rc-bug {
   display: inline-block;
-  transform: translateY(.03em);
+  transform: translateY(.08em) !important;
 }
 
 .nav__admin-tools .fi-rc-shield {
   display: inline-block;
-  transform: translateY(.02em);
+  transform: translateY(.08em) !important;
 }
 
 .nav__developer-tools .fi-rc-code-simple {
   display: inline-block;
-  transform: translateY(.02em);
+  transform: translateY(.08em) !important;
 }
 
 .nav__logo-img {
