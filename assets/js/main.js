@@ -2146,8 +2146,8 @@ function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = [], 
             developerButton.type = 'button'
             developerButton.className = 'admin-user-list__moderator-toggle'
             developerButton.textContent = user.isDeveloper
-               ? 'Entwickler degradieren'
-               : 'Zu Entwickler befördern'
+               ? 'Entwickler*in degradieren'
+               : 'Zu Entwickler*in befördern'
 
             developerButton.addEventListener('click', async () => {
                developerButton.disabled = true
@@ -2159,12 +2159,12 @@ function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = [], 
 
                   const data = await response.json()
                   if (!response.ok) {
-                     showMsg('admin-user-list-message', data.error || 'Entwicklerstatus konnte nicht geändert werden.', 'error')
+                     showMsg('admin-user-list-message', data.error || 'Entwickler*innen-Status konnte nicht geändert werden.', 'error')
                      developerButton.disabled = false
                      return
                   }
 
-                  showMsg('admin-user-list-message', data.message || 'Entwicklerstatus aktualisiert.', 'success')
+                  showMsg('admin-user-list-message', data.message || 'Entwickler*innen-Status aktualisiert.', 'success')
                   await loadAdminUserList(adminUserListSearch.value)
                } catch (_) {
                   showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
@@ -2401,6 +2401,123 @@ async function openAdminUserListModal() {
    adminUserListModal.classList.add('show-search')
    await loadAdminUserList('')
    adminUserListSearch.focus()
+}
+
+function renderDeveloperUserList(users, bugReportUsers = []) {
+   developerUserListResults.innerHTML = ''
+
+   function createUserGroup(title, userList) {
+      const group = document.createElement('section')
+      group.className = 'search-results__group'
+
+      const heading = document.createElement('h3')
+      heading.className = 'search-results__title'
+      heading.textContent = title
+      group.appendChild(heading)
+
+      const list = document.createElement('div')
+      list.className = 'search-results__list'
+
+      if (!userList.length) {
+         const empty = document.createElement('p')
+         empty.className = 'search-results__empty'
+         empty.textContent = 'Keine User gefunden.'
+         list.appendChild(empty)
+      } else {
+         userList.forEach((user) => {
+            const item = document.createElement('button')
+            item.type = 'button'
+            item.className = 'search-results__item admin-user-list__item'
+
+            const username = document.createElement('span')
+            username.className = 'admin-user-list__username'
+            username.textContent = '@' + user.username
+
+            item.appendChild(username)
+            item.addEventListener('click', async () => {
+               await openPublicProfileByUsername(user.username)
+            })
+
+            list.appendChild(item)
+         })
+      }
+
+      group.appendChild(list)
+      return group
+   }
+
+   developerUserListResults.appendChild(createUserGroup('Bugs', bugReportUsers))
+   developerUserListResults.appendChild(createUserGroup('Nutzernamen', users))
+}
+
+let developerUserListDebounceTimer = null
+
+async function loadDeveloperUserList(query = '') {
+   if (!canAccessDeveloperPanel(currentUser)) {
+      return showMsg('developer-user-list-message', 'Kein Zugriff auf den Entwickler*innen-Bereich.', 'error')
+   }
+
+   const trimmedQuery = typeof query === 'string' ? query.trim() : ''
+
+   try {
+      const usersUrl = trimmedQuery
+         ? `/api/auth/admin/developer/users?q=${encodeURIComponent(trimmedQuery)}`
+         : '/api/auth/admin/developer/users'
+
+      const [usersResp, bugReportsResp] = await Promise.all([
+         fetch(usersUrl, { credentials: 'include' }),
+         fetch('/api/auth/admin/developer/bug-reports', { credentials: 'include' })
+      ])
+
+      const usersData = await usersResp.json()
+      if (!usersResp.ok) {
+         showMsg('developer-user-list-message', usersData.error || 'Userliste konnte nicht geladen werden.', 'error')
+         renderDeveloperUserList([], [])
+         return
+      }
+
+      const bugReportsData = bugReportsResp.ok ? await bugReportsResp.json() : { reports: [] }
+      const allUsers = Array.isArray(usersData.users) ? usersData.users : []
+      const usersByUsername = new Map(
+         allUsers
+            .filter((user) => user?.username)
+            .map((user) => [String(user.username).trim().toLowerCase(), user])
+      )
+
+      const seenBugUsernames = new Set()
+      const bugReportUsers = (Array.isArray(bugReportsData.reports) ? bugReportsData.reports : [])
+         .filter((report) => report?.closed === 0 || report?.closed === false)
+         .map((report) => report?.username ? String(report.username).trim().toLowerCase() : '')
+         .filter(Boolean)
+         .filter((normalizedUsername) => {
+            if (seenBugUsernames.has(normalizedUsername)) return false
+            seenBugUsernames.add(normalizedUsername)
+            return true
+         })
+         .map((normalizedUsername) => usersByUsername.get(normalizedUsername))
+         .filter(Boolean)
+
+      clearMsg('developer-user-list-message')
+      renderDeveloperUserList(allUsers, bugReportUsers)
+   } catch (_) {
+      showMsg('developer-user-list-message', 'Server nicht erreichbar.', 'error')
+      renderDeveloperUserList([], [])
+   }
+}
+
+async function openDeveloperUserListModal() {
+   if (!canAccessDeveloperPanel(currentUser)) {
+      return showPublicProfileNotice('Kein Zugriff auf den Entwickler*innen-Bereich.', 'error', 3000)
+   }
+
+   developerUserListSearch.value = ''
+   clearMsg('developer-user-list-message')
+   renderDeveloperUserList([], [])
+
+   hideAll()
+   developerUserListModal.classList.add('show-search')
+   await loadDeveloperUserList('')
+   developerUserListSearch.focus()
 }
 
 async function openFollowList(type) {
@@ -2851,6 +2968,21 @@ adminUserListSearch.addEventListener('input', () => {
 adminUserListForm.addEventListener('submit', (event) => {
    event.preventDefault()
    loadAdminUserList(adminUserListSearch.value)
+})
+
+developerUserListSearch.addEventListener('input', () => {
+   if (developerUserListDebounceTimer) {
+      clearTimeout(developerUserListDebounceTimer)
+   }
+
+   developerUserListDebounceTimer = setTimeout(() => {
+      loadDeveloperUserList(developerUserListSearch.value)
+   }, 200)
+})
+
+developerUserListForm.addEventListener('submit', (event) => {
+   event.preventDefault()
+   loadDeveloperUserList(developerUserListSearch.value)
 })
 
 async function openSharedProfileFromUrl() {

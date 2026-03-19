@@ -175,7 +175,7 @@ function createAuthAdminRouter({
       }
 
       if (!isAdminSessionUser(req)) {
-        return res.status(403).json({ error: 'Nur Administrator*innen können den Entwicklerstatus ändern.' });
+        return res.status(403).json({ error: 'Nur Administrator*innen können den Entwickler*innen-Status ändern.' });
       }
 
       const username = typeof req.params.username === 'string' ? req.params.username.trim() : '';
@@ -206,7 +206,7 @@ function createAuthAdminRouter({
       });
     } catch (err) {
       console.error('[ADMIN TOGGLE DEVELOPER ERROR]', err);
-      return res.status(500).json({ error: 'Entwicklerstatus konnte nicht geändert werden.' });
+      return res.status(500).json({ error: 'Entwickler*innen-Status konnte nicht geändert werden.' });
     }
   });
 
