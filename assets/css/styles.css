@@ -159,11 +159,16 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: var(--nav-icon-size);
   line-height: 1;
   color: var(--title-color);
   cursor: pointer;
   transition: color .4s;
+}
+
+.nav__logo .fi-rc-bug {
+  display: inline-block;
+  transform: translateY(.03em);
 }
 
 .nav__logo-img {
