@@ -29,6 +29,7 @@ db.exec(`
     email       TEXT    NOT NULL UNIQUE COLLATE NOCASE,
     password    TEXT    NOT NULL,
     avatar      TEXT    DEFAULT NULL,
+    avatar_artist_url TEXT DEFAULT NULL,
     birth_date  TEXT    DEFAULT NULL,
     belief      TEXT    DEFAULT NULL,
     confession  TEXT    DEFAULT NULL,
@@ -45,6 +46,7 @@ const hasAccentColorColumn = userColumns.some((column) => column.name === 'accen
 const hasProfileNameColumn = userColumns.some((column) => column.name === 'profile_name');
 const hasPronounsColumn = userColumns.some((column) => column.name === 'pronouns');
 const hasBioColumn = userColumns.some((column) => column.name === 'bio');
+const hasAvatarArtistUrlColumn = userColumns.some((column) => column.name === 'avatar_artist_url');
 const hasBirthDateColumn = userColumns.some((column) => column.name === 'birth_date');
 const hasBeliefColumn = userColumns.some((column) => column.name === 'belief');
 const hasConfessionColumn = userColumns.some((column) => column.name === 'confession');
@@ -71,6 +73,10 @@ if (!hasPronounsColumn) {
 
 if (!hasBioColumn) {
   db.exec('ALTER TABLE users ADD COLUMN bio TEXT');
+}
+
+if (!hasAvatarArtistUrlColumn) {
+  db.exec('ALTER TABLE users ADD COLUMN avatar_artist_url TEXT');
 }
 
 if (!hasBirthDateColumn) {

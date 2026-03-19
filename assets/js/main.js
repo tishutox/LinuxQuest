@@ -360,6 +360,7 @@ const profileDisplayNameCounter = document.getElementById('profile-display-name-
 const profileUsernameCounter = document.getElementById('profile-username-counter')
 const profileBioInput = document.getElementById('profile-bio-input')
 const profileBioCounter = document.getElementById('profile-bio-counter')
+const profileAvatarArtistUrlInput = document.getElementById('profile-avatar-artist-url-input')
 const profileBirthDateOpen = document.getElementById('profile-birth-date-open')
 const profileBirthDateValue = document.getElementById('profile-birth-date-value')
 const profileBirthDateInput = document.getElementById('profile-birth-date-input')
@@ -1135,6 +1136,21 @@ function normalizePronouns(value) {
 function normalizeBio(value) {
    if (typeof value !== 'string') return ''
    return value.replace(/\r\n?/g, '\n').trim()
+}
+
+function normalizeAvatarArtistUrl(value) {
+   if (typeof value !== 'string') return ''
+   const trimmed = value.trim()
+   if (!trimmed) return ''
+
+   try {
+      const parsedUrl = new URL(trimmed)
+      const protocol = parsedUrl.protocol.toLowerCase()
+      if (protocol !== 'http:' && protocol !== 'https:') return ''
+      return parsedUrl.toString()
+   } catch (_) {
+      return ''
+   }
 }
 
 function updateCounter(el, value, max) {
@@ -2585,6 +2601,9 @@ async function openFollowList(type) {
 
 function updateProfileView(user) {
    profileAvatarImage.src  = getAvatarUrl(user)
+   const avatarArtistUrl = normalizeAvatarArtistUrl(user?.avatar_artist_url)
+   profileAvatarArtistUrlInput.value = avatarArtistUrl
+   profileAvatarButton.title = avatarArtistUrl ? 'Original vom Artist öffnen' : 'Profilbild ändern'
    profileFullNameInput.value = user.full_name
    profileDisplayNameInput.value = getProfileDisplayName(user)
    updateDisplayNameCounter(profileDisplayNameInput.value)
@@ -2691,6 +2710,7 @@ function setLoggedOut() {
    updatePronounsCounter('')
    profileBioInput.value = ''
    updateBioCounter('')
+   profileAvatarArtistUrlInput.value = ''
    profileBirthDateInput.value = ''
    updateBirthDateSummary('')
    profileBeliefInput.value = ''
@@ -2704,6 +2724,7 @@ function setLoggedOut() {
    profileDisplayName.textContent = ''
    profileDisplayName.style.display = 'none'
    profileUsername.textContent = ''
+   profileAvatarButton.title = 'Profilbild ändern'
    profileShareLinkInput.value = ''
    if (profileBackgroundInput) {
       profileBackgroundInput.value = ''
@@ -3048,7 +3069,15 @@ async function openSharedProfileFromUrl() {
 }
 
 profileBtn.addEventListener('click', showProfileModal)
-profileAvatarButton.addEventListener('click', () => profileAvatarInput.click())
+profileAvatarButton.addEventListener('click', () => {
+   const avatarArtistUrl = normalizeAvatarArtistUrl(profileAvatarArtistUrlInput.value || currentUser?.avatar_artist_url)
+   if (avatarArtistUrl) {
+      window.open(avatarArtistUrl, '_blank', 'noopener,noreferrer')
+      return
+   }
+
+   profileAvatarInput.click()
+})
 profileAccentColorOpen.addEventListener('click', openAccentColorModal)
 profileBirthDateOpen.addEventListener('click', openBirthDateModal)
 profileBeliefOpen.addEventListener('click', openBeliefModal)
@@ -3320,6 +3349,8 @@ profileForm.addEventListener('submit', async (e) => {
    const profile_name = profileDisplayNameInput.value
    const pronouns = normalizePronouns(profilePronounsInput.value)
    const bio = normalizeBio(profileBioInput.value)
+   const avatar_artist_url_raw = profileAvatarArtistUrlInput.value
+   const avatar_artist_url = normalizeAvatarArtistUrl(avatar_artist_url_raw)
    const birth_date = profileBirthDateInput.value.trim()
    const belief = profileBeliefInput.value.trim()
    const confession = profileConfessionInput.value.trim()
@@ -3345,6 +3376,14 @@ profileForm.addEventListener('submit', async (e) => {
 
    if (bio.length > 200) {
       return showMsg('profile-message', 'Die Bio darf maximal 200 Zeichen lang sein.', 'error')
+   }
+
+   if (typeof avatar_artist_url_raw === 'string' && avatar_artist_url_raw.trim() && !avatar_artist_url) {
+      return showMsg('profile-message', 'Der Artist-Link muss mit http:// oder https:// beginnen und gültig sein.', 'error')
+   }
+
+   if (avatar_artist_url.length > 500) {
+      return showMsg('profile-message', 'Der Artist-Link darf maximal 500 Zeichen lang sein.', 'error')
    }
 
    if (birth_date && !parseBirthDate(birth_date)) {
@@ -3375,7 +3414,7 @@ profileForm.addEventListener('submit', async (e) => {
          method: 'POST',
          credentials: 'include',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ full_name, profile_name, pronouns, bio, birth_date, belief, confession, username, accent_color })
+         body: JSON.stringify({ full_name, profile_name, pronouns, bio, avatar_artist_url, birth_date, belief, confession, username, accent_color })
       })
       const data = await res.json()
 

@@ -18,7 +18,8 @@ function createAuthProfileRouter({
   normalizeBelief,
   normalizeConfession,
   normalizePronouns,
-  normalizeBio
+  normalizeBio,
+  normalizeAvatarArtistUrl
 }) {
   const router = express.Router();
 
@@ -101,7 +102,7 @@ function createAuthProfileRouter({
       }
 
       const user = db.prepare(`
-        SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at, is_restricted
+        SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, avatar_artist_url, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at, is_restricted
         FROM users
         WHERE username = ?
       `).get(username);
@@ -300,7 +301,7 @@ function createAuthProfileRouter({
       db.prepare("UPDATE users SET username = ?, last_active_at = datetime('now') WHERE id = ?")
         .run(newUsername, req.session.userId);
 
-      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at FROM users WHERE id = ?')
+      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, avatar_artist_url, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at FROM users WHERE id = ?')
         .get(req.session.userId);
 
       return res.json({ message: 'Benutzername aktualisiert!', user: withResolvedRole(user) });
@@ -356,7 +357,7 @@ function createAuthProfileRouter({
         return res.status(403).json({ error: 'Dein Profil ist eingeschränkt und kann nicht modifiziert werden. Du kannst ein Freigabeticket einreichen.' });
       }
 
-      const { full_name, profile_name, pronouns, bio, birth_date, belief, confession, username, accent_color } = req.body;
+      const { full_name, profile_name, pronouns, bio, avatar_artist_url, birth_date, belief, confession, username, accent_color } = req.body;
 
       if (!full_name || !username) {
         return res.status(400).json({ error: 'Vollständiger Name und Benutzername sind erforderlich.' });
@@ -425,6 +426,12 @@ function createAuthProfileRouter({
         return res.status(400).json({ error: 'Die Bio darf maximal 200 Zeichen lang sein.' });
       }
 
+      const hasAvatarArtistUrlInput = typeof avatar_artist_url === 'string' && avatar_artist_url.trim().length > 0;
+      const normalizedAvatarArtistUrl = normalizeAvatarArtistUrl(avatar_artist_url);
+      if (hasAvatarArtistUrlInput && !normalizedAvatarArtistUrl) {
+        return res.status(400).json({ error: 'Der Artist-Link muss mit http:// oder https:// beginnen und gültig sein.' });
+      }
+
       const existing = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?')
         .get(trimmedUsername, req.session.userId);
 
@@ -432,10 +439,10 @@ function createAuthProfileRouter({
         return res.status(409).json({ error: 'Dieser Benutzername ist bereits vergeben.' });
       }
 
-      db.prepare("UPDATE users SET full_name = ?, profile_name = ?, pronouns = ?, bio = ?, birth_date = ?, belief = ?, confession = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
-        .run(trimmedName, trimmedProfileName || null, normalizedPronouns, normalizedBio, normalizedBirthDate, normalizedBelief, normalizedConfession, trimmedUsername, normalizedAccentColor, req.session.userId);
+      db.prepare("UPDATE users SET full_name = ?, profile_name = ?, pronouns = ?, bio = ?, avatar_artist_url = ?, birth_date = ?, belief = ?, confession = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
+        .run(trimmedName, trimmedProfileName || null, normalizedPronouns, normalizedBio, normalizedAvatarArtistUrl, normalizedBirthDate, normalizedBelief, normalizedConfession, trimmedUsername, normalizedAccentColor, req.session.userId);
 
-      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at FROM users WHERE id = ?')
+      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, avatar_artist_url, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at FROM users WHERE id = ?')
         .get(req.session.userId);
 
       return res.json({ message: 'Profil aktualisiert!', user: withResolvedRole(user) });

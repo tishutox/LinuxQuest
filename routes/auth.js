@@ -332,6 +332,23 @@ function normalizeBio(bioValue) {
   return normalizedBio;
 }
 
+function normalizeAvatarArtistUrl(urlValue) {
+  if (typeof urlValue !== 'string') return null;
+
+  const trimmedUrl = urlValue.trim();
+  if (!trimmedUrl) return null;
+  if (trimmedUrl.length > 500) return null;
+
+  try {
+    const parsed = new URL(trimmedUrl);
+    const protocol = (parsed.protocol || '').toLowerCase();
+    if (protocol !== 'http:' && protocol !== 'https:') return null;
+    return parsed.toString();
+  } catch (_) {
+    return null;
+  }
+}
+
 function shouldGrantEarlySupporterNow() {
   return Date.now() < new Date('2026-06-18T00:00:00').getTime();
 }
@@ -431,7 +448,8 @@ router.use('/', createAuthProfileRouter({
   normalizeBelief,
   normalizeConfession,
   normalizePronouns,
-  normalizeBio
+  normalizeBio,
+  normalizeAvatarArtistUrl
 }));
 
 router.use('/', createAuthCoreRouter({
