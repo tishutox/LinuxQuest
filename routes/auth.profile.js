@@ -336,7 +336,7 @@ function createAuthProfileRouter({
 
       deleteOldAvatar(currentUser.avatar);
 
-      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at FROM users WHERE id = ?')
+      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, avatar_artist_url, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at FROM users WHERE id = ?')
         .get(req.session.userId);
 
       return res.json({ message: 'Profilbild aktualisiert!', user: withResolvedRole(user) });

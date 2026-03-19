@@ -3070,18 +3070,33 @@ async function openSharedProfileFromUrl() {
 }
 
 profileBtn.addEventListener('click', showProfileModal)
-profileAvatarButton.addEventListener('click', () => {
-   const avatarArtistUrl = normalizeAvatarArtistUrl(
+profileAvatarButton.addEventListener('click', async (event) => {
+   event.preventDefault()
+
+   let avatarArtistUrl = normalizeAvatarArtistUrl(
       profileAvatarButton.dataset.artistUrl
       || profileAvatarArtistUrlInput.value
       || currentUser?.avatar_artist_url
    )
 
-   if (avatarArtistUrl) {
-      const popupWindow = window.open(avatarArtistUrl, '_blank', 'noopener,noreferrer')
-      if (!popupWindow) {
-         window.location.href = avatarArtistUrl
+   if (!avatarArtistUrl && currentUser) {
+      try {
+         const res = await fetch('/api/auth/me', { credentials: 'include' })
+         if (res.ok) {
+            const data = await res.json()
+            if (data?.user) {
+               currentUser = data.user
+               avatarArtistUrl = normalizeAvatarArtistUrl(data.user.avatar_artist_url)
+               profileAvatarButton.dataset.artistUrl = avatarArtistUrl
+               profileAvatarButton.title = avatarArtistUrl ? 'Original vom Artist öffnen' : 'Profilbild ändern'
+            }
+         }
+      } catch (_) {
       }
+   }
+
+   if (avatarArtistUrl) {
+      window.location.assign(avatarArtistUrl)
       return
    }
 
