@@ -339,11 +339,10 @@ function clearMsg(id) {
 /*=============== NAV – reflect logged-in user ===============*/
 const navUser     = document.getElementById('nav-user')
 const navAvatar   = document.getElementById('nav-avatar')
-const navUsername = document.getElementById('nav-username')
 const navAdminToolsBtn = document.getElementById('nav-admin-tools')
 const navDeveloperToolsBtn = document.getElementById('nav-developer-tools')
 const profileBtn  = document.getElementById('profile-btn')
-const logoutBtn   = document.getElementById('logout-btn')
+const profileLogoutBtn = document.getElementById('profile-logout-btn')
 const profileAvatarInput  = document.getElementById('profile-avatar-input')
 const profileAvatarButton = document.getElementById('profile-avatar-button')
 const profileAvatarImage  = document.getElementById('profile-avatar-image')
@@ -2684,7 +2683,6 @@ function setLoggedIn(user) {
    updateNavDeveloperToolsVisibility(user)
    loginBtn.style.display   = 'none'
    navUser.style.display    = 'flex'
-   navUsername.textContent  = user.username
    navAvatar.src = getAvatarUrl(user)
    updateProfileView(user)
    refreshProjectContacts()
@@ -2701,7 +2699,6 @@ function setLoggedOut() {
    loginBtn.style.display  = ''
    navUser.style.display   = 'none'
    navAvatar.src           = ''
-   navUsername.textContent = ''
    profileAvatarImage.src  = ''
    profileFullNameInput.value = ''
    profileDisplayNameInput.value = ''
@@ -3536,9 +3533,10 @@ async function checkSession() {
 checkSession()
 
 /*=============== LOGOUT ===============*/
-logoutBtn.addEventListener('click', async () => {
+profileLogoutBtn.addEventListener('click', async () => {
    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
    setLoggedOut()
+   showLogin()
 })
 
 /*=============== LOGIN ===============*/

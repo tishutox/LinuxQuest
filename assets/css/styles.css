@@ -5,6 +5,7 @@
 :root {
   --header-height: 3.5rem;
   --nav-icon-size: 1.25rem;
+  --nav-action-size: 2rem;
 
   /*========== Colors ==========*/
   /*Color mode HSL(hue, saturation, lightness)*/
@@ -167,26 +168,13 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: var(--nav-action-size);
+  height: var(--nav-action-size);
   font-size: var(--nav-icon-size);
   line-height: 1;
   color: var(--title-color);
   cursor: pointer;
   transition: color .4s;
-}
-
-.nav__logo .fi-rc-bug {
-  display: inline-block;
-  transform: translateY(.08em) !important;
-}
-
-.nav__admin-tools .fi-rc-shield {
-  display: inline-block;
-  transform: translateY(.08em) !important;
-}
-
-.nav__developer-tools .fi-rc-code-simple {
-  display: inline-block;
-  transform: translateY(.08em) !important;
 }
 
 .nav__logo-img {
@@ -208,6 +196,8 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: var(--nav-action-size);
+  height: var(--nav-action-size);
   font-size: var(--nav-icon-size);
   line-height: 1;
   color: var(--title-color);
@@ -877,14 +867,18 @@ body.user-theme-active #belief-modal .belief-picker__religion {
 .nav__user {
   display: flex;
   align-items: center;
-  column-gap: .5rem;
+  justify-content: center;
+  width: var(--nav-action-size);
+  height: var(--nav-action-size);
   line-height: 1;
 }
 
 .nav__profile-trigger {
   display: inline-flex;
   align-items: center;
-  column-gap: .5rem;
+  justify-content: center;
+  width: var(--nav-action-size);
+  height: var(--nav-action-size);
   border: none;
   background: none;
   padding: 0;
@@ -907,32 +901,6 @@ body.user-theme-active .nav__avatar {
   .nav__avatar {
     border-width: 1px;
   }
-}
-
-.nav__username {
-  display: inline-flex;
-  align-items: center;
-  font-weight: var(--font-semi-bold);
-  color: var(--title-color);
-  font-size: var(--normal-font-size);
-  line-height: 1;
-}
-
-.nav__logout {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  font-size: 1.2rem;
-  color: var(--text-color);
-  cursor: pointer;
-  transition: color .3s;
-  padding: 0;
-  line-height: 1;
-}
-
-.nav__logout:hover {
-  color: hsl(0, 75%, 56%);
 }
 
 .profile__form {
