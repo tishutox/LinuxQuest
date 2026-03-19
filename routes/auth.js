@@ -339,8 +339,10 @@ function normalizeAvatarArtistUrl(urlValue) {
   if (!trimmedUrl) return null;
   if (trimmedUrl.length > 500) return null;
 
+  const candidateUrl = /^https?:\/\//i.test(trimmedUrl) ? trimmedUrl : `https://${trimmedUrl}`;
+
   try {
-    const parsed = new URL(trimmedUrl);
+    const parsed = new URL(candidateUrl);
     const protocol = (parsed.protocol || '').toLowerCase();
     if (protocol !== 'http:' && protocol !== 'https:') return null;
     return parsed.toString();
