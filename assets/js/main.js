@@ -436,8 +436,8 @@ const adminReportsTitle = document.getElementById('admin-reports-title')
 const adminReportsMessage = document.getElementById('admin-reports-message')
 const adminReportsList = document.getElementById('admin-reports-list')
 const adminReportsCloseBtn = document.getElementById('admin-reports-close-btn')
+const adminReportsTabs = document.querySelector('.admin-reports__tabs')
 const adminReportsTabMeldungen = document.getElementById('admin-reports-tab-meldungen')
-const adminReportsTabBugs = document.getElementById('admin-reports-tab-bugs')
 const adminReportsTabEntbannungen = document.getElementById('admin-reports-tab-entbannungen')
 const adminBugReportsList = document.getElementById('admin-bug-reports-list')
 const adminUnbanRequestsList = document.getElementById('admin-unban-requests-list')
@@ -495,9 +495,8 @@ function setAdminReportsTab(tab = 'meldungen') {
       adminUnbanRequestsList.style.display = isEntbannungen ? 'block' : 'none'
    }
 
-   if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannungen) {
+   if (adminReportsTabMeldungen && adminReportsTabEntbannungen) {
       adminReportsTabMeldungen.classList.toggle('active', isMeldungen)
-      adminReportsTabBugs.classList.toggle('active', isBugs)
       adminReportsTabEntbannungen.classList.toggle('active', isEntbannungen)
    }
 }
@@ -715,6 +714,9 @@ async function openAdminReports(username, initialTab = 'meldungen') {
 
    clearMsg('admin-reports-message')
    adminReportsTitle.textContent = `Tickets für @${username}`
+   if (adminReportsTabs) {
+      adminReportsTabs.style.display = ''
+   }
    adminReportsList.innerHTML = ''
    adminBugReportsList.innerHTML = ''
    adminUnbanRequestsList.innerHTML = ''
@@ -726,9 +728,25 @@ async function openAdminReports(username, initialTab = 'meldungen') {
    await loadAdminReportsForUser(username)
    await loadAdminUnbanRequests(username)
 
-   if (initialTab === 'bugs') {
-      await loadAdminBugReports(username)
+}
+
+async function openDeveloperBugReports(username) {
+   if (!username) return
+
+   clearMsg('admin-reports-message')
+   adminReportsTitle.textContent = `Bugs für @${username}`
+   if (adminReportsTabs) {
+      adminReportsTabs.style.display = 'none'
    }
+   adminReportsList.innerHTML = ''
+   adminBugReportsList.innerHTML = ''
+   adminUnbanRequestsList.innerHTML = ''
+   setAdminReportsTab('bugs')
+
+   hideAll()
+   adminReportsModal.classList.add('show-login')
+
+   await loadAdminBugReports(username)
 }
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
@@ -946,15 +964,10 @@ async function loadAdminBugReports(targetUsername = '') {
 }
 
 // Admin reports tab handling
-if (adminReportsTabMeldungen && adminReportsTabBugs && adminReportsTabEntbannungen) {
+if (adminReportsTabMeldungen && adminReportsTabEntbannungen) {
    adminReportsTabMeldungen.addEventListener('click', async () => {
       if (!currentAdminReportsUsername) return
       await openAdminReports(currentAdminReportsUsername, 'meldungen')
-   })
-
-   adminReportsTabBugs.addEventListener('click', async () => {
-      if (!currentAdminReportsUsername) return
-      await openAdminReports(currentAdminReportsUsername, 'bugs')
    })
 
    adminReportsTabEntbannungen.addEventListener('click', async () => {
@@ -1537,19 +1550,22 @@ function updatePublicProfileEarlySupporter(isEarlySupporter) {
 
 function updatePublicProfileDeveloper(isDeveloper) {
    if (!publicProfileDeveloper) return
+   const viewerCanAccessDeveloperPanel = canAccessDeveloperPanel(currentUser)
 
    if (!isDeveloper) {
       publicProfileDeveloper.style.display = 'none'
       publicProfileDeveloper.innerHTML = ''
       setPublicProfileTooltip(publicProfileDeveloper, '')
       publicProfileDeveloper.setAttribute('aria-label', 'Entwickler*in')
+      publicProfileDeveloper.dataset.action = ''
       return
    }
 
    publicProfileDeveloper.style.display = 'inline-flex'
    publicProfileDeveloper.innerHTML = '<i class="fi fi-rc-code-simple"></i>'
    setPublicProfileTooltip(publicProfileDeveloper, 'Entwickler*in')
-   publicProfileDeveloper.setAttribute('aria-label', 'Entwickler*in')
+   publicProfileDeveloper.setAttribute('aria-label', viewerCanAccessDeveloperPanel ? 'Entwickler*innen-Bereich öffnen' : 'Entwickler*in')
+   publicProfileDeveloper.dataset.action = viewerCanAccessDeveloperPanel ? 'open-developer-list' : 'role-label'
 }
 
 function hslToHex(h, s, l) {
@@ -2046,7 +2062,7 @@ function renderFollowList(users) {
    })
 }
 
-function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = [], bugReportUsers = []) {
+function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = []) {
    adminUserListResults.innerHTML = ''
    const viewerIsAdministrator = isAdminUser(currentUser)
 
@@ -2292,12 +2308,6 @@ function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = [], 
       return group
    }
 
-   const bugsGroup = createUserGroup('Bugs', bugReportUsers, {
-      reportsLabel: 'Tickets',
-      initialReportsTab: 'bugs'
-   })
-   adminUserListResults.appendChild(bugsGroup)
-
    const unbanRequestsGroup = createUserGroup('Freigaben', unbanRequestUsers, {
       reportsLabel: 'Freigaben',
       initialReportsTab: 'entbannungen'
@@ -2325,11 +2335,10 @@ async function loadAdminUserList(query = '') {
          ? `/api/auth/admin/users/with-open-reports?q=${encodeURIComponent(trimmedQuery)}`
          : '/api/auth/admin/users/with-open-reports'
 
-      const [usersResp, reportsResp, unbanRequestsResp, bugReportsResp] = await Promise.all([
+      const [usersResp, reportsResp, unbanRequestsResp] = await Promise.all([
          fetch(usersUrl, { credentials: 'include' }),
          fetch(reportsUrl, { credentials: 'include' }),
-         fetch('/api/auth/admin/unban-requests', { credentials: 'include' }),
-         fetch('/api/auth/admin/bug-reports', { credentials: 'include' })
+         fetch('/api/auth/admin/unban-requests', { credentials: 'include' })
       ])
 
       const usersData = await usersResp.json()
@@ -2341,7 +2350,6 @@ async function loadAdminUserList(query = '') {
 
       const reportsData = reportsResp.ok ? await reportsResp.json() : { users: [] }
       const unbanRequestsData = unbanRequestsResp.ok ? await unbanRequestsResp.json() : { requests: [] }
-      const bugReportsData = bugReportsResp.ok ? await bugReportsResp.json() : { reports: [] }
 
       const allUsers = Array.isArray(usersData.users) ? usersData.users : []
       const usersByUsername = new Map(
@@ -2362,25 +2370,11 @@ async function loadAdminUserList(query = '') {
          .map((normalizedUsername) => usersByUsername.get(normalizedUsername))
          .filter(Boolean)
 
-      const seenBugUsernames = new Set()
-      const bugReportUsers = (Array.isArray(bugReportsData.reports) ? bugReportsData.reports : [])
-         .filter((report) => report?.closed === 0 || report?.closed === false)
-         .map((report) => report?.username ? String(report.username).trim().toLowerCase() : '')
-         .filter(Boolean)
-         .filter((normalizedUsername) => {
-            if (seenBugUsernames.has(normalizedUsername)) return false
-            seenBugUsernames.add(normalizedUsername)
-            return true
-         })
-         .map((normalizedUsername) => usersByUsername.get(normalizedUsername))
-         .filter(Boolean)
-
       clearMsg('admin-user-list-message')
       renderAdminUserList(
          allUsers,
          Array.isArray(reportsData.users) ? reportsData.users : [],
-         unbanRequestUsers,
-         bugReportUsers
+         unbanRequestUsers
       )
    } catch (_) {
       showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
@@ -2425,20 +2419,54 @@ function renderDeveloperUserList(users, bugReportUsers = []) {
          list.appendChild(empty)
       } else {
          userList.forEach((user) => {
-            const item = document.createElement('button')
-            item.type = 'button'
+            const wrap = document.createElement('div')
+            wrap.className = 'admin-user-list__item-wrap'
+
+            const item = document.createElement('div')
             item.className = 'search-results__item admin-user-list__item'
 
-            const username = document.createElement('span')
-            username.className = 'admin-user-list__username'
-            username.textContent = '@' + user.username
+            const menuButton = document.createElement('button')
+            menuButton.type = 'button'
+            menuButton.className = 'admin-user-list__menu'
+            menuButton.innerHTML = '<i class="fi fi-rr-menu-dots-vertical"></i>'
+            menuButton.title = 'Aktionen'
+            menuButton.setAttribute('aria-label', `Aktionen für @${user.username}`)
 
-            item.appendChild(username)
-            item.addEventListener('click', async () => {
+            const usernameButton = document.createElement('button')
+            usernameButton.type = 'button'
+            usernameButton.className = 'admin-user-list__username'
+            usernameButton.textContent = '@' + user.username
+
+            usernameButton.addEventListener('click', async () => {
                await openPublicProfileByUsername(user.username)
             })
 
-            list.appendChild(item)
+            const actions = document.createElement('div')
+            actions.className = 'admin-user-list__actions'
+
+            const bugsButton = document.createElement('button')
+            bugsButton.type = 'button'
+            bugsButton.className = 'admin-user-list__reports'
+            bugsButton.textContent = 'Bugs ansehen'
+            bugsButton.addEventListener('click', async () => {
+               await openDeveloperBugReports(user.username)
+            })
+
+            actions.appendChild(bugsButton)
+
+            menuButton.addEventListener('click', () => {
+               developerUserListResults.querySelectorAll('.admin-user-list__actions').forEach((el) => {
+                  if (el !== actions) el.classList.remove('is-open')
+               })
+               actions.classList.toggle('is-open')
+            })
+
+            item.appendChild(menuButton)
+            item.appendChild(usernameButton)
+            wrap.appendChild(item)
+            wrap.appendChild(actions)
+
+            list.appendChild(wrap)
          })
       }
 
@@ -2929,9 +2957,36 @@ publicProfileEarlySupporter.addEventListener('click', (event) => {
 })
 
 if (publicProfileDeveloper) {
-   publicProfileDeveloper.addEventListener('click', (event) => {
+   publicProfileDeveloper.addEventListener('click', async (event) => {
+      const canOpenDeveloperList = publicProfileDeveloper.dataset.action === 'open-developer-list'
+
+      if (hasTouchTooltipInteraction()) {
+         event.preventDefault()
+
+         const tooltipVisible = publicProfileDeveloper.classList.contains('is-tooltip-visible')
+         if (!tooltipVisible) {
+            showPublicProfileTooltip(publicProfileDeveloper, { autoHide: !canOpenDeveloperList })
+            return
+         }
+
+         if (!canOpenDeveloperList) {
+            showPublicProfileTooltip(publicProfileDeveloper, { autoHide: true })
+            return
+         }
+
+         hidePublicProfileTooltip(publicProfileDeveloper)
+         await openDeveloperUserListModal()
+         return
+      }
+
+      if (!canOpenDeveloperList) {
+         event.preventDefault()
+         showPublicProfileTooltip(publicProfileDeveloper, { autoHide: false })
+         return
+      }
+
       event.preventDefault()
-      showPublicProfileTooltip(publicProfileDeveloper, { autoHide: hasTouchTooltipInteraction() })
+      await openDeveloperUserListModal()
    })
 }
 
