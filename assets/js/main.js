@@ -3086,41 +3086,16 @@ async function openSharedProfileFromUrl() {
 }
 
 profileBtn.addEventListener('click', showProfileModal)
-profileAvatarButton.addEventListener('click', async (event) => {
-   const existingHref = profileAvatarButton.getAttribute('href')
-   if (existingHref) return
-
-   event.preventDefault()
-
-   let avatarArtistUrl = normalizeAvatarArtistUrl(
-      profileAvatarButton.dataset.artistUrl
-      || profileAvatarArtistUrlInput.value
-      || currentUser?.avatar_artist_url
-   )
-
-   if (!avatarArtistUrl && currentUser) {
-      try {
-         const res = await fetch('/api/auth/me', { credentials: 'include' })
-         if (res.ok) {
-            const data = await res.json()
-            if (data?.user) {
-               currentUser = data.user
-               avatarArtistUrl = syncProfileAvatarArtistLink(data.user.avatar_artist_url)
-            }
-         }
-      } catch (_) {
-      }
-   }
-
-   if (avatarArtistUrl) {
-      window.open(avatarArtistUrl, '_blank', 'noopener,noreferrer')
-      return
-   }
-
+profileAvatarButton.addEventListener('click', () => {
    profileAvatarInput.click()
 })
 profileAvatarArtistUrlInput.addEventListener('input', () => {
    syncProfileAvatarArtistLink(profileAvatarArtistUrlInput.value)
+})
+publicProfileAvatar.addEventListener('click', () => {
+   if (currentPublicProfileUser?.avatar_artist_url) {
+      window.open(currentPublicProfileUser.avatar_artist_url, '_blank', 'noopener,noreferrer')
+   }
 })
 profileAccentColorOpen.addEventListener('click', openAccentColorModal)
 profileBirthDateOpen.addEventListener('click', openBirthDateModal)
