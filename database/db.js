@@ -51,6 +51,7 @@ const hasConfessionColumn = userColumns.some((column) => column.name === 'confes
 const hasEarlySupporterColumn = userColumns.some((column) => column.name === 'early_supporter');
 const hasRoleColumn = userColumns.some((column) => column.name === 'role');
 const hasIsRestrictedColumn = userColumns.some((column) => column.name === 'is_restricted');
+const hasIsDeveloperColumn = userColumns.some((column) => column.name === 'is_developer');
 
 if (!hasLastActiveColumn) {
   db.exec('ALTER TABLE users ADD COLUMN last_active_at TEXT');
@@ -96,11 +97,23 @@ if (!hasIsRestrictedColumn) {
   db.exec('ALTER TABLE users ADD COLUMN is_restricted INTEGER NOT NULL DEFAULT 0');
 }
 
+if (!hasIsDeveloperColumn) {
+  db.exec('ALTER TABLE users ADD COLUMN is_developer INTEGER NOT NULL DEFAULT 0');
+}
+
 db.exec(`
   UPDATE users
   SET role = CASE
     WHEN LOWER(COALESCE(role, '')) IN ('user', 'moderator', 'administrator') THEN LOWER(role)
     ELSE 'user'
+  END
+`);
+
+db.exec(`
+  UPDATE users
+  SET is_developer = CASE
+    WHEN COALESCE(is_developer, 0) = 1 THEN 1
+    ELSE 0
   END
 `);
 

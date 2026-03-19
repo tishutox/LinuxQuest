@@ -28,13 +28,13 @@ function createAuthAdminRouter({
 
       const users = query
         ? db.prepare(`
-            SELECT id, username, profile_name, full_name, email, avatar, accent_color, role, is_restricted
+            SELECT id, username, profile_name, full_name, email, avatar, accent_color, role, is_restricted, is_developer
             FROM users
             WHERE username LIKE ? COLLATE NOCASE
             ORDER BY username COLLATE NOCASE ASC
           `).all(`%${query}%`)
         : db.prepare(`
-            SELECT id, username, profile_name, full_name, email, avatar, accent_color, role, is_restricted
+            SELECT id, username, profile_name, full_name, email, avatar, accent_color, role, is_restricted, is_developer
             FROM users
             ORDER BY username COLLATE NOCASE ASC
           `).all();
@@ -50,7 +50,8 @@ function createAuthAdminRouter({
         accent_color: user.accent_color,
         role: getRoleFromUserRecord(user),
         isProtected: isProtectedEmail(user.email),
-        isRestricted: user.is_restricted === 1
+        isRestricted: user.is_restricted === 1,
+        isDeveloper: user.is_developer === 1
       }));
 
       return res.json({ query, users: sanitizedUsers });
@@ -163,6 +164,48 @@ function createAuthAdminRouter({
     } catch (err) {
       console.error('[ADMIN TOGGLE MODERATOR ERROR]', err);
       return res.status(500).json({ error: 'Rolle konnte nicht geändert werden.' });
+    }
+  });
+
+  router.patch('/users/:username/developer-toggle', (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: 'Nicht authentifiziert.' });
+      }
+
+      if (!isAdminSessionUser(req)) {
+        return res.status(403).json({ error: 'Nur Administrator*innen können den Entwicklerstatus ändern.' });
+      }
+
+      const username = typeof req.params.username === 'string' ? req.params.username.trim() : '';
+      if (!username) {
+        return res.status(400).json({ error: 'Ungültiger Benutzername.' });
+      }
+
+      const targetUser = db.prepare(`
+        SELECT id, username, is_developer
+        FROM users
+        WHERE username = ? COLLATE NOCASE
+      `).get(username);
+
+      if (!targetUser) {
+        return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+      }
+
+      const nextDeveloperStatus = targetUser.is_developer === 1 ? 0 : 1;
+
+      db.prepare('UPDATE users SET is_developer = ? WHERE id = ?').run(nextDeveloperStatus, targetUser.id);
+
+      return res.json({
+        message: nextDeveloperStatus === 1
+          ? `@${targetUser.username} wurde zum Entwickler befördert.`
+          : `@${targetUser.username} wurde vom Entwicklerstatus zurückgestuft.`,
+        isDeveloper: nextDeveloperStatus === 1,
+        username: targetUser.username
+      });
+    } catch (err) {
+      console.error('[ADMIN TOGGLE DEVELOPER ERROR]', err);
+      return res.status(500).json({ error: 'Entwicklerstatus konnte nicht geändert werden.' });
     }
   });
 
@@ -327,7 +370,7 @@ function createAuthAdminRouter({
 
       const users = query
         ? db.prepare(`
-            SELECT DISTINCT u.id, u.username, u.profile_name, u.full_name, u.email, u.avatar, u.accent_color, u.role
+            SELECT DISTINCT u.id, u.username, u.profile_name, u.full_name, u.email, u.avatar, u.accent_color, u.role, u.is_developer
             FROM users u
             INNER JOIN reports r ON r.reported_user_id = u.id
             WHERE r.closed = 0
@@ -335,7 +378,7 @@ function createAuthAdminRouter({
             ORDER BY u.username COLLATE NOCASE ASC
           `).all(`%${query}%`)
         : db.prepare(`
-            SELECT DISTINCT u.id, u.username, u.profile_name, u.full_name, u.email, u.avatar, u.accent_color, u.role
+            SELECT DISTINCT u.id, u.username, u.profile_name, u.full_name, u.email, u.avatar, u.accent_color, u.role, u.is_developer
             FROM users u
             INNER JOIN reports r ON r.reported_user_id = u.id
             WHERE r.closed = 0
@@ -350,7 +393,8 @@ function createAuthAdminRouter({
         avatar: user.avatar,
         accent_color: user.accent_color,
         role: getRoleFromUserRecord(user),
-        isProtected: isProtectedEmail(user.email)
+        isProtected: isProtectedEmail(user.email),
+        isDeveloper: user.is_developer === 1
       }));
 
       return res.json({ query, users: sanitizedUsers });

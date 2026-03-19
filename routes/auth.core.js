@@ -251,7 +251,7 @@ function createAuthCoreRouter({
 
       db.prepare('DELETE FROM email_verifications WHERE email = ?').run(normalizeEmail(email));
 
-      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at FROM users WHERE id = ?')
+      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at FROM users WHERE id = ?')
         .get(info.lastInsertRowid);
 
       return res.status(201).json({ message: 'Konto erfolgreich erstellt!', user: withResolvedRole(user) });
@@ -286,7 +286,7 @@ function createAuthCoreRouter({
       grantEarlySupporterStatus(user.id);
 
       const refreshedUser = db.prepare(`
-      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at, is_restricted
+      SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at, is_restricted
       FROM users
       WHERE id = ?
     `).get(user.id);
@@ -316,7 +316,7 @@ function createAuthCoreRouter({
     if (!req.session.userId) return res.status(401).json({ error: 'Nicht authentifiziert.' });
 
     const user = db.prepare(
-      'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at, is_restricted FROM users WHERE id = ?'
+      'SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at, is_restricted FROM users WHERE id = ?'
     ).get(req.session.userId);
 
     if (!user) return res.status(401).json({ error: 'Benutzer nicht gefunden.' });

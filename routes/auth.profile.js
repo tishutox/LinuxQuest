@@ -101,7 +101,7 @@ function createAuthProfileRouter({
       }
 
       const user = db.prepare(`
-        SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at, is_restricted
+        SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at, is_restricted
         FROM users
         WHERE username = ?
       `).get(username);
@@ -300,7 +300,7 @@ function createAuthProfileRouter({
       db.prepare("UPDATE users SET username = ?, last_active_at = datetime('now') WHERE id = ?")
         .run(newUsername, req.session.userId);
 
-      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at FROM users WHERE id = ?')
+      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at FROM users WHERE id = ?')
         .get(req.session.userId);
 
       return res.json({ message: 'Benutzername aktualisiert!', user: withResolvedRole(user) });
@@ -335,7 +335,7 @@ function createAuthProfileRouter({
 
       deleteOldAvatar(currentUser.avatar);
 
-      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at FROM users WHERE id = ?')
+      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at FROM users WHERE id = ?')
         .get(req.session.userId);
 
       return res.json({ message: 'Profilbild aktualisiert!', user: withResolvedRole(user) });
@@ -435,7 +435,7 @@ function createAuthProfileRouter({
       db.prepare("UPDATE users SET full_name = ?, profile_name = ?, pronouns = ?, bio = ?, birth_date = ?, belief = ?, confession = ?, username = ?, accent_color = ?, last_active_at = datetime('now') WHERE id = ?")
         .run(trimmedName, trimmedProfileName || null, normalizedPronouns, normalizedBio, normalizedBirthDate, normalizedBelief, normalizedConfession, trimmedUsername, normalizedAccentColor, req.session.userId);
 
-      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at FROM users WHERE id = ?')
+      const user = db.prepare('SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at FROM users WHERE id = ?')
         .get(req.session.userId);
 
       return res.json({ message: 'Profil aktualisiert!', user: withResolvedRole(user) });

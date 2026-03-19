@@ -403,6 +403,7 @@ const publicProfileCopyBtn = document.getElementById('public-profile-copy-btn')
 const publicProfileZodiac = document.getElementById('public-profile-zodiac')
 const publicProfileBelief = document.getElementById('public-profile-belief')
 const publicProfileEarlySupporter = document.getElementById('public-profile-early-supporter')
+const publicProfileDeveloper = document.getElementById('public-profile-developer')
 const publicProfileEmailLink = document.getElementById('public-profile-email-link')
 const publicProfileFollowersCount = document.getElementById('public-profile-followers-count')
 const publicProfileFollowingCount = document.getElementById('public-profile-following-count')
@@ -1452,7 +1453,7 @@ function hidePublicProfileTooltip(element) {
 }
 
 function hideAllPublicProfileTooltips(exceptElement = null) {
-   ;[publicProfileEmailLink, publicProfileEarlySupporter, publicProfileZodiac, publicProfileBelief].forEach((element) => {
+   ;[publicProfileEmailLink, publicProfileEarlySupporter, publicProfileDeveloper, publicProfileZodiac, publicProfileBelief].forEach((element) => {
       if (!element || element === exceptElement) return
       hidePublicProfileTooltip(element)
    })
@@ -1507,6 +1508,23 @@ function updatePublicProfileEarlySupporter(isEarlySupporter) {
    publicProfileEarlySupporter.innerHTML = '<i class="fi fi-rc-seedling"></i>'
    setPublicProfileTooltip(publicProfileEarlySupporter, 'Early Supporter')
    publicProfileEarlySupporter.setAttribute('aria-label', 'Early Supporter')
+}
+
+function updatePublicProfileDeveloper(isDeveloper) {
+   if (!publicProfileDeveloper) return
+
+   if (!isDeveloper) {
+      publicProfileDeveloper.style.display = 'none'
+      publicProfileDeveloper.innerHTML = ''
+      setPublicProfileTooltip(publicProfileDeveloper, '')
+      publicProfileDeveloper.setAttribute('aria-label', 'Entwickler*in')
+      return
+   }
+
+   publicProfileDeveloper.style.display = 'inline-flex'
+   publicProfileDeveloper.innerHTML = '<i class="fi fi-rc-code-simple"></i>'
+   setPublicProfileTooltip(publicProfileDeveloper, 'Entwickler*in')
+   publicProfileDeveloper.setAttribute('aria-label', 'Entwickler*in')
 }
 
 function hslToHex(h, s, l) {
@@ -1823,6 +1841,7 @@ function updatePublicProfileView(payload) {
    updatePublicProfileZodiac(user?.birth_date)
    updatePublicProfileBelief(user?.belief, user?.confession)
    updatePublicProfileEarlySupporter(Boolean(user?.early_supporter))
+   updatePublicProfileDeveloper(Boolean(user?.is_developer))
    publicProfileBioText.textContent = hasBio ? publicBio : ''
    publicProfileBioBox.style.display = hasBio ? 'block' : 'none'
    updatePublicFollowStats()
@@ -1891,6 +1910,7 @@ function showPublicProfileError(message) {
    updatePublicProfileZodiac(null)
    updatePublicProfileBelief(null, null)
    updatePublicProfileEarlySupporter(false)
+   updatePublicProfileDeveloper(false)
    hideAllPublicProfileTooltips()
    publicProfileBioText.textContent = ''
    publicProfileBioBox.style.display = 'none'
@@ -2094,6 +2114,40 @@ function renderAdminUserList(users, reportedUsers = [], unbanRequestUsers = [], 
             })
 
             actions.appendChild(roleButton)
+         }
+
+         if (viewerIsAdministrator) {
+            const developerButton = document.createElement('button')
+            developerButton.type = 'button'
+            developerButton.className = 'admin-user-list__moderator-toggle'
+            developerButton.textContent = user.isDeveloper
+               ? 'Entwickler degradieren'
+               : 'Zu Entwickler befördern'
+
+            developerButton.addEventListener('click', async () => {
+               developerButton.disabled = true
+               try {
+                  const response = await fetch(`/api/auth/admin/users/${encodeURIComponent(user.username)}/developer-toggle`, {
+                     method: 'PATCH',
+                     credentials: 'include'
+                  })
+
+                  const data = await response.json()
+                  if (!response.ok) {
+                     showMsg('admin-user-list-message', data.error || 'Entwicklerstatus konnte nicht geändert werden.', 'error')
+                     developerButton.disabled = false
+                     return
+                  }
+
+                  showMsg('admin-user-list-message', data.message || 'Entwicklerstatus aktualisiert.', 'success')
+                  await loadAdminUserList(adminUserListSearch.value)
+               } catch (_) {
+                  showMsg('admin-user-list-message', 'Server nicht erreichbar.', 'error')
+                  developerButton.disabled = false
+               }
+            })
+
+            actions.appendChild(developerButton)
          }
 
          const canRestrict = () => {
@@ -2680,7 +2734,7 @@ if (publicProfileFollowingTrigger) {
    })
 }
 
-;[publicProfileEmailLink, publicProfileEarlySupporter, publicProfileZodiac, publicProfileBelief].forEach((element) => {
+;[publicProfileEmailLink, publicProfileEarlySupporter, publicProfileDeveloper, publicProfileZodiac, publicProfileBelief].forEach((element) => {
    if (!element) return
 
    element.addEventListener('mouseenter', () => {
@@ -2729,6 +2783,13 @@ publicProfileEarlySupporter.addEventListener('click', (event) => {
    event.preventDefault()
    showPublicProfileTooltip(publicProfileEarlySupporter, { autoHide: hasTouchTooltipInteraction() })
 })
+
+if (publicProfileDeveloper) {
+   publicProfileDeveloper.addEventListener('click', (event) => {
+      event.preventDefault()
+      showPublicProfileTooltip(publicProfileDeveloper, { autoHide: hasTouchTooltipInteraction() })
+   })
+}
 
 ;[publicProfileZodiac, publicProfileBelief].forEach((element) => {
    if (!element) return

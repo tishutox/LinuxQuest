@@ -153,7 +153,7 @@ function touchUserActivity(userId) {
 
 function getPublicUserProfileByEmail(email) {
   return db.prepare(`
-    SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, created_at
+    SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at
     FROM users
     WHERE email = ?
   `).get(normalizeEmail(email));
@@ -228,7 +228,8 @@ function withResolvedRole(user) {
   if (!user) return user;
   return {
     ...user,
-    role: getRoleFromUserRecord(user)
+    role: getRoleFromUserRecord(user),
+    is_developer: user.is_developer === 1 ? 1 : 0
   };
 }
 
