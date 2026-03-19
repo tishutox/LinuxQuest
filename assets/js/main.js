@@ -182,6 +182,7 @@ const loginPanel      = document.getElementById('login'),
       adminReportsModal = document.getElementById('admin-reports-modal'),
    followListModal = document.getElementById('follow-list-modal'),
    adminUserListModal = document.getElementById('admin-user-list-modal'),
+   developerUserListModal = document.getElementById('developer-user-list-modal'),
       loginBtn        = document.getElementById('login-btn'),
       loginClose      = document.getElementById('login-close'),
       registerClose   = document.getElementById('register-close'),
@@ -201,7 +202,8 @@ const loginPanel      = document.getElementById('login'),
       unbanRequestClose = document.getElementById('unban-request-close'),
       adminReportsClose = document.getElementById('admin-reports-close'),
       followListClose = document.getElementById('follow-list-close'),
-      adminUserListClose = document.getElementById('admin-user-list-close')
+      adminUserListClose = document.getElementById('admin-user-list-close'),
+      developerUserListClose = document.getElementById('developer-user-list-close')
 
 const staticModalTriggers = document.querySelectorAll('[data-modal-target]')
 const staticModalCloseButtons = document.querySelectorAll('[data-modal-close]')
@@ -232,10 +234,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -288,6 +290,7 @@ unbanRequestClose.addEventListener('click', hideAll)
 adminReportsClose.addEventListener('click', hideAll)
 followListClose.addEventListener('click', hideAll)
 adminUserListClose.addEventListener('click', hideAll)
+developerUserListClose.addEventListener('click', hideAll)
 
 /*=============== AVATAR PREVIEW ===============*/
 const avatarInput       = document.getElementById('avatar-input')
@@ -338,6 +341,7 @@ const navUser     = document.getElementById('nav-user')
 const navAvatar   = document.getElementById('nav-avatar')
 const navUsername = document.getElementById('nav-username')
 const navAdminToolsBtn = document.getElementById('nav-admin-tools')
+const navDeveloperToolsBtn = document.getElementById('nav-developer-tools')
 const profileBtn  = document.getElementById('profile-btn')
 const logoutBtn   = document.getElementById('logout-btn')
 const profileAvatarInput  = document.getElementById('profile-avatar-input')
@@ -444,6 +448,10 @@ const adminUserListSearch = document.getElementById('admin-user-list-search')
 const adminUserListMessage = document.getElementById('admin-user-list-message')
 const adminUserListResults = document.getElementById('admin-user-list-results')
 const adminUserListForm = document.getElementById('admin-user-list-form')
+const developerUserListSearch = document.getElementById('developer-user-list-search')
+const developerUserListMessage = document.getElementById('developer-user-list-message')
+const developerUserListResults = document.getElementById('developer-user-list-results')
+const developerUserListForm = document.getElementById('developer-user-list-form')
 
 const PROTECTED_EMAILS = new Set([
    'armand.patrick.asztalos@tha.de'
@@ -767,6 +775,13 @@ if (navAdminToolsBtn) {
    })
 }
 
+if (navDeveloperToolsBtn) {
+   navDeveloperToolsBtn.addEventListener('click', async (event) => {
+      event.preventDefault()
+      await openDeveloperUserListModal()
+   })
+}
+
 bugReportReasonInput.addEventListener('input', () => {
    bugReportReasonCounter.textContent = `${bugReportReasonInput.value.length}/1000`
 })
@@ -1040,9 +1055,19 @@ function canAccessAdminPanel(user) {
    return role === USER_ROLES.ADMINISTRATOR || role === USER_ROLES.MODERATOR
 }
 
+function canAccessDeveloperPanel(user) {
+   if (!user) return false
+   return user.is_developer === 1 || user.is_developer === true
+}
+
 function updateNavAdminToolsVisibility(user) {
    if (!navAdminToolsBtn) return
    navAdminToolsBtn.style.display = canAccessAdminPanel(user) ? 'inline-flex' : 'none'
+}
+
+function updateNavDeveloperToolsVisibility(user) {
+   if (!navDeveloperToolsBtn) return
+   navDeveloperToolsBtn.style.display = canAccessDeveloperPanel(user) ? 'inline-flex' : 'none'
 }
 
 function getDefaultAccentColor() {
@@ -2492,6 +2517,7 @@ function setLoggedIn(user) {
    applyUserAccentColor(user?.accent_color)
    applyStoredBackgroundForUser(user)
    updateNavAdminToolsVisibility(user)
+   updateNavDeveloperToolsVisibility(user)
    loginBtn.style.display   = 'none'
    navUser.style.display    = 'flex'
    navUsername.textContent  = user.username
@@ -2507,6 +2533,7 @@ function setLoggedOut() {
    applyUserAccentColor(null)
    applyMainBackground(null)
    updateNavAdminToolsVisibility(null)
+   updateNavDeveloperToolsVisibility(null)
    loginBtn.style.display  = ''
    navUser.style.display   = 'none'
    navAvatar.src           = ''

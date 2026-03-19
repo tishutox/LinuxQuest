@@ -162,7 +162,8 @@ img {
 }
 
 .nav__logo,
-.nav__admin-tools {
+.nav__admin-tools,
+.nav__developer-tools {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -179,6 +180,11 @@ img {
 }
 
 .nav__admin-tools .fi-rc-shield {
+  display: inline-block;
+  transform: translateY(.02em);
+}
+
+.nav__developer-tools .fi-rc-code-simple {
   display: inline-block;
   transform: translateY(.02em);
 }
@@ -209,7 +215,7 @@ img {
   transition: color .4s;
 }
 
-:is(.nav__logo, .nav__admin-tools, .nav__search, .nav__login, .nav__toggle, .nav__link):hover {
+:is(.nav__logo, .nav__admin-tools, .nav__developer-tools, .nav__search, .nav__login, .nav__toggle, .nav__link):hover {
   color: var(--first-color);
 }
 

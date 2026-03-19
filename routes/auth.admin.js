@@ -8,6 +8,7 @@ function createAuthAdminRouter({
   getSessionUserRole,
   isAdminSessionUser,
   canAccessAdminPanel,
+  canAccessDeveloperPanel,
   USER_ROLES,
   deleteOldAvatar
 }) {
@@ -198,8 +199,8 @@ function createAuthAdminRouter({
 
       return res.json({
         message: nextDeveloperStatus === 1
-          ? `@${targetUser.username} wurde zum Entwickler befördert.`
-          : `@${targetUser.username} wurde vom Entwicklerstatus zurückgestuft.`,
+          ? `@${targetUser.username} wurde zu Entwickler*in befördert.`
+          : `@${targetUser.username} wurde vom Entwickler*innen-Status zurückgestuft.`,
         isDeveloper: nextDeveloperStatus === 1,
         username: targetUser.username
       });
@@ -509,6 +510,83 @@ function createAuthAdminRouter({
       return res.json({ reports });
     } catch (err) {
       console.error('[GET ADMIN BUG REPORTS ERROR]', err);
+      return res.status(500).json({ error: 'Serverfehler beim Abrufen der Bug Reports.' });
+    }
+  });
+
+  router.get('/developer/users', (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: 'Nicht authentifiziert.' });
+      }
+
+      if (!canAccessDeveloperPanel(req)) {
+        return res.status(403).json({ error: 'Kein Zugriff auf den Entwickler*innen-Bereich.' });
+      }
+
+      const rawQuery = typeof req.query.q === 'string' ? req.query.q : '';
+      const query = rawQuery.trim();
+
+      const users = query
+        ? db.prepare(`
+            SELECT id, username, profile_name, full_name, email, avatar, accent_color, role, is_restricted, is_developer
+            FROM users
+            WHERE username LIKE ? COLLATE NOCASE
+            ORDER BY username COLLATE NOCASE ASC
+          `).all(`%${query}%`)
+        : db.prepare(`
+            SELECT id, username, profile_name, full_name, email, avatar, accent_color, role, is_restricted, is_developer
+            FROM users
+            ORDER BY username COLLATE NOCASE ASC
+          `).all();
+
+      const visibleUsers = filterDisallowedUsers(users);
+
+      const sanitizedUsers = visibleUsers.map((user) => ({
+        id: user.id,
+        username: user.username,
+        profile_name: user.profile_name,
+        full_name: user.full_name,
+        avatar: user.avatar,
+        accent_color: user.accent_color,
+        role: getRoleFromUserRecord(user),
+        isRestricted: user.is_restricted === 1,
+        isDeveloper: user.is_developer === 1
+      }));
+
+      return res.json({ query, users: sanitizedUsers });
+    } catch (err) {
+      console.error('[DEVELOPER USER LIST ERROR]', err);
+      return res.status(500).json({ error: 'Entwickler*innen-Userliste konnte nicht geladen werden.' });
+    }
+  });
+
+  router.get('/developer/bug-reports', (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: 'Nicht authentifiziert.' });
+      }
+
+      if (!canAccessDeveloperPanel(req)) {
+        return res.status(403).json({ error: 'Kein Zugriff auf den Entwickler*innen-Bereich.' });
+      }
+
+      const reports = db.prepare(`
+        SELECT
+          b.id,
+          b.description,
+          b.closed,
+          b.created_at,
+          u.username,
+          u.full_name
+        FROM bug_reports b
+        JOIN users u ON u.id = b.reported_user_id
+        ORDER BY b.closed ASC, datetime(b.created_at) DESC
+      `).all();
+
+      return res.json({ reports });
+    } catch (err) {
+      console.error('[GET DEVELOPER BUG REPORTS ERROR]', err);
       return res.status(500).json({ error: 'Serverfehler beim Abrufen der Bug Reports.' });
     }
   });

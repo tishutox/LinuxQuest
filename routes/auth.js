@@ -248,6 +248,14 @@ function canAccessAdminPanel(req) {
   return role === USER_ROLES.ADMINISTRATOR || role === USER_ROLES.MODERATOR;
 }
 
+function canAccessDeveloperPanel(req) {
+  if (!req.session.userId) return false;
+  const user = db.prepare('SELECT is_developer, is_restricted FROM users WHERE id = ?').get(req.session.userId);
+  if (!user) return false;
+  if (user.is_restricted === 1) return false;
+  return user.is_developer === 1;
+}
+
 function normalizeAccentColor(colorValue) {
   if (typeof colorValue !== 'string') return null;
   const trimmedColor = colorValue.trim();
@@ -400,6 +408,7 @@ router.use('/admin', createAuthAdminRouter({
   getSessionUserRole,
   isAdminSessionUser,
   canAccessAdminPanel,
+  canAccessDeveloperPanel,
   USER_ROLES,
   deleteOldAvatar
 }));
