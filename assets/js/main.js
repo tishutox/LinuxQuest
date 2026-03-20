@@ -1586,22 +1586,11 @@ function updatePublicProfileEarlySupporter(isEarlySupporter) {
 
 function updatePublicProfileDeveloper(isDeveloper) {
    if (!publicProfileDeveloper) return
-   const viewerCanAccessDeveloperPanel = canAccessDeveloperPanel(currentUser)
-
-   if (!isDeveloper) {
-      publicProfileDeveloper.style.display = 'none'
-      publicProfileDeveloper.innerHTML = ''
-      setPublicProfileTooltip(publicProfileDeveloper, '')
-      publicProfileDeveloper.setAttribute('aria-label', 'Entwickler*in')
-      publicProfileDeveloper.dataset.action = ''
-      return
-   }
-
-   publicProfileDeveloper.style.display = 'inline-flex'
-   publicProfileDeveloper.innerHTML = '<i class="fi fi-rc-code-simple"></i>'
-   setPublicProfileTooltip(publicProfileDeveloper, 'Entwickler*in')
-   publicProfileDeveloper.setAttribute('aria-label', viewerCanAccessDeveloperPanel ? 'Entwickler*innen-Bereich öffnen' : 'Entwickler*in')
-   publicProfileDeveloper.dataset.action = viewerCanAccessDeveloperPanel ? 'open-developer-list' : 'role-label'
+   publicProfileDeveloper.style.display = 'none'
+   publicProfileDeveloper.innerHTML = ''
+   setPublicProfileTooltip(publicProfileDeveloper, '')
+   publicProfileDeveloper.setAttribute('aria-label', 'Entwickler*in')
+   publicProfileDeveloper.dataset.action = ''
 }
 
 function hslToHex(h, s, l) {
@@ -1933,33 +1922,14 @@ function updatePublicProfileView(payload) {
       unbanRequestModal.classList.add('show-login')
    }
 
-   const viewedRole = getUserRole(user)
-   const viewedHasStaffBadge = viewedRole === USER_ROLES.ADMINISTRATOR || viewedRole === USER_ROLES.MODERATOR
-   const viewerCanAccessAdminPanel = canAccessAdminPanel(currentUser)
-   const viewedRoleLabel = viewedRole === USER_ROLES.ADMINISTRATOR ? 'Administrator*in' : 'Moderator*in'
-
-   if (viewedHasStaffBadge) {
-      publicProfileEmailLink.style.display = 'inline-flex'
-      publicProfileEmailLink.href = '#'
-      publicProfileEmailLink.innerHTML = '<i class="fi fi-rc-shield"></i>'
-      publicProfileEmailLink.dataset.action = viewerCanAccessAdminPanel ? 'open-admin-list' : 'role-label'
-      setPublicProfileTooltip(publicProfileEmailLink, viewedRoleLabel)
-      publicProfileEmailLink.setAttribute('aria-label', viewerCanAccessAdminPanel ? 'Admin-Bereich öffnen' : viewedRoleLabel)
-      if (viewerCanAccessAdminPanel) {
-         publicProfileEmailLink.classList.remove('public-profile__action--badge')
-      } else {
-         publicProfileEmailLink.classList.add('public-profile__action--badge')
-      }
-   } else {
-      hidePublicProfileTooltip(publicProfileEmailLink)
-      publicProfileEmailLink.style.display = 'none'
-      publicProfileEmailLink.href = '#'
-      publicProfileEmailLink.innerHTML = '<i class="fi fi-rc-envelope"></i>'
-      publicProfileEmailLink.dataset.action = ''
-      publicProfileEmailLink.title = 'E-Mail schreiben'
-      publicProfileEmailLink.setAttribute('aria-label', 'E-Mail schreiben')
-      publicProfileEmailLink.classList.remove('public-profile__action--badge')
-   }
+   hidePublicProfileTooltip(publicProfileEmailLink)
+   publicProfileEmailLink.style.display = 'none'
+   publicProfileEmailLink.href = '#'
+   publicProfileEmailLink.innerHTML = '<i class="fi fi-rc-envelope"></i>'
+   publicProfileEmailLink.dataset.action = ''
+   publicProfileEmailLink.title = 'E-Mail schreiben'
+   publicProfileEmailLink.setAttribute('aria-label', 'E-Mail schreiben')
+   publicProfileEmailLink.classList.remove('public-profile__action--badge')
 }
 
 function showPublicProfileError(message) {
