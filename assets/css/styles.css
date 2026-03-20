@@ -1201,7 +1201,7 @@ body.user-theme-active #belief-modal #belief-picker-confession {
 .profile__avatar-wrap {
   display: flex;
   justify-content: center;
-  margin-bottom: .3rem;
+  margin-bottom: .1rem;
 }
 
 .profile__bio-group {
@@ -1209,11 +1209,11 @@ body.user-theme-active #belief-modal #belief-picker-confession {
 }
 
 #profile-modal .profile__display-name {
-  margin-top: 0;
+  margin-top: -.15rem;
 }
 
 #profile-modal .profile__username {
-  margin-top: -.2rem;
+  margin-top: -.45rem;
 }
 
 #public-profile-modal .info-modal__avatar-wrap {
@@ -1339,13 +1339,20 @@ body.user-theme-active .profile__avatar-button:hover {
   color: var(--title-color);
   font-weight: var(--font-semi-bold);
   text-align: center;
-  margin-top: -.1rem;
+  margin-top: -.2rem;
 }
 
 .profile__username {
   color: var(--text-color);
   text-align: center;
-  margin-top: -.25rem;
+  margin-top: -.45rem;
+}
+
+@media screen and (max-width: 1023px) {
+  .nav__menu.show-menu + .nav__actions .nav__toggle {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 .profile__local-note {
