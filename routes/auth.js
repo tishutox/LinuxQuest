@@ -348,7 +348,7 @@ function normalizeAvatarArtistUrl(urlValue) {
     const protocol = (parsed.protocol || '').toLowerCase();
     if (protocol !== 'http:' && protocol !== 'https:') return null;
     return parsed.toString();
-  } catch (_) {
+  } catch {
     return null;
   }
 }

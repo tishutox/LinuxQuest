@@ -201,7 +201,7 @@ db.exec('CREATE INDEX IF NOT EXISTS idx_reports_reporter_user_id ON reports(repo
 // Migration: add closed column if it does not exist yet
 try {
   db.exec('ALTER TABLE reports ADD COLUMN closed INTEGER NOT NULL DEFAULT 0');
-} catch (_) { /* column already exists */ }
+} catch { /* column already exists */ }
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS restriction_requests (

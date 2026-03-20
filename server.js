@@ -23,7 +23,7 @@ function normalizeOrigin(originValue) {
   if (!trimmed) return null;
   try {
     return new URL(trimmed).origin;
-  } catch (_err) {
+  } catch {
     return null;
   }
 }

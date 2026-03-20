@@ -426,14 +426,11 @@ const bugReportReasonInput = document.getElementById('bug-report-reason-input')
 const bugReportReasonCounter = document.getElementById('bug-report-reason-counter')
 const bugReportSubmitBtn = document.getElementById('bug-report-submit-btn')
 const bugReportCancelBtn = document.getElementById('bug-report-cancel-btn')
-const bugReportMessage = document.getElementById('bug-report-message')
 const unbanRequestReasonInput = document.getElementById('unban-request-reason-input')
 const unbanRequestReasonCounter = document.getElementById('unban-request-reason-counter')
 const unbanRequestSubmitBtn = document.getElementById('unban-request-submit-btn')
 const unbanRequestCancelBtn = document.getElementById('unban-request-cancel-btn')
-const unbanRequestMessage = document.getElementById('unban-request-message')
 const adminReportsTitle = document.getElementById('admin-reports-title')
-const adminReportsMessage = document.getElementById('admin-reports-message')
 const adminReportsList = document.getElementById('admin-reports-list')
 const adminReportsCloseBtn = document.getElementById('admin-reports-close-btn')
 const adminReportsTabs = document.querySelector('.admin-reports__tabs')
@@ -442,14 +439,11 @@ const adminReportsTabEntbannungen = document.getElementById('admin-reports-tab-e
 const adminBugReportsList = document.getElementById('admin-bug-reports-list')
 const adminUnbanRequestsList = document.getElementById('admin-unban-requests-list')
 const followListTitle = document.getElementById('follow-list-title')
-const followListMessage = document.getElementById('follow-list-message')
 const followListContainer = document.getElementById('follow-list-container')
 const adminUserListSearch = document.getElementById('admin-user-list-search')
-const adminUserListMessage = document.getElementById('admin-user-list-message')
 const adminUserListResults = document.getElementById('admin-user-list-results')
 const adminUserListForm = document.getElementById('admin-user-list-form')
 const developerUserListSearch = document.getElementById('developer-user-list-search')
-const developerUserListMessage = document.getElementById('developer-user-list-message')
 const developerUserListResults = document.getElementById('developer-user-list-results')
 const developerUserListForm = document.getElementById('developer-user-list-form')
 
@@ -841,7 +835,7 @@ bugReportSubmitBtn.addEventListener('click', async () => {
          bugReportSubmitBtn.disabled = false
          bugReportSubmitBtn.textContent = 'Bug melden'
       }, 2000)
-   } catch (err) {
+   } catch {
       showMsg('bug-report-message', 'Serverfehler. Bitte versuche es später erneut.', 'error')
       bugReportSubmitBtn.disabled = false
       bugReportSubmitBtn.textContent = 'Bug melden'
@@ -923,7 +917,7 @@ function createAdminBugReportItem(report, viewerIsAdministrator, targetUsername)
                closeBtn.disabled = false
                closeBtn.textContent = 'Fall schließen'
             }
-         } catch (err) {
+         } catch {
             showMsg('admin-reports-message', 'Server nicht erreichbar.', 'error')
             closeBtn.disabled = false
             closeBtn.textContent = 'Fall schließen'
@@ -1584,7 +1578,7 @@ function updatePublicProfileEarlySupporter(isEarlySupporter) {
    publicProfileEarlySupporter.setAttribute('aria-label', 'Early Supporter')
 }
 
-function updatePublicProfileDeveloper(isDeveloper) {
+function updatePublicProfileDeveloper() {
    if (!publicProfileDeveloper) return
    publicProfileDeveloper.style.display = 'none'
    publicProfileDeveloper.innerHTML = ''
