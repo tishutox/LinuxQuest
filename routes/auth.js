@@ -26,9 +26,11 @@ const storage = multer.diskStorage({
   }
 });
 
+const MAX_AVATAR_SIZE_MB = Math.max(1, Math.min(10, Number(process.env.MAX_AVATAR_SIZE_MB) || 8));
+
 const upload = multer({
   storage,
-  limits: { fileSize: 25 * 1024 * 1024 }, // 25 MB max
+  limits: { fileSize: MAX_AVATAR_SIZE_MB * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const allowed = /jpeg|jpg|png|gif|webp/;
     const ok = allowed.test(path.extname(file.originalname).toLowerCase())

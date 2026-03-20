@@ -81,7 +81,7 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 ### Lokaler Custom-Background
 - Nur für eingeloggte Nutzer im Profil konfigurierbar
 - Wird ausschließlich lokal im Browser gespeichert (nicht serverseitig synchronisiert)
-- Upload-Limit: bis zu 25 MB
+- Upload-Limit: standardmäßig 8 MB (konfigurierbar über `MAX_AVATAR_SIZE_MB`)
 
 ### System/Backend
 - Express-Server mit SQLite (Node.js built-in SQLite)
@@ -123,7 +123,22 @@ Lege eine `.env` im Projektverzeichnis an.
 ### Mindest-Setup
 
 ```env
-SESSION_SECRET=replace-this-in-production
+SESSION_SECRET=replace-this-with-at-least-32-characters
+CORS_ORIGIN=http://localhost:3000
+```
+
+### Security-relevante optionale Variablen
+
+```env
+# Mehrere Origins per Komma möglich
+CORS_ORIGINS=http://localhost:3000,https://deine-domain.de
+
+# API-Ratenbegrenzung
+API_RATE_LIMIT_MAX=500
+AUTH_WRITE_RATE_LIMIT_MAX=60
+
+# Max. Avatar-Dateigröße in MB (1-10)
+MAX_AVATAR_SIZE_MB=8
 ```
 
 ### SMTP (z. B. lokal mit Gmail App-Passwort)
