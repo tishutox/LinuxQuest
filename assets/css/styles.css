@@ -96,7 +96,6 @@ img {
 .main {
   position: relative;
   min-height: 100vh;
-  background-color: var(--body-color);
   display: flex;
   justify-content: center;
   align-items: center;
