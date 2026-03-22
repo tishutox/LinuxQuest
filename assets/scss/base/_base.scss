@@ -19,7 +19,7 @@ button{
 body{
 	background-color: var(--body-color);
 	color: var(--text-color);
-	cursor: url('../cursors/Hollow Knight Black Arrow--cursor--SweezyCursors..cur'), auto;
+	cursor: url('../cursors/cursor.cur'), auto;
 }
 
 a,
@@ -30,7 +30,7 @@ input[type='button'],
 input[type='reset'],
 label[for],
 summary{
-	cursor: url('../cursors/Hollow Knight Black Arrow--pointer--SweezyCursors..cur'), pointer;
+	cursor: url('../cursors/pointer.cur'), pointer;
 }
 
 input,
