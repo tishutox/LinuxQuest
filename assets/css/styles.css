@@ -101,6 +101,9 @@ img {
   align-items: center;
   padding: calc(var(--header-height) + 2rem) 1.5rem 2rem;
   overflow: hidden;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .main__background-text {

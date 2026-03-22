@@ -468,8 +468,8 @@ let projectContactsRefreshPromise = null
 const USER_THEME_CLASS = 'user-theme-active'
 const LOCAL_BACKGROUND_STORAGE_PREFIX = 'local-custom-bg:'
 const LOCAL_BACKGROUND_MAX_DATA_URL_LENGTH = 36000000
-const mainBackgroundImage = document.querySelector('.main__bg')
-const DEFAULT_MAIN_BACKGROUND_SRC = mainBackgroundImage?.getAttribute('src') || 'assets/img/bg-image.png'
+const mainContainer = document.querySelector('.main')
+const DEFAULT_MAIN_BACKGROUND_SRC = 'none'
 
 const messageTimers = new Map()
 let currentAdminReportsUsername = ''
@@ -1773,8 +1773,14 @@ function getBackgroundStorageKey(user) {
 }
 
 function applyMainBackground(source) {
-   if (!mainBackgroundImage) return
-   mainBackgroundImage.src = source || DEFAULT_MAIN_BACKGROUND_SRC
+   if (!mainContainer) return
+
+   if (source) {
+      mainContainer.style.backgroundImage = `url("${source}")`
+      return
+   }
+
+   mainContainer.style.backgroundImage = DEFAULT_MAIN_BACKGROUND_SRC
 }
 
 function getStoredBackgroundForUser(user) {
