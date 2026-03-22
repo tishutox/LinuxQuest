@@ -352,11 +352,33 @@
                   <input type="file" id="profile-background-input" accept="image/*" style="display:none;">
                   <button type="button" class="profile-background__pick" id="profile-background-pick-btn">Bild auswählen</button>
                   <p class="profile-background__filename" id="profile-background-filename">Kein Bild ausgewählt</p>
-                  <p class="profile__local-note">Wird nur in diesem Browser gespeichert und nicht mit dem Konto synchronisiert.</p>
                </div>
 
                <div class="profile-background__actions">
                   <button type="button" class="login__button profile-background__reset" id="profile-background-reset-btn">Hintergrund zurücksetzen</button>
+               </div>
+
+               <div>
+                  <label for="profile-cursor-input" class="login__label">Custom Cursor <small>(nur lokal)</small></label>
+                  <input type="file" id="profile-cursor-input" accept=".cur,.ani,image/*" style="display:none;">
+                  <button type="button" class="profile-background__pick" id="profile-cursor-pick-btn">Cursor auswählen</button>
+                  <p class="profile-background__filename" id="profile-cursor-filename">Keine Cursor-Datei ausgewählt</p>
+               </div>
+
+               <div class="profile-background__actions">
+                  <button type="button" class="login__button profile-background__reset" id="profile-cursor-reset-btn">Cursor zurücksetzen</button>
+               </div>
+
+               <div>
+                  <label for="profile-pointer-input" class="login__label">Custom Pointer <small>(nur lokal)</small></label>
+                  <input type="file" id="profile-pointer-input" accept=".cur,.ani,image/*" style="display:none;">
+                  <button type="button" class="profile-background__pick" id="profile-pointer-pick-btn">Pointer auswählen</button>
+                  <p class="profile-background__filename" id="profile-pointer-filename">Keine Pointer-Datei ausgewählt</p>
+                  <p class="profile__local-note">Hintergrund, Cursor und Pointer werden nur in diesem Browser gespeichert und nicht mit dem Konto synchronisiert.</p>
+               </div>
+
+               <div class="profile-background__actions">
+                  <button type="button" class="login__button profile-background__reset" id="profile-pointer-reset-btn">Pointer zurücksetzen</button>
                </div>
 
                <div>
