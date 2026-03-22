@@ -51,18 +51,61 @@ const search      = document.getElementById('search'),
       searchBtn   = document.getElementById('search-btn'),
       searchClose = document.getElementById('search-close'),
       searchForm  = document.getElementById('search-form'),
-   searchInput = document.getElementById('search-input')
+      searchInput = document.getElementById('search-input')
 
 const searchResults = document.getElementById('search-results')
-let searchDebounceTimer = null
+const finderNavLink = document.getElementById('nav-finder-link')
+const finderFilterOptions = document.getElementById('finder-filter-options')
+const finderDistroResults = document.getElementById('finder-distro-results')
+const finderFilterCodebase = document.getElementById('finder-filter-codebase')
+const finderFilterCountry = document.getElementById('finder-filter-country')
+const finderFilterSpeed = document.getElementById('finder-filter-speed')
+const finderFilterSpeedValue = document.getElementById('finder-filter-speed-value')
+const finderTagInputs = Array.from(document.querySelectorAll('input[name="finder-tags"]'))
 
-searchBtn.addEventListener('click',   () => search.classList.add('show-search'))
+const DISTRO_FINDER_DATA = [
+   { name: 'Ubuntu', codebase: 'debian', countries: ['uk'], speed: 6, tags: ['beginner', 'stable'] },
+   { name: 'Kubuntu', codebase: 'debian', countries: ['uk'], speed: 6, tags: ['beginner', 'stable'] },
+   { name: 'Linux Mint', codebase: 'debian', countries: ['ie'], speed: 7, tags: ['beginner', 'stable'] },
+   { name: 'Debian', codebase: 'debian', countries: ['us'], speed: 7, tags: ['stable', 'privacy'] },
+   { name: 'Fedora', codebase: 'redhat', countries: ['us'], speed: 7, tags: ['stable'] },
+   { name: 'Nobara', codebase: 'redhat', countries: ['us'], speed: 8, tags: ['gaming'] },
+   { name: 'Arch Linux', codebase: 'arch', countries: ['de'], speed: 9, tags: ['rolling', 'privacy'] },
+   { name: 'EndeavourOS', codebase: 'arch', countries: ['de'], speed: 8, tags: ['rolling'] },
+   { name: 'Manjaro', codebase: 'arch', countries: ['de'], speed: 7, tags: ['rolling', 'beginner'] },
+   { name: 'openSUSE Tumbleweed', codebase: 'independent', countries: ['de'], speed: 8, tags: ['rolling', 'stable'] },
+   { name: 'Gentoo', codebase: 'gentoo', countries: ['us'], speed: 9, tags: ['lightweight', 'privacy'] }
+]
+
+let searchDebounceTimer = null
+let isFinderMode = false
+
+searchBtn.addEventListener('click', () => {
+   setFinderMode(false)
+   search.classList.add('show-search')
+})
+
+finderNavLink?.addEventListener('click', (event) => {
+   event.preventDefault()
+   setFinderMode(true)
+   search.classList.add('show-search')
+   navMenu.classList.remove('show-menu')
+})
+
 searchClose.addEventListener('click', () => {
    search.classList.remove('show-search')
    hideSearchResults()
+   hideFinderResults()
+   setFinderMode(false)
 })
 
 searchForm.addEventListener('submit', (event) => {
+   if (isFinderMode) {
+      event.preventDefault()
+      runFinderSearch()
+      return
+   }
+
    event.preventDefault()
 
    const query = searchInput.value.trim()
@@ -80,6 +123,93 @@ searchForm.addEventListener('submit', (event) => {
 function hideSearchResults() {
    searchResults.style.display = 'none'
    searchResults.innerHTML = ''
+}
+
+function hideFinderResults() {
+   finderDistroResults.style.display = 'none'
+   finderDistroResults.innerHTML = ''
+}
+
+function setFinderMode(active) {
+   isFinderMode = Boolean(active)
+
+   if (isFinderMode) {
+      searchInput.placeholder = 'Nach Distro-Namen suchen...'
+      finderFilterOptions.style.display = 'grid'
+      hideSearchResults()
+      hideFinderResults()
+      finderFilterSpeedValue.textContent = String(finderFilterSpeed.value)
+      setTimeout(() => searchInput.focus(), 0)
+      return
+   }
+
+   searchInput.placeholder = 'Wonach suchst du?'
+   finderFilterOptions.style.display = 'none'
+   hideFinderResults()
+}
+
+function getSelectedFinderCountries() {
+   return Array.from(finderFilterCountry.selectedOptions).map((option) => option.value)
+}
+
+function getSelectedFinderTags() {
+   return finderTagInputs.filter((input) => input.checked).map((input) => input.value)
+}
+
+function runFinderSearch() {
+   const nameQuery = searchInput.value.trim().toLowerCase()
+   const selectedCountries = getSelectedFinderCountries()
+   const selectedTags = getSelectedFinderTags()
+   const selectedCodebase = finderFilterCodebase.value
+   const minSpeed = Number.parseInt(finderFilterSpeed.value, 10) || 1
+
+   const matches = DISTRO_FINDER_DATA.filter((distro) => {
+      const matchesName = !nameQuery || distro.name.toLowerCase().includes(nameQuery)
+      const matchesCodebase = !selectedCodebase || distro.codebase === selectedCodebase
+      const matchesCountries = !selectedCountries.length || distro.countries.some((country) => selectedCountries.includes(country))
+      const matchesTags = !selectedTags.length || selectedTags.every((tag) => distro.tags.includes(tag))
+      const matchesSpeed = distro.speed >= minSpeed
+      return matchesName && matchesCodebase && matchesCountries && matchesTags && matchesSpeed
+   })
+
+   renderFinderDistroResults(matches)
+   finderFilterOptions.style.display = 'none'
+}
+
+function renderFinderDistroResults(matches) {
+   finderDistroResults.innerHTML = ''
+
+   const group = document.createElement('section')
+   group.className = 'search-results__group'
+
+   const heading = document.createElement('h3')
+   heading.className = 'finder-distro-results__title'
+   heading.textContent = 'Passende Distros'
+   group.appendChild(heading)
+
+   if (!matches.length) {
+      const empty = document.createElement('p')
+      empty.className = 'search-results__empty'
+      empty.textContent = 'Keine passenden Distros gefunden'
+      group.appendChild(empty)
+   } else {
+      const list = document.createElement('div')
+      list.className = 'finder-distro-results__list'
+
+      matches.forEach((distro) => {
+         const item = document.createElement('button')
+         item.type = 'button'
+         item.className = 'search-results__item'
+         item.textContent = distro.name
+         item.addEventListener('click', (event) => event.preventDefault())
+         list.appendChild(item)
+      })
+
+      group.appendChild(list)
+   }
+
+   finderDistroResults.appendChild(group)
+   finderDistroResults.style.display = 'block'
 }
 
 function createSearchGroup(title, users, formatter) {
@@ -158,6 +288,8 @@ async function loadSearchResults(query) {
 }
 
 searchInput.addEventListener('input', () => {
+   if (isFinderMode) return
+
    if (searchDebounceTimer) {
       clearTimeout(searchDebounceTimer)
    }
@@ -165,6 +297,10 @@ searchInput.addEventListener('input', () => {
    searchDebounceTimer = setTimeout(() => {
       loadSearchResults(searchInput.value)
    }, 200)
+})
+
+finderFilterSpeed?.addEventListener('input', () => {
+   finderFilterSpeedValue.textContent = String(finderFilterSpeed.value)
 })
 
 /*=============== LOGIN / REGISTER TOGGLE ===============*/

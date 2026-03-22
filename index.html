@@ -45,7 +45,7 @@
                   </li>
 
                   <li class="nav__item">
-                     <a href="#" class="nav__link">Finder</a>
+                     <a href="#" class="nav__link" id="nav-finder-link">Finder</a>
                   </li>
 
                   <li class="nav__item">
@@ -95,6 +95,53 @@
             <i class="fi fi-rc-search search__icon"></i>
             <input type="search" placeholder="Wonach suchst du?" class="search__input" id="search-input" name="q">
          </form>
+
+         <div class="finder-search__filters" id="finder-filter-options" style="display:none;">
+            <div class="finder-search__group">
+               <label class="login__label" for="finder-filter-codebase">Code-Basis</label>
+               <select id="finder-filter-codebase" class="finder-filter__select">
+                  <option value="">Alle</option>
+                  <option value="debian">Debian-basiert</option>
+                  <option value="arch">Arch-basiert</option>
+                  <option value="redhat">Red Hat-basiert</option>
+                  <option value="gentoo">Gentoo-basiert</option>
+                  <option value="independent">Unabhängig</option>
+               </select>
+            </div>
+
+            <div class="finder-search__group">
+               <label class="login__label" for="finder-filter-country">Herkunftsland/-länder</label>
+               <select id="finder-filter-country" class="finder-filter__select" multiple>
+                  <option value="de">Deutschland</option>
+                  <option value="us">USA</option>
+                  <option value="uk">Vereinigtes Königreich</option>
+                  <option value="fr">Frankreich</option>
+                  <option value="ie">Irland</option>
+               </select>
+            </div>
+
+            <div class="finder-search__group">
+               <span class="login__label">Tags</span>
+               <div class="finder-filter__tags">
+                  <label class="finder-filter__tag-option"><input type="checkbox" name="finder-tags" value="beginner"> Anfängerfreundlich</label>
+                  <label class="finder-filter__tag-option"><input type="checkbox" name="finder-tags" value="lightweight"> Leichtgewichtig</label>
+                  <label class="finder-filter__tag-option"><input type="checkbox" name="finder-tags" value="gaming"> Gaming</label>
+                  <label class="finder-filter__tag-option"><input type="checkbox" name="finder-tags" value="privacy"> Privacy</label>
+                  <label class="finder-filter__tag-option"><input type="checkbox" name="finder-tags" value="rolling"> Rolling</label>
+                  <label class="finder-filter__tag-option"><input type="checkbox" name="finder-tags" value="stable"> Stabil</label>
+               </div>
+            </div>
+
+            <div class="finder-search__group">
+               <label class="login__label" for="finder-filter-speed">Geschwindigkeit (mind.)</label>
+               <div class="finder-filter__range-wrap">
+                  <input type="range" min="1" max="10" value="1" step="1" id="finder-filter-speed" class="finder-filter__range">
+                  <span class="finder-filter__range-value" id="finder-filter-speed-value">1</span>
+               </div>
+            </div>
+         </div>
+
+         <div class="search__results" id="finder-distro-results" style="display:none;"></div>
 
          <div class="search__results" id="search-results" style="display:none;"></div>
 
