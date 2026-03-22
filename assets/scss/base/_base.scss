@@ -19,7 +19,7 @@ button{
 body{
 	background-color: var(--body-color);
 	color: var(--text-color);
-	cursor: default;
+	cursor: url('../cursors/cursor.cur'), auto;
 }
 
 a,
@@ -43,7 +43,7 @@ summary,
 .nav__close,
 .search__close,
 .login__close{
-	cursor: pointer;
+	cursor: url('../cursors/pointer.cur'), pointer;
 }
 
 input,
