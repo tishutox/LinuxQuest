@@ -65,7 +65,7 @@ button {
 body {
   background-color: var(--body-color);
   color: var(--text-color);
-  cursor: url('../cursors/cursor.cur'), auto;
+  cursor: default;
 }
 
 a,
@@ -89,7 +89,7 @@ summary,
 .nav__close,
 .search__close,
 .login__close {
-  cursor: url('../cursors/pointer.cur'), pointer;
+  cursor: pointer;
 }
 
 input,
