@@ -19,6 +19,18 @@ button{
 body{
 	background-color: var(--body-color);
 	color: var(--text-color);
+	cursor: url('../cursors/Hollow Knight Black Arrow--cursor--SweezyCursors..cur'), auto;
+}
+
+a,
+button,
+[role='button'],
+input[type='submit'],
+input[type='button'],
+input[type='reset'],
+label[for],
+summary{
+	cursor: url('../cursors/Hollow Knight Black Arrow--pointer--SweezyCursors..cur'), pointer;
 }
 
 input,
