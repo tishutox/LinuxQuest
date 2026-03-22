@@ -19,7 +19,7 @@ button{
 body{
 	background-color: var(--body-color);
 	color: var(--text-color);
-	cursor: url('../cursors/cursor-16.png') 5 5, url('../cursors/cursor.cur'), auto;
+	cursor: url('../cursors/cursor-18.png') 6 6, url('../cursors/cursor.cur'), auto;
 }
 
 a,
@@ -43,12 +43,12 @@ summary,
 .nav__close,
 .search__close,
 .login__close{
-	cursor: url('../cursors/pointer-16.png') 5 5, url('../cursors/pointer.cur'), pointer !important;
+	cursor: url('../cursors/pointer-18.png') 6 6, url('../cursors/pointer.cur'), pointer !important;
 }
 
 @media (min-width: 768px) and (pointer: fine){
 	body{
-		cursor: url('../cursors/cursor-20.png') 6 6, url('../cursors/cursor.cur'), auto;
+		cursor: url('../cursors/cursor-22.png') 7 7, url('../cursors/cursor.cur'), auto;
 	}
 
 	a,
@@ -72,13 +72,13 @@ summary,
 	.nav__close,
 	.search__close,
 	.login__close{
-		cursor: url('../cursors/pointer-20.png') 6 6, url('../cursors/pointer.cur'), pointer !important;
+		cursor: url('../cursors/pointer-22.png') 7 7, url('../cursors/pointer.cur'), pointer !important;
 	}
 }
 
 @media (min-width: 1280px) and (pointer: fine){
 	body{
-		cursor: url('../cursors/cursor-24.png') 8 8, url('../cursors/cursor.cur'), auto;
+		cursor: url('../cursors/cursor-26.png') 9 9, url('../cursors/cursor.cur'), auto;
 	}
 
 	a,
@@ -102,13 +102,13 @@ summary,
 	.nav__close,
 	.search__close,
 	.login__close{
-		cursor: url('../cursors/pointer-24.png') 8 8, url('../cursors/pointer.cur'), pointer !important;
+		cursor: url('../cursors/pointer-26.png') 9 9, url('../cursors/pointer.cur'), pointer !important;
 	}
 }
 
 @media (min-width: 1600px) and (min-resolution: 2dppx) and (pointer: fine){
 	body{
-		cursor: url('../cursors/cursor-32.png') 10 10, url('../cursors/cursor.cur'), auto;
+		cursor: url('../cursors/cursor-34.png') 11 11, url('../cursors/cursor.cur'), auto;
 	}
 
 	a,
@@ -132,7 +132,7 @@ summary,
 	.nav__close,
 	.search__close,
 	.login__close{
-		cursor: url('../cursors/pointer-32.png') 10 10, url('../cursors/pointer.cur'), pointer !important;
+		cursor: url('../cursors/pointer-34.png') 11 11, url('../cursors/pointer.cur'), pointer !important;
 	}
 }
 
