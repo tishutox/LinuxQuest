@@ -387,6 +387,14 @@ const profileBackgroundInput = document.getElementById('profile-background-input
 const profileBackgroundPickBtn = document.getElementById('profile-background-pick-btn')
 const profileBackgroundFilename = document.getElementById('profile-background-filename')
 const profileBackgroundResetBtn = document.getElementById('profile-background-reset-btn')
+const profileCursorInput = document.getElementById('profile-cursor-input')
+const profileCursorPickBtn = document.getElementById('profile-cursor-pick-btn')
+const profileCursorFilename = document.getElementById('profile-cursor-filename')
+const profileCursorResetBtn = document.getElementById('profile-cursor-reset-btn')
+const profilePointerInput = document.getElementById('profile-pointer-input')
+const profilePointerPickBtn = document.getElementById('profile-pointer-pick-btn')
+const profilePointerFilename = document.getElementById('profile-pointer-filename')
+const profilePointerResetBtn = document.getElementById('profile-pointer-reset-btn')
 const accentColorWheel = document.getElementById('accent-color-wheel')
 const accentColorWheelIndicator = document.getElementById('accent-color-wheel-indicator')
 const accentBrightnessInput = document.getElementById('accent-brightness')
@@ -467,7 +475,10 @@ let projectContactsLastLoadedAt = 0
 let projectContactsRefreshPromise = null
 const USER_THEME_CLASS = 'user-theme-active'
 const LOCAL_BACKGROUND_STORAGE_PREFIX = 'local-custom-bg:'
+const LOCAL_CURSOR_STORAGE_PREFIX = 'local-custom-cursor:'
+const LOCAL_POINTER_STORAGE_PREFIX = 'local-custom-pointer:'
 const LOCAL_BACKGROUND_MAX_DATA_URL_LENGTH = 36000000
+const LOCAL_CURSOR_MAX_DATA_URL_LENGTH = 12000000
 const mainContainer = document.querySelector('.main')
 const DEFAULT_MAIN_BACKGROUND_SRC = 'none'
 
@@ -1766,10 +1777,27 @@ function updateProfileShareLink(username) {
    profileShareLinkInput.value = buildProfileUrl(username)
 }
 
-function getBackgroundStorageKey(user) {
+function getStorageUsername(user) {
    const username = user?.username?.trim().toLowerCase()
+   return username || null
+}
+
+function getBackgroundStorageKey(user) {
+   const username = getStorageUsername(user)
    if (!username) return null
    return `${LOCAL_BACKGROUND_STORAGE_PREFIX}${username}`
+}
+
+function getCursorStorageKey(user, kind = 'cursor') {
+   const username = getStorageUsername(user)
+   if (!username) return null
+
+   const normalizedKind = kind === 'pointer' ? 'pointer' : 'cursor'
+   const prefix = normalizedKind === 'pointer'
+      ? LOCAL_POINTER_STORAGE_PREFIX
+      : LOCAL_CURSOR_STORAGE_PREFIX
+
+   return `${prefix}${username}`
 }
 
 function applyMainBackground(source) {
@@ -1781,6 +1809,20 @@ function applyMainBackground(source) {
    }
 
    mainContainer.style.backgroundImage = DEFAULT_MAIN_BACKGROUND_SRC
+}
+
+function applyUserCursor(cursorSource, pointerSource) {
+   if (cursorSource) {
+      document.documentElement.style.setProperty('--app-cursor-main', `url("${cursorSource}") 8 8, auto`)
+   } else {
+      document.documentElement.style.removeProperty('--app-cursor-main')
+   }
+
+   if (pointerSource) {
+      document.documentElement.style.setProperty('--app-cursor-pointer', `url("${pointerSource}") 8 8, pointer`)
+   } else {
+      document.documentElement.style.removeProperty('--app-cursor-pointer')
+   }
 }
 
 function getStoredBackgroundForUser(user) {
@@ -1799,8 +1841,36 @@ function getStoredBackgroundForUser(user) {
    return null
 }
 
+function getStoredCursorForUser(user, kind = 'cursor') {
+   const storageKey = getCursorStorageKey(user, kind)
+   if (!storageKey) return null
+
+   try {
+      const storedValue = localStorage.getItem(storageKey)
+      if (typeof storedValue === 'string' && storedValue.startsWith('data:')) {
+         return storedValue
+      }
+   } catch (_) {
+      return null
+   }
+
+   return null
+}
+
 function saveBackgroundForCurrentUser(dataUrl) {
    const storageKey = getBackgroundStorageKey(currentUser)
+   if (!storageKey) return false
+
+   try {
+      localStorage.setItem(storageKey, dataUrl)
+      return true
+   } catch (_) {
+      return false
+   }
+}
+
+function saveCursorForCurrentUser(kind, dataUrl) {
+   const storageKey = getCursorStorageKey(currentUser, kind)
    if (!storageKey) return false
 
    try {
@@ -1823,9 +1893,27 @@ function clearBackgroundForCurrentUser() {
    }
 }
 
+function clearCursorForCurrentUser(kind) {
+   const storageKey = getCursorStorageKey(currentUser, kind)
+   if (!storageKey) return false
+
+   try {
+      localStorage.removeItem(storageKey)
+      return true
+   } catch (_) {
+      return false
+   }
+}
+
 function applyStoredBackgroundForUser(user) {
    const storedBackground = getStoredBackgroundForUser(user)
    applyMainBackground(storedBackground)
+}
+
+function applyStoredCursorForUser(user) {
+   const storedCursor = getStoredCursorForUser(user, 'cursor')
+   const storedPointer = getStoredCursorForUser(user, 'pointer')
+   applyUserCursor(storedCursor, storedPointer)
 }
 
 function updateBackgroundControls(user) {
@@ -1838,10 +1926,49 @@ function updateBackgroundControls(user) {
       : 'Kein eigener Hintergrund'
 }
 
-   function setBackgroundFilenameLabel(fileName = '') {
-      if (!profileBackgroundFilename) return
-      profileBackgroundFilename.textContent = fileName || 'Kein Bild ausgewählt'
+function updateCursorControls(user) {
+   const hasCustomCursor = Boolean(getStoredCursorForUser(user, 'cursor'))
+   const hasCustomPointer = Boolean(getStoredCursorForUser(user, 'pointer'))
+
+   if (profileCursorResetBtn) {
+      profileCursorResetBtn.disabled = !hasCustomCursor
+      profileCursorResetBtn.textContent = hasCustomCursor
+         ? 'Cursor zurücksetzen'
+         : 'Kein eigener Cursor'
    }
+
+   if (profilePointerResetBtn) {
+      profilePointerResetBtn.disabled = !hasCustomPointer
+      profilePointerResetBtn.textContent = hasCustomPointer
+         ? 'Pointer zurücksetzen'
+         : 'Kein eigener Pointer'
+   }
+
+   if (!profileCursorInput?.value) {
+      setCursorFilenameLabel('cursor', hasCustomCursor ? 'Lokaler Cursor aktiv' : '')
+   }
+
+   if (!profilePointerInput?.value) {
+      setCursorFilenameLabel('pointer', hasCustomPointer ? 'Lokaler Pointer aktiv' : '')
+   }
+}
+
+function setBackgroundFilenameLabel(fileName = '') {
+   if (!profileBackgroundFilename) return
+   profileBackgroundFilename.textContent = fileName || 'Kein Bild ausgewählt'
+}
+
+function setCursorFilenameLabel(kind, fileName = '') {
+   const isPointer = kind === 'pointer'
+   const targetElement = isPointer ? profilePointerFilename : profileCursorFilename
+   if (!targetElement) return
+
+   const fallbackLabel = isPointer
+      ? 'Keine Pointer-Datei ausgewählt'
+      : 'Keine Cursor-Datei ausgewählt'
+
+   targetElement.textContent = fileName || fallbackLabel
+}
 
 function updateFollowButton() {
    if (!publicProfileFollowIconBtn) return
@@ -2609,6 +2736,7 @@ function updateProfileView(user) {
    updateUsernameCounter(profileUsernameInput.value)
    updateProfileAccentSummary(normalizeHexColor(user?.accent_color) || getDefaultAccentColor())
    updateBackgroundControls(user)
+   updateCursorControls(user)
    const displayName = getProfileDisplayName(user)
    profileDisplayName.textContent = displayName
    profileDisplayName.style.display = displayName ? 'block' : 'none'
@@ -2669,6 +2797,7 @@ function setLoggedIn(user) {
    currentUser = user
    applyUserAccentColor(user?.accent_color)
    applyStoredBackgroundForUser(user)
+   applyStoredCursorForUser(user)
    updateNavAdminToolsVisibility(user)
    updateNavDeveloperToolsVisibility(user)
    loginBtn.style.display   = 'none'
@@ -2684,6 +2813,7 @@ function setLoggedOut() {
    currentUser = null
    applyUserAccentColor(null)
    applyMainBackground(null)
+   applyUserCursor(null, null)
    updateNavAdminToolsVisibility(null)
    updateNavDeveloperToolsVisibility(null)
    loginBtn.style.display  = ''
@@ -2716,8 +2846,17 @@ function setLoggedOut() {
    if (profileBackgroundInput) {
       profileBackgroundInput.value = ''
    }
+   if (profileCursorInput) {
+      profileCursorInput.value = ''
+   }
+   if (profilePointerInput) {
+      profilePointerInput.value = ''
+   }
    setBackgroundFilenameLabel('')
+   setCursorFilenameLabel('cursor', '')
+   setCursorFilenameLabel('pointer', '')
    updateBackgroundControls(null)
+   updateCursorControls(null)
    profileDeleteBtn.textContent = 'Konto löschen'
    if (profileDeleteNote) {
       profileDeleteNote.textContent = 'Zum Löschen des Kontos ist dein Passwort erforderlich.'
@@ -3307,6 +3446,157 @@ profileBackgroundResetBtn.addEventListener('click', () => {
    setBackgroundFilenameLabel('')
    updateBackgroundControls(currentUser)
    showMsg('profile-message', 'Lokaler Hintergrund entfernt.', 'success')
+})
+
+function isSupportedCursorFile(file) {
+   if (!file) return false
+   if (typeof file.type === 'string' && file.type.startsWith('image/')) return true
+
+   const lowerName = String(file.name || '').trim().toLowerCase()
+   return lowerName.endsWith('.cur') || lowerName.endsWith('.ani')
+}
+
+function readAndStoreLocalCursorFile(kind, file, inputElement, pickButton, resetButton) {
+   if (!file || !currentUser) return
+
+   const isPointer = kind === 'pointer'
+   const readableKind = isPointer ? 'Pointer' : 'Cursor'
+
+   clearMsg('profile-message')
+   inputElement.disabled = true
+   pickButton.disabled = true
+   resetButton.disabled = true
+
+   const reader = new FileReader()
+   reader.onload = () => {
+      const dataUrl = typeof reader.result === 'string' ? reader.result : ''
+
+      if (!dataUrl.startsWith('data:')) {
+         showMsg('profile-message', `Ungültige ${readableKind}-Datei.`, 'error')
+      } else if (dataUrl.length > LOCAL_CURSOR_MAX_DATA_URL_LENGTH) {
+         showMsg('profile-message', `${readableKind}-Datei ist zu groß für die lokale Speicherung.`, 'error')
+      } else if (!saveCursorForCurrentUser(kind, dataUrl)) {
+         showMsg('profile-message', 'Lokaler Speicher voll oder blockiert. Bitte kleinere Datei wählen.', 'error')
+      } else {
+         applyStoredCursorForUser(currentUser)
+         updateCursorControls(currentUser)
+         showMsg('profile-message', `Lokaler ${readableKind} gespeichert.`, 'success')
+      }
+
+      inputElement.value = ''
+      inputElement.disabled = false
+      pickButton.disabled = false
+      resetButton.disabled = false
+   }
+
+   reader.onerror = () => {
+      showMsg('profile-message', `${readableKind}-Datei konnte nicht gelesen werden.`, 'error')
+      inputElement.value = ''
+      setCursorFilenameLabel(kind, '')
+      inputElement.disabled = false
+      pickButton.disabled = false
+      resetButton.disabled = false
+   }
+
+   reader.readAsDataURL(file)
+}
+
+profileCursorPickBtn.addEventListener('click', () => {
+   if (!currentUser) {
+      return showMsg('profile-message', 'Bitte melde dich an, um einen lokalen Cursor zu verwenden.', 'error')
+   }
+
+   clearMsg('profile-message')
+   profileCursorInput.click()
+})
+
+profilePointerPickBtn.addEventListener('click', () => {
+   if (!currentUser) {
+      return showMsg('profile-message', 'Bitte melde dich an, um einen lokalen Pointer zu verwenden.', 'error')
+   }
+
+   clearMsg('profile-message')
+   profilePointerInput.click()
+})
+
+profileCursorInput.addEventListener('change', () => {
+   const cursorFile = profileCursorInput.files[0]
+   if (!cursorFile) return
+
+   setCursorFilenameLabel('cursor', cursorFile.name)
+
+   if (!currentUser) {
+      profileCursorInput.value = ''
+      setCursorFilenameLabel('cursor', '')
+      return showMsg('profile-message', 'Bitte melde dich an, um einen lokalen Cursor zu verwenden.', 'error')
+   }
+
+   if (!isSupportedCursorFile(cursorFile)) {
+      profileCursorInput.value = ''
+      setCursorFilenameLabel('cursor', '')
+      return showMsg('profile-message', 'Bitte wähle eine gültige Cursor-Datei (.cur, .ani oder Bilddatei).', 'error')
+   }
+
+   if (cursorFile.size > 8 * 1024 * 1024) {
+      profileCursorInput.value = ''
+      setCursorFilenameLabel('cursor', '')
+      return showMsg('profile-message', 'Cursor-Datei ist zu groß (max. 8 MB).', 'error')
+   }
+
+   readAndStoreLocalCursorFile('cursor', cursorFile, profileCursorInput, profileCursorPickBtn, profileCursorResetBtn)
+})
+
+profilePointerInput.addEventListener('change', () => {
+   const pointerFile = profilePointerInput.files[0]
+   if (!pointerFile) return
+
+   setCursorFilenameLabel('pointer', pointerFile.name)
+
+   if (!currentUser) {
+      profilePointerInput.value = ''
+      setCursorFilenameLabel('pointer', '')
+      return showMsg('profile-message', 'Bitte melde dich an, um einen lokalen Pointer zu verwenden.', 'error')
+   }
+
+   if (!isSupportedCursorFile(pointerFile)) {
+      profilePointerInput.value = ''
+      setCursorFilenameLabel('pointer', '')
+      return showMsg('profile-message', 'Bitte wähle eine gültige Pointer-Datei (.cur, .ani oder Bilddatei).', 'error')
+   }
+
+   if (pointerFile.size > 8 * 1024 * 1024) {
+      profilePointerInput.value = ''
+      setCursorFilenameLabel('pointer', '')
+      return showMsg('profile-message', 'Pointer-Datei ist zu groß (max. 8 MB).', 'error')
+   }
+
+   readAndStoreLocalCursorFile('pointer', pointerFile, profilePointerInput, profilePointerPickBtn, profilePointerResetBtn)
+})
+
+profileCursorResetBtn.addEventListener('click', () => {
+   if (!currentUser) return
+
+   const removed = clearCursorForCurrentUser('cursor')
+   if (!removed) {
+      return showMsg('profile-message', 'Lokaler Cursor konnte nicht entfernt werden.', 'error')
+   }
+
+   applyStoredCursorForUser(currentUser)
+   updateCursorControls(currentUser)
+   showMsg('profile-message', 'Lokaler Cursor entfernt.', 'success')
+})
+
+profilePointerResetBtn.addEventListener('click', () => {
+   if (!currentUser) return
+
+   const removed = clearCursorForCurrentUser('pointer')
+   if (!removed) {
+      return showMsg('profile-message', 'Lokaler Pointer konnte nicht entfernt werden.', 'error')
+   }
+
+   applyStoredCursorForUser(currentUser)
+   updateCursorControls(currentUser)
+   showMsg('profile-message', 'Lokaler Pointer entfernt.', 'success')
 })
 
 profileUsernameInput.addEventListener('input', () => {
