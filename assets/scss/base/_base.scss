@@ -25,11 +25,24 @@ body{
 a,
 button,
 [role='button'],
+[onclick],
+[tabindex]:not([tabindex='-1']),
+[data-modal-target],
+[data-modal-close],
 input[type='submit'],
 input[type='button'],
 input[type='reset'],
 label[for],
-summary{
+summary,
+.nav__logo,
+.nav__admin-tools,
+.nav__developer-tools,
+.nav__search,
+.nav__login,
+.nav__toggle,
+.nav__close,
+.search__close,
+.login__close{
 	cursor: url('../cursors/pointer-small.png') 0 0, pointer;
 }
 
