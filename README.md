@@ -22,14 +22,18 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 - Optionale Bio speichern (max. 200 Zeichen, Zeilenumbrüche erlaubt)
 	- Live-Zeichenzähler (`0/200`) direkt unter dem Eingabefeld
 - Optionales Geburtsdatum speichern (`dd/mm/yyyy`)
+	- Interaktiver Kalender-Picker für einfache Navigation
 - Sternzeichen-Icon im öffentlichen Profil anzeigen (wenn Geburtsdatum gesetzt ist)
 	- Klick auf das Sternzeichen-Icon öffnet den passenden Wikipedia-Artikel
 - Optionalen Glauben speichern (Atheismus, Christentum, Islam, Judentum, Hinduismus, Buddhismus, Daoismus, Shintoismus)
+	- Optional: Bekenntnis/Subkategorie hinzufügen
 	- Im öffentlichen Profil erscheint ein passendes Glaubens-Icon
 	- Klick auf das Glaubens-Icon öffnet den passenden Wikipedia-Artikel
 - Im öffentlichen Usermodal stehen Profilname und Pronomen zentriert nebeneinander, Pronomen in hellerer Darstellung
-- Im öffentlichen Usermodal erscheint die Bio in einer Box unter „Follower | Folge ich“
+- Im öffentlichen Usermodal erscheint die Bio in einer Box unter „Follower | Folge ich"
 - Akzentfarbe fürs Profil auswählen
+	- Interaktiver Farbwähler (HSL + Hex-Input)
+- Avatar-Künstler-Attribution (optionale URL zum Urheber)
 - Konto löschen (mit Passwort-Bestätigung)
 - Geschützte Projektkonten können nicht gelöscht werden
 
@@ -75,19 +79,54 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 - Ergebnisse in getrennten Listen:
 	- Anzeigename
 	- Username
-	- Echter Name
 - Klick auf Treffer öffnet direkt das jeweilige Profil
 
 ### Lokaler Custom-Background
 - Nur für eingeloggte Nutzer im Profil konfigurierbar
 - Wird ausschließlich lokal im Browser gespeichert (nicht serverseitig synchronisiert)
-- Upload-Limit: standardmäßig 8 MB (konfigurierbar über `MAX_AVATAR_SIZE_MB`)
+- Avatar-Upload-Limit: standardmäßig 8 MB (konfigurierbar via `.env`)
+- Custom-Cursor (lokal im Browser)
+- Custom-Pointer (lokal im Browser)
 
 ### System/Backend
-- Express-Server mit SQLite (Node.js built-in SQLite)
+- Express-Server mit SQLite (Node.js built-in)
 - Avatar-Uploads über Multer
-- Inaktive Accounts werden serverseitig periodisch bereinigt
 - Mailversand über SMTP oder Resend
+- Rollenbasiertes Zugriffssystem (User, Moderator, Administrator, Developer)
+- Early-Supporter-Status für Account (automatisch für Accounts vor 2026-06-18)
+- Benutzer-Einschränkungen und Sperrungen mit Freigabeanfragen
+
+### Admin & Moderations-Funktionen
+- Benutzer-Verwaltung (Liste, Suche, Löschen)
+- Moderator/Developer-Rollen verwalten (Toggle)
+- Benutzer-Sperrung (Restriction)
+- Benutzer-Meldungssystem
+  - Nutzer können Profile melden (mit Grund)
+  - Admin/Moderator können alle Meldungen zu einem Nutzer sehen
+  - Meldungen können geschlossen werden
+  - Reporter-Informationen werden erfasst (Nutzername, Vollname, Zeitstempel)
+- Benutzer-Freigabeanfragen
+  - Gesperrte Benutzer können um Freigabe ersuchen
+  - Admin/Moderator können Anfragen genehmigen oder ablehnen
+
+### Developer-Funktionen
+- Bug/Fehler-Meldungssystem
+  - Nutzer können Bugs durch Klick auf Logo melden
+  - Basis-Informationen werden erfasst (Benutzername, Nachricht, Zeitstempel)
+- Bug-Report-Panel
+  - Alle eingereichten Bugs ansehen
+  - Bugs mit Statusanzeige (offen/geschlossen)
+  - Einzelne Bugs schließen
+
+### Weitere Funktionen
+- PWA (Progressive Web App)
+  - Service Worker für Offline-Unterstützung
+  - Installationsprompt
+  - Auto-Update bei Controller-Wechsel
+- Projekt-Kontakt-Modal (zeigt Kontaktinfo von Armand & Jost)
+- Sicherheitsheader via Helmet
+- CORS mit konfigurierbaren Origins
+- Rate-Limiting für API und Auth-Endpunkte
 
 ## Tech-Stack
 - Frontend: HTML, CSS, JavaScript
@@ -166,51 +205,57 @@ Hinweis: Wenn `RESEND_API_KEY` gesetzt ist, werden `SMTP_*`-Variablen ignoriert.
 - Auf Railway sollte für persistente Daten ein `DATA_DIR` gesetzt werden.
 - Server-Logs zeigen beim Start, ob Mailversand korrekt konfiguriert ist.
 
-## Smoke-Test nach Router-Cleanup
+## Smoke-Test
 
-Diese Checkliste prüft die zuletzt modularisierten Auth-Routen (`auth.core`, `auth.profile`, `auth.admin`) schnell manuell im Browser.
+Diese Checkliste prüft die wichtigsten Funktionen manuell im Browser.
 
 ### Vorbereitung
 1. Server starten: `npm run dev` (oder `npm start`).
 2. App öffnen: `http://localhost:3000`.
-3. Zwei Accounts bereithalten:
-	- normaler User
-	- Admin/Moderator für Ticket-Ansicht
+3. Test-Accounts vorbereiten:
+	- Normaler Benutzer (Registration/Login)
+	- Admin/Moderator-Account (für Admin-Panel)
 
-### User-Flow (Core)
-1. **Login** mit gültigen Daten.
-	- Erwartung: Erfolgreiche Anmeldung, kein Fehler-Toast.
-2. **Session prüfen** durch Seiten-Reload oder geschützte Ansicht.
-	- Erwartung: Nutzer bleibt eingeloggt (`/me` funktioniert intern).
-3. **Bug melden** (Profil/Modal → Bug-Formular) mit Text < 1000 Zeichen.
-	- Erwartung: Erfolgsmeldung „Bug erfolgreich gemeldet.“
-4. **Negativtest Bug** mit leerem Text.
-	- Erwartung: Validierungsfehler „Bitte beschreibe den Bug.“
+### Authentifizierung & Profil
+1. **Registrierung** mit `@tha.de`-E-Mail testen.
+	- Verifikationscode per Mail sollte ankommen.
+	- Account sollte aktiviert werden nach Code-Eingabe.
+2. **Login** mit E-Mail oder Benutzername.
+	- Session sollte bestehen bleiben nach Reload.
+3. **Profil bearbeiten**:
+	- Avatar hochladen (< 8 MB).
+	- Pronomen, Bio, Geburtsdatum, Glaube setzen.
+	- Akzentfarbe ändern.
+	- Alle Änderungen sollten gespeichert werden.
 
-### User-Flow (Profile/Public)
-1. Öffentliches Profil öffnen (`/public/:username` via UI).
-	- Erwartung: Profil lädt weiterhin normal.
-2. Folgen/Entfolgen testen.
-	- Erwartung: Zähler aktualisieren sich wie zuvor.
+### Öffentliche Profile & Social
+1. Eigenes öffentliches Profil ansehen.
+	- Alle Daten sollten korrekt angezeigt werden.
+	- Sternzeichen-Icon sollte beim Geburtsdatum angezeigt werden.
+2. Anderes Profil aufrufen und **folgen/entfolgen** testen.
+	- Follower-Zähler sollte sich aktualisieren.
 
-### Admin-Flow (Tickets)
-1. Als Admin/Moderator anmelden.
-2. Person-Tickets öffnen und Tabs prüfen:
-	- **Meldungen** lädt Einträge oder leeren Zustand ohne Fehler.
-	- **Bugs** lädt Einträge oder leeren Zustand ohne Fehler.
-	- **Freigaben** lädt Einträge oder leeren Zustand ohne Fehler.
-3. Optional je einen Eintrag schließen/entscheiden.
-	- Erwartung: Eintrag verschwindet aus Liste, UI bleibt stabil.
+### Suche
+1. Live-Suche modal öffnen.
+2. Nach Benutzernamen & Anzeigenamen suchen.
+	- Ergebnisse sollten in separaten Listen erscheinen.
+	- Klick auf Treffer sollte Profil öffnen.
 
-### Quick-API-Checks (optional, DevTools)
-- `POST /api/auth/login` → `200` bei gültigen Daten.
-- `GET /api/auth/me` → `200` mit Session, sonst `401`.
-- `POST /api/auth/report-bug` → `201` bei gültiger Meldung.
-- `GET /api/auth/admin/bug-reports/:username` → `200` für Admin/Moderator.
+### Bug-Report
+1. Logo klicken → Bug-Report-Modal öffnen.
+2. Bug-Text eingeben und absenden.
+	- Erfolgsmeldung sollte angezeigt werden.
 
-Wenn alle Punkte grün sind, ist der Router-Cleanup funktional konsistent.
+### Admin-Panel (als Moderator/Admin)
+Über Navigationsverweis zugänglich:
+1. **Benutzer-Liste** ansehen und durchsuchen.
+2. **Person-Tickets** öffnen:
+	- **Meldungen** Tab: Benutzer-Meldungen ansehen/schließen.
+	- **Bugs** Tab: Bug-Reports ansehen/schließen.
+	- **Freigaben** Tab: Entbannungs-Anfragen genehmigen/ablehnen.
 
-## Roadmap (kurz)
-- Weitere Suchkategorien/Objekttypen
-- Ausbau der Ergebnisse und Relevanzlogik
-- Zusätzliche Profil- und Community-Features
+## Roadmap
+- Erweiterte Filterung in Admin-Panel
+- Statistik-Dashboard (Nutzer-Aktivität, Reports, etc.)
+- Weitere Social-Features (Direct Messages, etc.)
+- Mobile App Optimization
