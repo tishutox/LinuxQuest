@@ -65,7 +65,7 @@ button {
 body {
   background-color: var(--body-color);
   color: var(--text-color);
-  cursor: url('../cursors/Hollow Knight The Knight--cursor--SweezyCursors.cur'), auto;
+  cursor: url('../cursors/cursor-small.png') 8 8, url('../cursors/cursor.cur'), auto;
 }
 
 a,
@@ -89,7 +89,7 @@ summary,
 .nav__close,
 .search__close,
 .login__close {
-  cursor: url('../cursors/Hollow Knight The Knight--pointer--SweezyCursors.cur'), pointer !important;
+  cursor: url('../cursors/pointer-small.png') 8 8, url('../cursors/pointer.cur'), pointer !important;
 }
 
 input,
