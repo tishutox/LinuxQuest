@@ -19,7 +19,7 @@ button{
 body{
 	background-color: var(--body-color);
 	color: var(--text-color);
-	cursor: url('../cursors/cursor.cur'), auto;
+	cursor: url('../cursors/cursor-small.png') 0 0, auto;
 }
 
 a,
@@ -30,7 +30,7 @@ input[type='button'],
 input[type='reset'],
 label[for],
 summary{
-	cursor: url('../cursors/pointer.cur'), pointer;
+	cursor: url('../cursors/pointer-small.png') 0 0, pointer;
 }
 
 input,
