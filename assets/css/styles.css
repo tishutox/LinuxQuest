@@ -2508,10 +2508,10 @@ body.user-theme-active .profile-background__reset:disabled {
 @media screen and (max-width: 1023px) {
   :root {
     --mobile-modal-top-gap: 4.5rem;
-    --mobile-modal-bottom-gap: max(1.5rem, env(safe-area-inset-bottom));
-    --mobile-modal-content-cap-svh: min(82svh, calc(100svh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap)));
-    --mobile-modal-content-cap-dvh: min(82dvh, calc(100dvh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap)));
-    --mobile-modal-content-cap-vh: min(82vh, calc(100vh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap)));
+    --mobile-modal-bottom-gap: max(2rem, env(safe-area-inset-bottom));
+    --mobile-modal-content-cap-svh: min(62svh, calc(100svh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap)));
+    --mobile-modal-content-cap-dvh: min(62dvh, calc(100dvh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap)));
+    --mobile-modal-content-cap-vh: min(62vh, calc(100vh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap)));
   }
 
   .search,
