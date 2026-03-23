@@ -1,10 +1,29 @@
 /*=============== SHOW MENU ===============*/
 const navMenu = document.getElementById('nav-menu'),
       navToggle = document.getElementById('nav-toggle'),
-      navClose = document.getElementById('nav-close')
+      navClose = document.getElementById('nav-close'),
+      navSearch = document.getElementById('search-btn'),
+      navLogin = document.getElementById('login-btn');
 
-navToggle.addEventListener('click', () => navMenu.classList.add('show-menu'))
-navClose.addEventListener('click',  () => navMenu.classList.remove('show-menu'))
+function setNavActionsVisible(visible) {
+   if (navSearch) navSearch.style.display = visible ? '' : 'none';
+   if (navLogin) navLogin.style.display = visible ? '' : 'none';
+}
+
+navToggle.addEventListener('click', () => {
+   navMenu.classList.add('show-menu');
+   // Auf Mobilgeräten Lupe und Login ausblenden
+   if (window.matchMedia('(max-width: 1023px)').matches) {
+      setNavActionsVisible(false);
+   }
+});
+navClose.addEventListener('click',  () => {
+   navMenu.classList.remove('show-menu');
+   // Beim Schließen wieder einblenden
+   if (window.matchMedia('(max-width: 1023px)').matches) {
+      setNavActionsVisible(true);
+   }
+});
 
 /*=============== APP INSTALL (NO POPUP) ===============*/
 const installAppBtn = document.getElementById('install-app-btn')

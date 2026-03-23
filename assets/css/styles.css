@@ -211,11 +211,13 @@ img {
 .search__close,
 .login__close {
   position: absolute;
-  top: .65rem;
-  right: 2rem;
-  font-size: 1.5rem;
+  top: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.7rem;
   color: var(--title-color);
   cursor: pointer;
+  z-index: 10;
 }
 
 /*=============== HEADER & NAV ===============*/
