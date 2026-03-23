@@ -1289,13 +1289,15 @@ body.user-theme-active .birth-date-picker__day.is-selected {
 }
 
 .belief-picker__religion.is-selected {
+  background-color: var(--first-color);
   border-color: var(--first-color);
-  color: var(--first-color);
+  color: #fff;
 }
 
 body.user-theme-active .belief-picker__religion.is-selected {
-  border-color: var(--first-color);
-  color: var(--first-color);
+  background-color: var(--user-accent-color);
+  border-color: var(--user-accent-color);
+  color: var(--user-accent-text-color, #fff);
 }
 
 body.user-theme-active #belief-modal #belief-picker-confession {
