@@ -38,6 +38,7 @@
 }
 
 .finder-search__filters{
+   border-radius: .5rem;
    max-height: min(56vh, 24rem);
    overflow-y: scroll;
    scrollbar-gutter: stable;
