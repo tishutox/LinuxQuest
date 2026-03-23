@@ -1,28 +1,13 @@
 /*=============== SHOW MENU ===============*/
 const navMenu = document.getElementById('nav-menu'),
       navToggle = document.getElementById('nav-toggle'),
-      navClose = document.getElementById('nav-close'),
-      navSearch = document.getElementById('search-btn'),
-      navLogin = document.getElementById('login-btn');
-
-function setNavActionsVisible(visible) {
-   if (navSearch) navSearch.style.display = visible ? '' : 'none';
-   if (navLogin) navLogin.style.display = visible ? '' : 'none';
-}
+      navClose = document.getElementById('nav-close');
 
 navToggle.addEventListener('click', () => {
    navMenu.classList.add('show-menu');
-   // Auf Mobilgeräten Lupe und Login ausblenden
-   if (window.matchMedia('(max-width: 1023px)').matches) {
-      setNavActionsVisible(false);
-   }
 });
 navClose.addEventListener('click',  () => {
    navMenu.classList.remove('show-menu');
-   // Beim Schließen wieder einblenden
-   if (window.matchMedia('(max-width: 1023px)').matches) {
-      setNavActionsVisible(true);
-   }
 });
 
 /*=============== APP INSTALL (NO POPUP) ===============*/

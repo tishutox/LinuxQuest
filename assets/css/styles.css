@@ -220,6 +220,13 @@ img {
   z-index: 10;
 }
 
+/* Fix: Modal-Close-Icon sichtbar machen */
+.search__close i,
+.login__close i {
+  color: var(--first-color) !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
 /*=============== HEADER & NAV ===============*/
 .header {
   position: fixed;
@@ -324,6 +331,10 @@ img {
     width: 100%;
     padding-block: 4.5rem 4rem;
     transition: top .4s;
+    z-index: 120;
+  }
+  .nav__actions {
+    z-index: 110;
   }
 }
 
