@@ -31,6 +31,19 @@
    }
 }
 
+@media screen and (max-width: 575px){
+   .search,
+   .login{
+      padding: 4.5rem 1rem 1rem;
+   }
+
+   .login__form{
+      width: 100%;
+      max-height: calc(100vh - 5.5rem);
+      max-height: calc(100dvh - 5.5rem);
+   }
+}
+
 /* For large devices */
 @media screen and (min-width: 1023px){
    .nav{

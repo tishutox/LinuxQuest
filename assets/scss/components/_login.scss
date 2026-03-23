@@ -96,3 +96,10 @@
    padding-right: .2rem;
    scrollbar-gutter: stable;
 }
+
+@media screen and (max-width: 575px){
+   #finder-country-modal #finder-country-picker-countries{
+      max-height: min(52vh, 24rem);
+      max-height: min(52dvh, 24rem);
+   }
+}
