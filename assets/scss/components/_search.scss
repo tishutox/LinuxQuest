@@ -77,4 +77,40 @@
    #finder-distro-results{
       max-height: min(64vh, 30rem);
    }
+
+   #search.is-finder-mode{
+      padding: 4rem .85rem .85rem;
+      overflow: hidden;
+   }
+
+   #search.is-finder-mode .search__form{
+      max-width: 430px;
+      margin-inline: auto;
+   }
+
+   #search.is-finder-mode .finder-search__filters{
+      max-height: min(42svh, 20rem);
+      max-height: min(42dvh, 20rem);
+      max-height: min(42vh, 20rem);
+   }
+
+   #search.is-finder-mode #finder-distro-results{
+      max-height: min(30svh, 14rem);
+      max-height: min(30dvh, 14rem);
+      max-height: min(30vh, 14rem);
+   }
+}
+
+@media screen and (max-width: 575px){
+   #search.is-finder-mode .finder-search__filters{
+      max-height: min(38svh, 17rem);
+      max-height: min(38dvh, 17rem);
+      max-height: min(38vh, 17rem);
+   }
+
+   #search.is-finder-mode #finder-distro-results{
+      max-height: min(26svh, 11.5rem);
+      max-height: min(26dvh, 11.5rem);
+      max-height: min(26vh, 11.5rem);
+   }
 }

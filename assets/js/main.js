@@ -245,6 +245,7 @@ function hideFinderResults() {
 
 function setFinderMode(active) {
    isFinderMode = Boolean(active)
+   search.classList.toggle('is-finder-mode', isFinderMode)
 
    if (isFinderMode) {
       searchInput.placeholder = 'Nach Distro-Namen suchen...'
