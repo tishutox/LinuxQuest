@@ -431,12 +431,12 @@ img {
   padding: .85rem 1rem;
   width: min(100%, 450px);
   margin-inline: auto;
-  max-height: min(62vh, 30rem);
+  max-height: min(78vh, 42rem);
   overflow-y: auto;
 }
 
 #finder-distro-results {
-  max-height: min(62vh, 30rem);
+  max-height: min(78vh, 42rem);
   overflow-y: auto;
 }
 
@@ -489,7 +489,7 @@ img {
   padding: 1rem;
   display: grid;
   row-gap: .95rem;
-  max-height: min(62vh, 30rem);
+  max-height: min(78vh, 42rem);
   overflow-y: auto;
   scrollbar-gutter: stable;
 }
@@ -516,7 +516,7 @@ img {
   display: flex;
   flex-wrap: wrap;
   gap: .45rem;
-  max-height: 8rem;
+  max-height: min(55vh, 26rem);
   overflow-y: scroll;
   align-content: flex-start;
   padding-right: .2rem;
@@ -682,7 +682,7 @@ img {
 .finder-distro-results__list {
   display: grid;
   gap: .35rem;
-  max-height: 10rem;
+  max-height: min(60vh, 30rem);
   overflow-y: auto;
   align-content: start;
   padding-right: .2rem;
@@ -690,7 +690,7 @@ img {
 }
 
 #finder-distro-results .finder-distro-results__list {
-  max-height: min(48vh, 22rem);
+  max-height: min(70vh, 36rem);
   overflow-y: auto;
 }
 
@@ -826,7 +826,7 @@ img {
 }
 
 .admin-reports__list {
-  max-height: 22rem;
+  max-height: min(65vh, 34rem);
   overflow-y: auto;
   border: 1px solid var(--border-color);
   border-radius: .5rem;
@@ -1375,7 +1375,7 @@ body.user-theme-active .birth-date-picker__day.is-selected {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: .45rem;
-  max-height: min(55vh, 26rem);
+  max-height: min(70vh, 36rem);
   overflow-y: auto;
   align-content: start;
   padding-right: .2rem;
@@ -1383,7 +1383,7 @@ body.user-theme-active .birth-date-picker__day.is-selected {
 }
 
 #finder-country-modal #finder-country-picker-countries {
-  max-height: min(55vh, 26rem);
+  max-height: min(70vh, 36rem);
   overflow-y: auto;
   align-content: start;
   padding-right: .2rem;
@@ -2038,7 +2038,7 @@ body.user-theme-active .profile-background__reset:disabled {
 .follow-list {
   display: grid;
   gap: .5rem;
-  max-height: min(55vh, 24rem);
+  max-height: min(70vh, 36rem);
   overflow-y: auto;
 }
 
