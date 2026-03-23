@@ -2432,3 +2432,44 @@ body.user-theme-active .profile-background__reset:disabled {
     max-height: min(60vh, 30rem);
   }
 }
+
+@media screen and (max-width: 1023px) {
+  :root {
+    --mobile-search-modal-list-max: min(64svh, 32rem);
+    --mobile-login-modal-max: min(86svh, 42rem);
+    --mobile-list-modal-max: min(60svh, 30rem);
+  }
+
+  #search,
+  #admin-user-list-modal,
+  #developer-user-list-modal {
+    padding: 4.5rem 1rem 1rem;
+    overflow-y: auto;
+  }
+
+  #search .search__form,
+  #admin-user-list-modal .search__form,
+  #developer-user-list-modal .search__form {
+    max-width: 450px;
+    margin-inline: auto;
+  }
+
+  #search .search__results,
+  #admin-user-list-modal .search__results,
+  #developer-user-list-modal .search__results,
+  #search #finder-filter-options,
+  #search #finder-distro-results {
+    max-height: var(--mobile-search-modal-list-max);
+  }
+
+  .login .login__form {
+    max-height: var(--mobile-login-modal-max);
+  }
+
+  .belief-picker__religions,
+  #finder-country-modal #finder-country-picker-countries,
+  .follow-list,
+  .admin-reports__list {
+    max-height: var(--mobile-list-modal-max);
+  }
+}
