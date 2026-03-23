@@ -72,7 +72,7 @@ const finderFilterSpeedMaxValue = document.getElementById('finder-filter-speed-m
 const finderTagsContainer = document.getElementById('finder-tags-container')
 const finderTagButtons = Array.from(finderTagsContainer?.querySelectorAll('.finder-filter__tag-option') || [])
 
-let finderSelectedTags = []
+let finderTagStates = {}
 
 const FINDER_COUNTRY_OPTIONS = [
    { value: 'de', label: 'Deutschland' },
@@ -270,19 +270,48 @@ function getSelectedFinderCountries() {
 }
 
 function getSelectedFinderTags() {
-   return [...finderSelectedTags]
+   return Object.entries(finderTagStates)
+      .filter(([, state]) => state === 'include')
+      .map(([tag]) => tag)
+}
+
+function getExcludedFinderTags() {
+   return Object.entries(finderTagStates)
+      .filter(([, state]) => state === 'exclude')
+      .map(([tag]) => tag)
+}
+
+function applyFinderTagButtonState(button, state) {
+   button.classList.toggle('is-selected', state === 'include')
+   button.classList.toggle('is-excluded', state === 'exclude')
+}
+
+function cycleFinderTagState(tagValue) {
+   const currentState = finderTagStates[tagValue] || 'neutral'
+
+   if (currentState === 'neutral') {
+      finderTagStates[tagValue] = 'include'
+      return 'include'
+   }
+
+   if (currentState === 'include') {
+      finderTagStates[tagValue] = 'exclude'
+      return 'exclude'
+   }
+
+   delete finderTagStates[tagValue]
+   return 'neutral'
 }
 
 function initFinderTagButtons() {
    finderTagButtons.forEach((button) => {
       button.addEventListener('click', () => {
          const tagValue = button.dataset.value
-         if (finderSelectedTags.includes(tagValue)) {
-            finderSelectedTags = finderSelectedTags.filter((tag) => tag !== tagValue)
-            button.classList.remove('is-selected')
-         } else {
-            finderSelectedTags = [...finderSelectedTags, tagValue]
-            button.classList.add('is-selected')
+         const nextState = cycleFinderTagState(tagValue)
+         applyFinderTagButtonState(button, nextState)
+
+         if (isFinderMode) {
+            runFinderSearch()
          }
       })
    })
@@ -291,7 +320,8 @@ function initFinderTagButtons() {
 function runFinderSearch() {
    const nameQuery = searchInput.value.trim().toLowerCase()
    const selectedCountries = getSelectedFinderCountries()
-   const selectedTags = getSelectedFinderTags()
+   const includedTags = getSelectedFinderTags()
+   const excludedTags = getExcludedFinderTags()
    const selectedCodebase = finderFilterCodebase.value
    const minSpeed = Number.parseInt(finderFilterSpeedMin.value, 10) || 1
    const maxSpeed = Number.parseInt(finderFilterSpeedMax.value, 10) || 10
@@ -300,9 +330,10 @@ function runFinderSearch() {
       const matchesName = !nameQuery || distro.name.toLowerCase().includes(nameQuery)
       const matchesCodebase = !selectedCodebase || distro.codebase === selectedCodebase
       const matchesCountries = !selectedCountries.length || distro.countries.some((country) => selectedCountries.includes(country))
-      const matchesTags = !selectedTags.length || selectedTags.every((tag) => distro.tags.includes(tag))
+      const matchesIncludedTags = !includedTags.length || includedTags.every((tag) => distro.tags.includes(tag))
+      const matchesExcludedTags = !excludedTags.length || !excludedTags.some((tag) => distro.tags.includes(tag))
       const matchesSpeed = distro.speed >= minSpeed && distro.speed <= maxSpeed
-      return matchesName && matchesCodebase && matchesCountries && matchesTags && matchesSpeed
+      return matchesName && matchesCodebase && matchesCountries && matchesIncludedTags && matchesExcludedTags && matchesSpeed
    })
 
    renderFinderDistroResults(matches)

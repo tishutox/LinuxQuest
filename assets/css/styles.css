@@ -602,6 +602,12 @@ img {
   border-color: var(--user-accent-color, var(--first-color));
 }
 
+.finder-filter__tag-option.is-excluded {
+  background-color: hsl(0, 75%, 56%);
+  color: #fff;
+  border-color: hsl(0, 75%, 56%);
+}
+
 .finder-filter__range-wrap {
   display: grid;
   grid-template-columns: 1fr auto;
