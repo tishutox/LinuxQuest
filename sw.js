@@ -1,8 +1,8 @@
-const CACHE_NAME = 'linuxquest-v22'
+const CACHE_NAME = 'linuxquest-v23'
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/assets/css/styles.css?v=20260323-2',
+  '/assets/css/styles.css?v=20260323-3',
   '/assets/js/main.js',
   '/assets/img/Logo.png',
   '/assets/img/bg-image.png',

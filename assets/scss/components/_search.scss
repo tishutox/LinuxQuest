@@ -37,6 +37,20 @@
    }
 }
 
+.finder-search__filters{
+   max-height: min(56vh, 24rem);
+   overflow-y: scroll;
+   scrollbar-gutter: stable;
+}
+
+.finder-filter__tags{
+   max-height: 8rem;
+   overflow-y: scroll;
+   align-content: flex-start;
+   padding-right: .2rem;
+   scrollbar-gutter: stable;
+}
+
 #finder-distro-results{
    max-height: 14rem;
    overflow-y: scroll;

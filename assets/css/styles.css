@@ -485,6 +485,9 @@ img {
   padding: 1rem;
   display: grid;
   row-gap: .95rem;
+  max-height: min(56vh, 24rem);
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 .finder-search__group {
@@ -509,6 +512,11 @@ img {
   display: flex;
   flex-wrap: wrap;
   gap: .45rem;
+  max-height: 8rem;
+  overflow-y: scroll;
+  align-content: flex-start;
+  padding-right: .2rem;
+  scrollbar-gutter: stable;
 }
 
 .finder-filter__tag-option {
