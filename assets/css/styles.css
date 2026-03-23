@@ -665,8 +665,8 @@ img {
 .finder-distro-results__list {
   display: grid;
   gap: .35rem;
-  max-height: min(42vh, 18rem);
-  overflow-y: auto;
+  max-height: 10rem;
+  overflow-y: scroll;
   align-content: start;
   padding-right: .2rem;
   scrollbar-gutter: stable;
@@ -674,6 +674,7 @@ img {
 
 #finder-distro-results .finder-distro-results__list {
   max-height: 10rem;
+  overflow-y: scroll;
 }
 
 .admin-user-list__form {
@@ -1366,7 +1367,7 @@ body.user-theme-active .birth-date-picker__day.is-selected {
 
 #finder-country-modal #finder-country-picker-countries {
   max-height: 10rem;
-  overflow-y: auto;
+  overflow-y: scroll;
   align-content: start;
   padding-right: .2rem;
   scrollbar-gutter: stable;
