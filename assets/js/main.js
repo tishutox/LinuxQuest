@@ -314,13 +314,14 @@ function initFinderTagButtons() {
          applyFinderTagButtonState(button, nextState)
 
          if (isFinderMode) {
-            runFinderSearch()
+            runFinderSearch({ keepFiltersOpen: true })
          }
       })
    })
 }
 
-function runFinderSearch() {
+function runFinderSearch(options = {}) {
+   const { keepFiltersOpen = false } = options
    const nameQuery = searchInput.value.trim().toLowerCase()
    const selectedCountries = getSelectedFinderCountries()
    const includedTags = getSelectedFinderTags()
@@ -340,7 +341,9 @@ function runFinderSearch() {
    })
 
    renderFinderDistroResults(matches)
-   finderFilterOptions.style.display = 'none'
+   if (!keepFiltersOpen) {
+      finderFilterOptions.style.display = 'none'
+   }
 }
 
 function updateFinderSpeedRangeUi() {
