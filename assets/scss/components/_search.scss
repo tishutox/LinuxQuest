@@ -89,28 +89,28 @@
    }
 
    #search.is-finder-mode .finder-search__filters{
-      max-height: min(66svh, 32rem);
-      max-height: min(66dvh, 32rem);
-      max-height: min(66vh, 32rem);
+      max-height: min(68svh, 34rem);
+      max-height: min(68dvh, 34rem);
+      max-height: min(68vh, 34rem);
    }
 
    #search.is-finder-mode #finder-distro-results{
-      max-height: min(60svh, 28rem);
-      max-height: min(60dvh, 28rem);
-      max-height: min(60vh, 28rem);
+      max-height: min(62svh, 30rem);
+      max-height: min(62dvh, 30rem);
+      max-height: min(62vh, 30rem);
    }
 }
 
 @media screen and (max-width: 575px){
    #search.is-finder-mode .finder-search__filters{
-      max-height: min(60svh, 28rem);
-      max-height: min(60dvh, 28rem);
-      max-height: min(60vh, 28rem);
+      max-height: min(62svh, 30rem);
+      max-height: min(62dvh, 30rem);
+      max-height: min(62vh, 30rem);
    }
 
    #search.is-finder-mode #finder-distro-results{
-      max-height: min(54svh, 24rem);
-      max-height: min(54dvh, 24rem);
-      max-height: min(54vh, 24rem);
+      max-height: min(56svh, 26rem);
+      max-height: min(56dvh, 26rem);
+      max-height: min(56vh, 26rem);
    }
 }

@@ -106,9 +106,9 @@
       width: min(100%, 430px);
       margin-inline: auto;
       height: auto;
-      max-height: min(88svh, 42rem);
-      max-height: min(88dvh, 42rem);
-      max-height: min(88vh, 42rem);
+      max-height: min(90svh, 44rem);
+      max-height: min(90dvh, 44rem);
+      max-height: min(90vh, 44rem);
       display: grid;
       grid-template-rows: auto minmax(0, 1fr) auto;
       overflow-y: auto;
@@ -116,23 +116,23 @@
 
    #finder-country-modal #finder-country-picker-countries{
       min-height: 0;
-      max-height: min(62svh, 30rem);
-      max-height: min(62dvh, 30rem);
-      max-height: min(62vh, 30rem);
+      max-height: min(64svh, 32rem);
+      max-height: min(64dvh, 32rem);
+      max-height: min(64vh, 32rem);
       overflow-y: auto;
    }
 }
 
 @media screen and (max-width: 575px){
    #finder-country-modal .login__form{
-      max-height: min(84svh, 38rem);
-      max-height: min(84dvh, 38rem);
-      max-height: min(84vh, 38rem);
+      max-height: min(86svh, 40rem);
+      max-height: min(86dvh, 40rem);
+      max-height: min(86vh, 40rem);
    }
 
    #finder-country-modal #finder-country-picker-countries{
-      max-height: min(56svh, 26rem);
-      max-height: min(56dvh, 26rem);
-      max-height: min(56vh, 26rem);
+      max-height: min(58svh, 28rem);
+      max-height: min(58dvh, 28rem);
+      max-height: min(58vh, 28rem);
    }
 }
