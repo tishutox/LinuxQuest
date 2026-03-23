@@ -83,7 +83,7 @@ const FINDER_COUNTRY_OPTIONS = [
    { value: 'uk', label: 'Vereinigtes Königreich' },
    { value: 'fr', label: 'Frankreich' },
    { value: 'ie', label: 'Irland' }
-]
+].sort((first, second) => first.label.localeCompare(second.label, 'de'))
 const FINDER_COUNTRY_LABEL_BY_VALUE = Object.fromEntries(
    FINDER_COUNTRY_OPTIONS.map((country) => [country.value, country.label])
 )
@@ -270,6 +270,31 @@ function setFinderMode(active) {
 
 function getSelectedFinderCountries() {
    return [...finderSelectedCountries]
+}
+
+function sortFinderFilterOptions() {
+   if (finderTagsContainer) {
+      const sortedTagButtons = Array.from(finderTagsContainer.querySelectorAll('.finder-filter__tag-option'))
+         .sort((firstButton, secondButton) => firstButton.textContent.trim().localeCompare(secondButton.textContent.trim(), 'de'))
+
+      sortedTagButtons.forEach((button) => {
+         finderTagsContainer.appendChild(button)
+      })
+   }
+
+   if (finderFilterCodebase) {
+      const options = Array.from(finderFilterCodebase.options)
+      const defaultOption = options.find((option) => option.value === '')
+      const otherOptions = options
+         .filter((option) => option.value !== '')
+         .sort((firstOption, secondOption) => firstOption.textContent.trim().localeCompare(secondOption.textContent.trim(), 'de'))
+
+      finderFilterCodebase.innerHTML = ''
+      if (defaultOption) {
+         finderFilterCodebase.appendChild(defaultOption)
+      }
+      otherOptions.forEach((option) => finderFilterCodebase.appendChild(option))
+   }
 }
 
 function getSelectedFinderTags() {
@@ -533,6 +558,7 @@ finderCountryModal?.addEventListener('click', (event) => {
 })
 
 renderFinderCountrySummary()
+sortFinderFilterOptions()
 initFinderTagButtons()
 
 if (finderFilterSpeedMin && finderFilterSpeedMax) {
