@@ -392,6 +392,9 @@ function runFinderSearch(options = {}) {
    const selectedCodebase = finderFilterCodebase.value
    const minIsoSizeMb = Number.parseInt(finderFilterSpeedMin.value, 10) || FINDER_ISO_SIZE_MIN_MB
    const maxIsoSizeMb = Number.parseInt(finderFilterSpeedMax.value, 10) || FINDER_ISO_SIZE_MAX_MB
+   const hasIsoRangeFilter = minIsoSizeMb > FINDER_ISO_SIZE_MIN_MB || maxIsoSizeMb < FINDER_ISO_SIZE_MAX_MB
+   const hasRankingSignal = Boolean(nameQuery) || hasIsoRangeFilter || selectedCountries.length > 1
+   const targetIsoSizeMb = (minIsoSizeMb + maxIsoSizeMb) / 2
 
    const matches = DISTRO_FINDER_DATA.filter((distro) => {
       const matchesName = !nameQuery || distro.name.toLowerCase().includes(nameQuery)
@@ -401,12 +404,67 @@ function runFinderSearch(options = {}) {
       const matchesExcludedTags = !excludedTags.length || !excludedTags.some((tag) => distro.tags.includes(tag))
       const matchesIsoSize = distro.isoSizeMb >= minIsoSizeMb && distro.isoSizeMb <= maxIsoSizeMb
       return matchesName && matchesCodebase && matchesCountries && matchesIncludedTags && matchesExcludedTags && matchesIsoSize
+   }).sort((firstDistro, secondDistro) => {
+      if (!hasRankingSignal) {
+         return firstDistro.name.localeCompare(secondDistro.name, 'de')
+      }
+
+      const firstScore = getFinderRelevanceScore(firstDistro, {
+         nameQuery,
+         selectedCountries,
+         targetIsoSizeMb,
+         hasIsoRangeFilter
+      })
+      const secondScore = getFinderRelevanceScore(secondDistro, {
+         nameQuery,
+         selectedCountries,
+         targetIsoSizeMb,
+         hasIsoRangeFilter
+      })
+
+      if (secondScore !== firstScore) {
+         return secondScore - firstScore
+      }
+
+      return firstDistro.name.localeCompare(secondDistro.name, 'de')
    })
 
    renderFinderDistroResults(matches)
    if (!keepFiltersOpen) {
       finderFilterOptions.style.display = 'none'
    }
+}
+
+function getFinderRelevanceScore(distro, context) {
+   const { nameQuery, selectedCountries, targetIsoSizeMb, hasIsoRangeFilter } = context
+   let score = 0
+
+   if (nameQuery) {
+      const nameLower = distro.name.toLowerCase()
+      const matchIndex = nameLower.indexOf(nameQuery)
+
+      if (matchIndex === 0) {
+         score += 120
+      } else if (matchIndex > 0) {
+         score += Math.max(60 - matchIndex, 10)
+      }
+
+      if (nameLower === nameQuery) {
+         score += 40
+      }
+   }
+
+   if (selectedCountries.length > 1) {
+      const countryMatches = distro.countries.filter((country) => selectedCountries.includes(country)).length
+      score += countryMatches * 8
+   }
+
+   if (hasIsoRangeFilter) {
+      const isoDistance = Math.abs(distro.isoSizeMb - targetIsoSizeMb)
+      score += Math.max(40 - Math.floor(isoDistance / 100), 0)
+   }
+
+   return score
 }
 
 function updateFinderSpeedRangeUi() {
