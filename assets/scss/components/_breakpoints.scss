@@ -162,9 +162,9 @@
    :root{
       --mobile-modal-top-gap: 4.5rem;
       --mobile-modal-bottom-gap: max(1.5rem, env(safe-area-inset-bottom));
-      --mobile-modal-content-cap-svh: calc(100svh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap));
-      --mobile-modal-content-cap-dvh: calc(100dvh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap));
-      --mobile-modal-content-cap-vh: calc(100vh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap));
+      --mobile-modal-content-cap-svh: min(82svh, calc(100svh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap)));
+      --mobile-modal-content-cap-dvh: min(82dvh, calc(100dvh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap)));
+      --mobile-modal-content-cap-vh: min(82vh, calc(100vh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap)));
    }
 
    .search,
