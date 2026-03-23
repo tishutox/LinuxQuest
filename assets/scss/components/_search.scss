@@ -54,7 +54,7 @@
 }
 
 .finder-filter__tags{
-   max-height: min(55vh, 26rem);
+   max-height: min(42vh, 18rem);
    overflow-y: scroll;
    align-content: flex-start;
    padding-right: .2rem;
@@ -67,6 +67,10 @@
 }
 
 @media screen and (max-width: 1023px){
+   .finder-filter__tags{
+      max-height: min(32vh, 13rem);
+   }
+
    .search{
       &__results{
          max-height: min(64vh, 30rem);

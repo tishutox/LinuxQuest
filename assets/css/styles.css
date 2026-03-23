@@ -563,11 +563,17 @@ img {
   display: flex;
   flex-wrap: wrap;
   gap: .45rem;
-  max-height: min(55vh, 26rem);
+  max-height: min(42vh, 18rem);
   overflow-y: scroll;
   align-content: flex-start;
   padding-right: .2rem;
   scrollbar-gutter: stable;
+}
+
+@media screen and (max-width: 1023px) {
+  .finder-filter__tags {
+    max-height: min(32vh, 13rem);
+  }
 }
 
 .finder-filter__tag-option {
