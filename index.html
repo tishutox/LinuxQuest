@@ -110,14 +110,11 @@
             </div>
 
             <div class="finder-search__group">
-               <label class="login__label" for="finder-filter-country">Herkunftsland/-länder</label>
-               <select id="finder-filter-country" class="finder-filter__select" multiple>
-                  <option value="de">Deutschland</option>
-                  <option value="us">USA</option>
-                  <option value="uk">Vereinigtes Königreich</option>
-                  <option value="fr">Frankreich</option>
-                  <option value="ie">Irland</option>
-               </select>
+               <label class="login__label" for="finder-filter-country-open">Herkunftsland/-länder</label>
+               <button type="button" id="finder-filter-country-open" class="profile-select-trigger finder-country-trigger" aria-haspopup="dialog" aria-controls="finder-country-modal">
+                  <span class="profile-select-trigger__value" id="finder-filter-country-value">Alle Länder</span>
+                  <span class="profile-select-trigger__subvalue" id="finder-filter-country-subvalue">Keine Länder ausgewählt</span>
+               </button>
             </div>
 
             <div class="finder-search__group">
@@ -653,6 +650,18 @@
          <i class="fi fi-rr-cross-small login__close" id="belief-close"></i>
       </div>
 
+      <div class="login" id="finder-country-modal">
+         <div class="login__form profile__form belief-picker__form">
+            <h2 class="login__title">Herkunftsland/-länder</h2>
+
+            <div class="belief-picker__religions" id="finder-country-picker-countries"></div>
+
+            <button type="button" class="login__button" id="finder-country-apply-btn">Auswahl übernehmen</button>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" id="finder-country-close"></i>
+      </div>
+
       <div class="login" id="follow-list-modal">
          <div class="login__form profile__form">
             <h2 class="login__title" id="follow-list-title">Liste</h2>
@@ -712,6 +721,24 @@
 
       <!--==================== MAIN ====================-->
       <main class="main">
+         <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g clip-path="url(#DE_svg__a)">
+               <path
+                  d="M.746 16.175C2.442 20.745 6.84 24 12 24c5.16 0 9.558-3.257 11.253-7.826L12 15.132.746 16.175Z"
+                  fill="#FFDA44"
+               />
+               <path d="M12 0C6.84 0 2.442 3.258.746 7.828L12 8.87l11.253-1.043C21.558 3.257 17.16 0 12 0Z" fill="#000" />
+               <path
+                  d="M.746 7.826A11.974 11.974 0 0 0 0 12c0 1.467.264 2.873.746 4.174h22.508c.482-1.3.746-2.707.746-4.174 0-1.468-.264-2.874-.746-4.174H.746Z"
+                  fill="#D80027"
+               />
+            </g>
+            <defs>
+               <clipPath id="DE_svg__a">
+                  <path fill="#fff" d="M0 0h24v24H0z" />
+               </clipPath>
+            </defs>
+         </svg>
       </main>
 
       <footer class="footer">

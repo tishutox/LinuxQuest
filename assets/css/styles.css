@@ -921,7 +921,8 @@ body.user-theme-active #profile-modal .login__button {
 
 body.user-theme-active #birth-date-modal .login__button,
 body.user-theme-active #belief-modal .login__button,
-body.user-theme-active #accent-color-modal .login__button {
+body.user-theme-active #accent-color-modal .login__button,
+body.user-theme-active #finder-country-modal .login__button {
   background-color: var(--user-accent-color);
   color: var(--user-accent-text-color);
 }
@@ -945,6 +946,11 @@ body.user-theme-active #profile-modal .profile-color-trigger__value {
 }
 
 body.user-theme-active #belief-modal .belief-picker__religion {
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+body.user-theme-active #finder-country-modal .belief-picker__religion {
   border-color: var(--border-color);
   color: var(--text-color);
 }
@@ -1109,6 +1115,10 @@ body.user-theme-active .nav__avatar {
   cursor: pointer;
 }
 
+.finder-country-trigger {
+  text-align: left;
+}
+
 .profile-select-trigger__value {
   color: var(--text-color);
   font-weight: var(--font-medium);
@@ -1253,6 +1263,18 @@ body.user-theme-active .birth-date-picker__day.is-selected {
   display: inline-flex;
   align-items: center;
   line-height: 1;
+}
+
+.finder-country-picker__country {
+  justify-content: flex-start;
+  padding-inline: .65rem;
+}
+
+.finder-country-picker__country svg {
+  width: .9rem;
+  height: .9rem;
+  flex-shrink: 0;
+  border-radius: 50%;
 }
 
 .belief-picker__religion.is-selected {

@@ -58,10 +58,27 @@ const finderNavLink = document.getElementById('nav-finder-link')
 const finderFilterOptions = document.getElementById('finder-filter-options')
 const finderDistroResults = document.getElementById('finder-distro-results')
 const finderFilterCodebase = document.getElementById('finder-filter-codebase')
-const finderFilterCountry = document.getElementById('finder-filter-country')
+const finderFilterCountryOpen = document.getElementById('finder-filter-country-open')
+const finderFilterCountryValue = document.getElementById('finder-filter-country-value')
+const finderFilterCountrySubvalue = document.getElementById('finder-filter-country-subvalue')
+const finderCountryModal = document.getElementById('finder-country-modal')
+const finderCountryClose = document.getElementById('finder-country-close')
+const finderCountryPickerCountries = document.getElementById('finder-country-picker-countries')
+const finderCountryApplyBtn = document.getElementById('finder-country-apply-btn')
 const finderFilterSpeed = document.getElementById('finder-filter-speed')
 const finderFilterSpeedValue = document.getElementById('finder-filter-speed-value')
 const finderTagInputs = Array.from(document.querySelectorAll('input[name="finder-tags"]'))
+
+const FINDER_COUNTRY_OPTIONS = [
+   { value: 'de', label: 'Deutschland' },
+   { value: 'us', label: 'USA' },
+   { value: 'uk', label: 'Vereinigtes Königreich' },
+   { value: 'fr', label: 'Frankreich' },
+   { value: 'ie', label: 'Irland' }
+]
+const FINDER_COUNTRY_LABEL_BY_VALUE = Object.fromEntries(
+   FINDER_COUNTRY_OPTIONS.map((country) => [country.value, country.label])
+)
 
 const DISTRO_FINDER_DATA = [
    { name: 'Ubuntu', codebase: 'debian', countries: ['uk'], speed: 6, tags: ['beginner', 'stable'] },
@@ -79,9 +96,92 @@ const DISTRO_FINDER_DATA = [
 
 let searchDebounceTimer = null
 let isFinderMode = false
+let finderSelectedCountries = []
+let finderCountryPickerState = []
+
+function getFinderCountryFlagSvg(countryCode) {
+   if (countryCode === 'de') {
+      return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><g clip-path="url(#DE_svg__a)"><path d="M.746 16.175C2.442 20.745 6.84 24 12 24c5.16 0 9.558-3.257 11.253-7.826L12 15.132.746 16.175Z" fill="#FFDA44"/><path d="M12 0C6.84 0 2.442 3.258.746 7.828L12 8.87l11.253-1.043C21.558 3.257 17.16 0 12 0Z" fill="#000"/><path d="M.746 7.826A11.974 11.974 0 0 0 0 12c0 1.467.264 2.873.746 4.174h22.508c.482-1.3.746-2.707.746-4.174 0-1.468-.264-2.874-.746-4.174H.746Z" fill="#D80027"/></g><defs><clipPath id="DE_svg__a"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></svg>'
+   }
+
+   if (countryCode === 'fr') {
+      return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="24" x="0" y="0" fill="#0052B4"/><rect width="8" height="24" x="8" y="0" fill="#F0F0F0"/><rect width="8" height="24" x="16" y="0" fill="#D80027"/></svg>'
+   }
+
+   if (countryCode === 'ie') {
+      return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="24" x="0" y="0" fill="#6DA544"/><rect width="8" height="24" x="8" y="0" fill="#F0F0F0"/><rect width="8" height="24" x="16" y="0" fill="#FF9811"/></svg>'
+   }
+
+   if (countryCode === 'us') {
+      return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" fill="#F0F0F0"/><rect width="24" height="2" y="0" fill="#D80027"/><rect width="24" height="2" y="4" fill="#D80027"/><rect width="24" height="2" y="8" fill="#D80027"/><rect width="24" height="2" y="12" fill="#D80027"/><rect width="24" height="2" y="16" fill="#D80027"/><rect width="24" height="2" y="20" fill="#D80027"/><rect width="10.5" height="10" x="0" y="0" fill="#0052B4"/></svg>'
+   }
+
+   if (countryCode === 'uk') {
+      return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" fill="#0052B4"/><path d="M0 3.2L7.2 0h2.3L0 4.9V3.2Zm24 3.2L16.8 0h-2.3L24 4.9V6.4ZM0 20.8 7.2 24h2.3L0 19.1v1.7Zm24-1.7L16.8 24h-2.3L24 19.1v-0.0Z" fill="#F0F0F0"/><path d="M10 0h4v24h-4z" fill="#F0F0F0"/><path d="M0 10h24v4H0z" fill="#F0F0F0"/><path d="M11 0h2v24h-2z" fill="#D80027"/><path d="M0 11h24v2H0z" fill="#D80027"/></svg>'
+   }
+
+   return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" fill="#D9D9D9"/></svg>'
+}
+
+function renderFinderCountrySummary() {
+   if (!finderFilterCountryValue || !finderFilterCountrySubvalue) return
+
+   const selectedLabels = finderSelectedCountries
+      .map((countryCode) => FINDER_COUNTRY_LABEL_BY_VALUE[countryCode])
+      .filter(Boolean)
+
+   finderFilterCountryValue.textContent = selectedLabels.length
+      ? `${selectedLabels.length} ${selectedLabels.length === 1 ? 'Land' : 'Länder'} ausgewählt`
+      : 'Alle Länder'
+   finderFilterCountrySubvalue.textContent = selectedLabels.length
+      ? selectedLabels.join(', ')
+      : 'Keine Länder ausgewählt'
+}
+
+function renderFinderCountryPickerCountries() {
+   if (!finderCountryPickerCountries) return
+
+   finderCountryPickerCountries.innerHTML = ''
+   FINDER_COUNTRY_OPTIONS.forEach((country) => {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'belief-picker__religion finder-country-picker__country'
+      button.dataset.value = country.value
+      button.innerHTML = `${getFinderCountryFlagSvg(country.value)}<span>${country.label}</span>`
+
+      if (finderCountryPickerState.includes(country.value)) {
+         button.classList.add('is-selected')
+      }
+
+      button.addEventListener('click', () => {
+         if (finderCountryPickerState.includes(country.value)) {
+            finderCountryPickerState = finderCountryPickerState.filter((entry) => entry !== country.value)
+         } else {
+            finderCountryPickerState = [...finderCountryPickerState, country.value]
+         }
+
+         renderFinderCountryPickerCountries()
+      })
+
+      finderCountryPickerCountries.appendChild(button)
+   })
+}
+
+function openFinderCountryModal() {
+   finderCountryPickerState = [...finderSelectedCountries]
+   renderFinderCountryPickerCountries()
+   finderCountryModal?.classList.add('show-login')
+}
+
+function applyFinderCountrySelection() {
+   finderSelectedCountries = [...finderCountryPickerState]
+   renderFinderCountrySummary()
+   finderCountryModal?.classList.remove('show-login')
+}
 
 searchBtn.addEventListener('click', () => {
    setFinderMode(false)
+   finderCountryModal?.classList.remove('show-login')
    search.classList.add('show-search')
 })
 
@@ -97,6 +197,7 @@ searchClose.addEventListener('click', () => {
    hideSearchResults()
    hideFinderResults()
    setFinderMode(false)
+   finderCountryModal?.classList.remove('show-login')
 })
 
 searchForm.addEventListener('submit', (event) => {
@@ -139,6 +240,7 @@ function setFinderMode(active) {
       hideSearchResults()
       hideFinderResults()
       finderFilterSpeedValue.textContent = String(finderFilterSpeed.value)
+      renderFinderCountrySummary()
       setTimeout(() => searchInput.focus(), 0)
       return
    }
@@ -149,7 +251,7 @@ function setFinderMode(active) {
 }
 
 function getSelectedFinderCountries() {
-   return Array.from(finderFilterCountry.selectedOptions).map((option) => option.value)
+   return [...finderSelectedCountries]
 }
 
 function getSelectedFinderTags() {
@@ -302,6 +404,19 @@ searchInput.addEventListener('input', () => {
 finderFilterSpeed?.addEventListener('input', () => {
    finderFilterSpeedValue.textContent = String(finderFilterSpeed.value)
 })
+
+finderFilterCountryOpen?.addEventListener('click', openFinderCountryModal)
+finderCountryClose?.addEventListener('click', () => {
+   finderCountryModal?.classList.remove('show-login')
+})
+finderCountryApplyBtn?.addEventListener('click', applyFinderCountrySelection)
+finderCountryModal?.addEventListener('click', (event) => {
+   if (event.target === finderCountryModal) {
+      finderCountryModal.classList.remove('show-login')
+   }
+})
+
+renderFinderCountrySummary()
 
 /*=============== LOGIN / REGISTER TOGGLE ===============*/
 const loginPanel      = document.getElementById('login'),
