@@ -69,6 +69,42 @@
    z-index: 5;
 }
 
+.finder-filter__range-wrap--dual{
+   --finder-range-thumb-size: 1.2rem;
+   --finder-range-track-size: 0.4rem;
+   --finder-range-line-offset: 1.1rem;
+}
+
+.finder-filter__range-wrap--dual .finder-filter__range{
+   top: calc(var(--finder-range-line-offset) - (var(--finder-range-thumb-size) / 2));
+   height: var(--finder-range-thumb-size);
+}
+
+.finder-filter__range-wrap--dual .finder-filter__range::-webkit-slider-thumb{
+   margin-top: calc((var(--finder-range-track-size) - var(--finder-range-thumb-size)) / 2);
+   width: var(--finder-range-thumb-size);
+   height: var(--finder-range-thumb-size);
+}
+
+.finder-filter__range-wrap--dual .finder-filter__range::-moz-range-thumb{
+   width: var(--finder-range-thumb-size);
+   height: var(--finder-range-thumb-size);
+}
+
+.finder-filter__range-wrap--dual .finder-filter__range::-webkit-slider-runnable-track{
+   height: var(--finder-range-track-size);
+}
+
+.finder-filter__range-wrap--dual .finder-filter__range::-moz-range-track,
+.finder-filter__range-wrap--dual .finder-filter__range::-moz-range-progress{
+   height: var(--finder-range-track-size);
+}
+
+.finder-filter__range-track{
+   top: calc(var(--finder-range-line-offset) - (var(--finder-range-track-size) / 2));
+   height: var(--finder-range-track-size);
+}
+
 #finder-distro-results{
    max-height: min(78vh, 42rem);
    overflow-y: auto;
