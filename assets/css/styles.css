@@ -191,7 +191,7 @@ img {
   background-color: hsla(230, 75%, 15%, .1);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px); /* For safari */
-  padding: 6.5rem 1.5rem 2rem;
+  padding: 5rem 1.5rem 2rem;
   opacity: 0;
   pointer-events: none;
   transition: opacity .4s;
@@ -201,7 +201,7 @@ img {
 .search__close,
 .login__close {
   position: absolute;
-  top: 1.25rem;
+  top: .65rem;
   right: 2rem;
   font-size: 1.5rem;
   color: var(--title-color);
@@ -670,6 +670,10 @@ img {
   align-content: start;
   padding-right: .2rem;
   scrollbar-gutter: stable;
+}
+
+#finder-distro-results .finder-distro-results__list {
+  max-height: 10rem;
 }
 
 .admin-user-list__form {
@@ -1354,6 +1358,14 @@ body.user-theme-active .birth-date-picker__day.is-selected {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: .45rem;
   max-height: min(40vh, 18rem);
+  overflow-y: auto;
+  align-content: start;
+  padding-right: .2rem;
+  scrollbar-gutter: stable;
+}
+
+#finder-country-modal #finder-country-picker-countries {
+  max-height: 10rem;
   overflow-y: auto;
   align-content: start;
   padding-right: .2rem;
@@ -2192,7 +2204,7 @@ body.user-theme-active .profile-background__reset:disabled {
 @media screen and (min-width: 576px) {
   .search,
   .login {
-    padding-top: 8rem;
+    padding-top: 6.5rem;
   }
 
   .search__form {
@@ -2203,7 +2215,7 @@ body.user-theme-active .profile-background__reset:disabled {
   .search__close,
   .login__close {
     width: max-content;
-    top: 3.5rem;
+    top: 2.1rem;
     left: 0;
     right: 0;
     margin-inline: auto;

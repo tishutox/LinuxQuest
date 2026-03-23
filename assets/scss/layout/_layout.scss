@@ -48,7 +48,7 @@
    background-color: hsla(230, 75%, 15%, .1);
    backdrop-filter: blur(24px);
    -webkit-backdrop-filter: blur(24px); // For safari
-   padding: 6.5rem 1.5rem 2rem;
+   padding: 5rem 1.5rem 2rem;
    opacity: 0;
    pointer-events: none;
    transition: opacity .4s;
@@ -58,7 +58,7 @@
 .search__close,
 .login__close{
    position: absolute;
-   top: 1.25rem;
+   top: .65rem;
    right: 2rem;
    font-size: 1.5rem;
    color: var(--title-color);
