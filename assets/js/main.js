@@ -67,7 +67,10 @@ const finderCountryPickerCountries = document.getElementById('finder-country-pic
 const finderCountryApplyBtn = document.getElementById('finder-country-apply-btn')
 const finderFilterSpeed = document.getElementById('finder-filter-speed')
 const finderFilterSpeedValue = document.getElementById('finder-filter-speed-value')
-const finderTagInputs = Array.from(document.querySelectorAll('input[name="finder-tags"]'))
+const finderTagsContainer = document.getElementById('finder-tags-container')
+const finderTagButtons = Array.from(finderTagsContainer?.querySelectorAll('.finder-filter__tag-option') || [])
+
+let finderSelectedTags = []
 
 const FINDER_COUNTRY_OPTIONS = [
    { value: 'de', label: 'Deutschland' },
@@ -255,7 +258,22 @@ function getSelectedFinderCountries() {
 }
 
 function getSelectedFinderTags() {
-   return finderTagInputs.filter((input) => input.checked).map((input) => input.value)
+   return [...finderSelectedTags]
+}
+
+function initFinderTagButtons() {
+   finderTagButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+         const tagValue = button.dataset.value
+         if (finderSelectedTags.includes(tagValue)) {
+            finderSelectedTags = finderSelectedTags.filter((tag) => tag !== tagValue)
+            button.classList.remove('is-selected')
+         } else {
+            finderSelectedTags = [...finderSelectedTags, tagValue]
+            button.classList.add('is-selected')
+         }
+      })
+   })
 }
 
 function runFinderSearch() {
@@ -417,8 +435,7 @@ finderCountryModal?.addEventListener('click', (event) => {
 })
 
 renderFinderCountrySummary()
-
-/*=============== LOGIN / REGISTER TOGGLE ===============*/
+initFinderTagButtons()
 const loginPanel      = document.getElementById('login'),
       registerPanel   = document.getElementById('register'),
       changeUsernamePanel = document.getElementById('change-username'),
