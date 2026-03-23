@@ -2328,21 +2328,25 @@ body.user-theme-active .profile-background__reset:disabled {
 
 @media screen and (max-width: 1023px) {
   #finder-country-modal {
-    padding: 4.5rem 1rem 1rem;
+    padding: 4rem .9rem .9rem;
   }
 
   #finder-country-modal .login__form {
     width: min(100%, 430px);
     margin-inline: auto;
-    max-height: min(72vh, 34rem);
-    max-height: min(72dvh, 34rem);
-    max-height: min(72svh, 34rem);
+    height: min(64svh, 30rem);
+    max-height: min(64svh, 30rem);
+    max-height: min(64dvh, 30rem);
+    max-height: min(64vh, 30rem);
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    overflow: hidden;
   }
 
   #finder-country-modal #finder-country-picker-countries {
-    max-height: min(42vh, 20rem);
-    max-height: min(42dvh, 20rem);
-    max-height: min(42svh, 20rem);
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
   }
 
   body.user-theme-active #profile-modal .profile-select-trigger,
@@ -2374,5 +2378,14 @@ body.user-theme-active .profile-background__reset:disabled {
   body.user-theme-active #belief-modal #belief-picker-confession {
     border-color: var(--border-color) !important;
     color: var(--text-color) !important;
+  }
+}
+
+@media screen and (max-width: 575px) {
+  #finder-country-modal .login__form {
+    height: min(58svh, 26rem);
+    max-height: min(58svh, 26rem);
+    max-height: min(58dvh, 26rem);
+    max-height: min(58vh, 26rem);
   }
 }
