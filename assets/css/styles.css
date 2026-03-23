@@ -451,39 +451,39 @@ img {
   }
 
   #search.is-finder-mode {
-    padding: 4rem .85rem .85rem;
-    overflow: hidden;
+    padding: 4.5rem 1rem 1rem;
+    overflow-y: auto;
   }
 
   #search.is-finder-mode .search__form {
-    max-width: 430px;
+    max-width: 450px;
     margin-inline: auto;
   }
 
   #search.is-finder-mode .finder-search__filters {
-    max-height: min(42svh, 20rem);
-    max-height: min(42dvh, 20rem);
-    max-height: min(42vh, 20rem);
+    max-height: min(58svh, 28rem);
+    max-height: min(58dvh, 28rem);
+    max-height: min(58vh, 28rem);
   }
 
   #search.is-finder-mode #finder-distro-results {
-    max-height: min(30svh, 14rem);
-    max-height: min(30dvh, 14rem);
-    max-height: min(30vh, 14rem);
+    max-height: min(52svh, 24rem);
+    max-height: min(52dvh, 24rem);
+    max-height: min(52vh, 24rem);
   }
 }
 
 @media screen and (max-width: 575px) {
   #search.is-finder-mode .finder-search__filters {
-    max-height: min(38svh, 17rem);
-    max-height: min(38dvh, 17rem);
-    max-height: min(38vh, 17rem);
+    max-height: min(52svh, 24rem);
+    max-height: min(52dvh, 24rem);
+    max-height: min(52vh, 24rem);
   }
 
   #search.is-finder-mode #finder-distro-results {
-    max-height: min(26svh, 11.5rem);
-    max-height: min(26dvh, 11.5rem);
-    max-height: min(26vh, 11.5rem);
+    max-height: min(46svh, 20rem);
+    max-height: min(46dvh, 20rem);
+    max-height: min(46vh, 20rem);
   }
 }
 
@@ -2364,24 +2364,26 @@ body.user-theme-active .profile-background__reset:disabled {
 
 @media screen and (max-width: 1023px) {
   #finder-country-modal {
-    padding: 4rem .9rem .9rem;
+    padding: 4.5rem 1rem 1rem;
   }
 
   #finder-country-modal .login__form {
     width: min(100%, 430px);
     margin-inline: auto;
-    height: min(64svh, 30rem);
-    max-height: min(64svh, 30rem);
-    max-height: min(64dvh, 30rem);
-    max-height: min(64vh, 30rem);
+    height: auto;
+    max-height: min(82svh, 38rem);
+    max-height: min(82dvh, 38rem);
+    max-height: min(82vh, 38rem);
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
-    overflow: hidden;
+    overflow-y: auto;
   }
 
   #finder-country-modal #finder-country-picker-countries {
     min-height: 0;
-    max-height: none;
+    max-height: min(56svh, 26rem);
+    max-height: min(56dvh, 26rem);
+    max-height: min(56vh, 26rem);
     overflow-y: auto;
   }
 
@@ -2419,9 +2421,14 @@ body.user-theme-active .profile-background__reset:disabled {
 
 @media screen and (max-width: 575px) {
   #finder-country-modal .login__form {
-    height: min(58svh, 26rem);
-    max-height: min(58svh, 26rem);
-    max-height: min(58dvh, 26rem);
-    max-height: min(58vh, 26rem);
+    max-height: min(78svh, 34rem);
+    max-height: min(78dvh, 34rem);
+    max-height: min(78vh, 34rem);
+  }
+
+  #finder-country-modal #finder-country-picker-countries {
+    max-height: min(50svh, 22rem);
+    max-height: min(50dvh, 22rem);
+    max-height: min(50vh, 22rem);
   }
 }

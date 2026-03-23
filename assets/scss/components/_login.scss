@@ -99,39 +99,40 @@
 
 @media screen and (max-width: 1023px){
    #finder-country-modal{
-      padding: 4rem .9rem .9rem;
+      padding: 4.5rem 1rem 1rem;
    }
 
    #finder-country-modal .login__form{
       width: min(100%, 430px);
       margin-inline: auto;
-      height: min(64svh, 30rem);
-      max-height: min(64svh, 30rem);
-      max-height: min(64dvh, 30rem);
-      max-height: min(64vh, 30rem);
+      height: auto;
+      max-height: min(82svh, 38rem);
+      max-height: min(82dvh, 38rem);
+      max-height: min(82vh, 38rem);
       display: grid;
       grid-template-rows: auto minmax(0, 1fr) auto;
-      overflow: hidden;
+      overflow-y: auto;
    }
 
    #finder-country-modal #finder-country-picker-countries{
       min-height: 0;
-      max-height: none;
+      max-height: min(56svh, 26rem);
+      max-height: min(56dvh, 26rem);
+      max-height: min(56vh, 26rem);
       overflow-y: auto;
    }
 }
 
 @media screen and (max-width: 575px){
    #finder-country-modal .login__form{
-      height: min(58svh, 26rem);
-      max-height: min(58svh, 26rem);
-      max-height: min(58dvh, 26rem);
-      max-height: min(58vh, 26rem);
+      max-height: min(78svh, 34rem);
+      max-height: min(78dvh, 34rem);
+      max-height: min(78vh, 34rem);
    }
 
    #finder-country-modal #finder-country-picker-countries{
-      max-height: min(40vh, 18rem);
-      max-height: min(40dvh, 18rem);
-      max-height: min(40svh, 18rem);
+      max-height: min(50svh, 22rem);
+      max-height: min(50dvh, 22rem);
+      max-height: min(50vh, 22rem);
    }
 }
