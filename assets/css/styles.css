@@ -440,6 +440,17 @@ img {
   overflow-y: auto;
 }
 
+@media screen and (max-width: 1023px) {
+  .search__results {
+    max-height: min(64vh, 30rem);
+  }
+
+  .finder-search__filters,
+  #finder-distro-results {
+    max-height: min(64vh, 30rem);
+  }
+}
+
 .search-results__group + .search-results__group {
   margin-top: .85rem;
   padding-top: .85rem;
