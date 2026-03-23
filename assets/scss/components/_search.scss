@@ -36,3 +36,8 @@
       transform: translateY(0);
    }
 }
+
+#finder-distro-results{
+   max-height: 14rem;
+   overflow-y: scroll;
+}

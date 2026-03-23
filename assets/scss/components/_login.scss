@@ -78,3 +78,16 @@
       transform: translateY(0);
    }
 }
+
+#finder-distro-results .finder-distro-results__list{
+   max-height: 6rem;
+   overflow-y: scroll;
+}
+
+#finder-country-modal #finder-country-picker-countries{
+   max-height: 6rem;
+   overflow-y: scroll;
+   align-content: start;
+   padding-right: .2rem;
+   scrollbar-gutter: stable;
+}

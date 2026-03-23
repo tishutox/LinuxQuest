@@ -433,6 +433,11 @@ img {
   overflow-y: auto;
 }
 
+#finder-distro-results {
+  max-height: 14rem;
+  overflow-y: scroll;
+}
+
 .search-results__group + .search-results__group {
   margin-top: .85rem;
   padding-top: .85rem;
@@ -673,7 +678,7 @@ img {
 }
 
 #finder-distro-results .finder-distro-results__list {
-  max-height: 10rem;
+  max-height: 6rem;
   overflow-y: scroll;
 }
 
@@ -1366,7 +1371,7 @@ body.user-theme-active .birth-date-picker__day.is-selected {
 }
 
 #finder-country-modal #finder-country-picker-countries {
-  max-height: 10rem;
+  max-height: 6rem;
   overflow-y: scroll;
   align-content: start;
   padding-right: .2rem;
