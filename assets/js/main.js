@@ -74,6 +74,9 @@ const finderTagButtons = Array.from(finderTagsContainer?.querySelectorAll('.find
 
 let finderTagStates = {}
 
+const FINDER_ISO_SIZE_MIN_MB = 700
+const FINDER_ISO_SIZE_MAX_MB = 5000
+
 const FINDER_COUNTRY_OPTIONS = [
    { value: 'de', label: 'Deutschland' },
    { value: 'us', label: 'USA' },
@@ -86,17 +89,17 @@ const FINDER_COUNTRY_LABEL_BY_VALUE = Object.fromEntries(
 )
 
 const DISTRO_FINDER_DATA = [
-   { name: 'Ubuntu', codebase: 'debian', countries: ['uk'], speed: 6, tags: ['einsteigerfreundlich', 'long-term-support'] },
-   { name: 'Kubuntu', codebase: 'debian', countries: ['uk'], speed: 6, tags: ['einsteigerfreundlich', 'long-term-support'] },
-   { name: 'Linux Mint', codebase: 'debian', countries: ['ie'], speed: 7, tags: ['einsteigerfreundlich', 'long-term-support'] },
-   { name: 'Debian', codebase: 'debian', countries: ['us'], speed: 7, tags: ['long-term-support', 'privacy'] },
-   { name: 'Fedora', codebase: 'redhat', countries: ['us'], speed: 7, tags: ['long-term-support'] },
-   { name: 'Nobara', codebase: 'redhat', countries: ['us'], speed: 8, tags: ['gaming'] },
-   { name: 'Arch Linux', codebase: 'arch', countries: ['de'], speed: 9, tags: ['rolling', 'privacy'] },
-   { name: 'EndeavourOS', codebase: 'arch', countries: ['de'], speed: 8, tags: ['rolling'] },
-   { name: 'Manjaro', codebase: 'arch', countries: ['de'], speed: 7, tags: ['rolling', 'einsteigerfreundlich'] },
-   { name: 'openSUSE Tumbleweed', codebase: 'independent', countries: ['de'], speed: 8, tags: ['rolling', 'long-term-support'] },
-   { name: 'Gentoo', codebase: 'gentoo', countries: ['us'], speed: 9, tags: ['lightweight', 'privacy'] }
+   { name: 'Ubuntu', codebase: 'debian', countries: ['uk'], isoSizeMb: 4900, tags: ['einsteigerfreundlich', 'long-term-support'] },
+   { name: 'Kubuntu', codebase: 'debian', countries: ['uk'], isoSizeMb: 3800, tags: ['einsteigerfreundlich', 'long-term-support'] },
+   { name: 'Linux Mint', codebase: 'debian', countries: ['ie'], isoSizeMb: 2800, tags: ['einsteigerfreundlich', 'long-term-support'] },
+   { name: 'Debian', codebase: 'debian', countries: ['us'], isoSizeMb: 3700, tags: ['long-term-support', 'privacy'] },
+   { name: 'Fedora', codebase: 'redhat', countries: ['us'], isoSizeMb: 2100, tags: ['long-term-support'] },
+   { name: 'Nobara', codebase: 'redhat', countries: ['us'], isoSizeMb: 4400, tags: ['gaming'] },
+   { name: 'Arch Linux', codebase: 'arch', countries: ['de'], isoSizeMb: 1100, tags: ['rolling', 'privacy'] },
+   { name: 'EndeavourOS', codebase: 'arch', countries: ['de'], isoSizeMb: 2300, tags: ['rolling'] },
+   { name: 'Manjaro', codebase: 'arch', countries: ['de'], isoSizeMb: 3600, tags: ['rolling', 'einsteigerfreundlich'] },
+   { name: 'openSUSE Tumbleweed', codebase: 'independent', countries: ['de'], isoSizeMb: 1500, tags: ['rolling', 'long-term-support'] },
+   { name: 'Gentoo', codebase: 'gentoo', countries: ['us'], isoSizeMb: 2600, tags: ['lightweight', 'privacy'] }
 ]
 
 let searchDebounceTimer = null
@@ -323,8 +326,8 @@ function runFinderSearch() {
    const includedTags = getSelectedFinderTags()
    const excludedTags = getExcludedFinderTags()
    const selectedCodebase = finderFilterCodebase.value
-   const minSpeed = Number.parseInt(finderFilterSpeedMin.value, 10) || 1
-   const maxSpeed = Number.parseInt(finderFilterSpeedMax.value, 10) || 10
+   const minIsoSizeMb = Number.parseInt(finderFilterSpeedMin.value, 10) || FINDER_ISO_SIZE_MIN_MB
+   const maxIsoSizeMb = Number.parseInt(finderFilterSpeedMax.value, 10) || FINDER_ISO_SIZE_MAX_MB
 
    const matches = DISTRO_FINDER_DATA.filter((distro) => {
       const matchesName = !nameQuery || distro.name.toLowerCase().includes(nameQuery)
@@ -332,8 +335,8 @@ function runFinderSearch() {
       const matchesCountries = !selectedCountries.length || distro.countries.some((country) => selectedCountries.includes(country))
       const matchesIncludedTags = !includedTags.length || includedTags.every((tag) => distro.tags.includes(tag))
       const matchesExcludedTags = !excludedTags.length || !excludedTags.some((tag) => distro.tags.includes(tag))
-      const matchesSpeed = distro.speed >= minSpeed && distro.speed <= maxSpeed
-      return matchesName && matchesCodebase && matchesCountries && matchesIncludedTags && matchesExcludedTags && matchesSpeed
+      const matchesIsoSize = distro.isoSizeMb >= minIsoSizeMb && distro.isoSizeMb <= maxIsoSizeMb
+      return matchesName && matchesCodebase && matchesCountries && matchesIncludedTags && matchesExcludedTags && matchesIsoSize
    })
 
    renderFinderDistroResults(matches)
@@ -343,19 +346,28 @@ function runFinderSearch() {
 function updateFinderSpeedRangeUi() {
    if (!finderFilterSpeedMin || !finderFilterSpeedMax) return
 
-   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10) || 1
-   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10) || 10
+   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10) || FINDER_ISO_SIZE_MIN_MB
+   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10) || FINDER_ISO_SIZE_MAX_MB
 
-   finderFilterSpeedMinValue.textContent = String(minVal)
-   finderFilterSpeedMaxValue.textContent = String(maxVal)
+   finderFilterSpeedMinValue.textContent = formatFinderIsoSize(minVal)
+   finderFilterSpeedMaxValue.textContent = formatFinderIsoSize(maxVal)
 
    const rangeWrap = finderFilterSpeedMin.parentElement
    if (!rangeWrap) return
 
-   const minPercent = ((minVal - 1) / 9) * 100
-   const maxPercent = ((maxVal - 1) / 9) * 100
+   const sizeRange = FINDER_ISO_SIZE_MAX_MB - FINDER_ISO_SIZE_MIN_MB
+   const minPercent = ((minVal - FINDER_ISO_SIZE_MIN_MB) / sizeRange) * 100
+   const maxPercent = ((maxVal - FINDER_ISO_SIZE_MIN_MB) / sizeRange) * 100
    rangeWrap.style.setProperty('--range-min', minPercent + '%')
    rangeWrap.style.setProperty('--range-max', maxPercent + '%')
+}
+
+function formatFinderIsoSize(sizeMb) {
+   if (sizeMb >= 1000) {
+      return `${(sizeMb / 1000).toFixed(1)} GB`
+   }
+
+   return `${sizeMb} MB`
 }
 
 function renderFinderDistroResults(matches) {
@@ -482,8 +494,8 @@ searchInput.addEventListener('input', () => {
 })
 
 finderFilterSpeedMin?.addEventListener('input', () => {
-   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10) || 1
-   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10) || 10
+   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10) || FINDER_ISO_SIZE_MIN_MB
+   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10) || FINDER_ISO_SIZE_MAX_MB
    
    if (minVal > maxVal) {
       finderFilterSpeedMin.value = maxVal
@@ -494,8 +506,8 @@ finderFilterSpeedMin?.addEventListener('input', () => {
 })
 
 finderFilterSpeedMax?.addEventListener('input', () => {
-   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10) || 1
-   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10) || 10
+   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10) || FINDER_ISO_SIZE_MIN_MB
+   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10) || FINDER_ISO_SIZE_MAX_MB
    
    if (maxVal < minVal) {
       finderFilterSpeedMax.value = minVal
