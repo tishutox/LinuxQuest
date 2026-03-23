@@ -65,8 +65,10 @@ const finderCountryModal = document.getElementById('finder-country-modal')
 const finderCountryClose = document.getElementById('finder-country-close')
 const finderCountryPickerCountries = document.getElementById('finder-country-picker-countries')
 const finderCountryApplyBtn = document.getElementById('finder-country-apply-btn')
-const finderFilterSpeed = document.getElementById('finder-filter-speed')
-const finderFilterSpeedValue = document.getElementById('finder-filter-speed-value')
+const finderFilterSpeedMin = document.getElementById('finder-filter-speed-min')
+const finderFilterSpeedMinValue = document.getElementById('finder-filter-speed-min-value')
+const finderFilterSpeedMax = document.getElementById('finder-filter-speed-max')
+const finderFilterSpeedMaxValue = document.getElementById('finder-filter-speed-max-value')
 const finderTagsContainer = document.getElementById('finder-tags-container')
 const finderTagButtons = Array.from(finderTagsContainer?.querySelectorAll('.finder-filter__tag-option') || [])
 
@@ -242,7 +244,8 @@ function setFinderMode(active) {
       finderFilterOptions.style.display = 'grid'
       hideSearchResults()
       hideFinderResults()
-      finderFilterSpeedValue.textContent = String(finderFilterSpeed.value)
+      finderFilterSpeedMinValue.textContent = String(finderFilterSpeedMin.value)
+      finderFilterSpeedMaxValue.textContent = String(finderFilterSpeedMax.value)
       renderFinderCountrySummary()
       setTimeout(() => searchInput.focus(), 0)
       return
@@ -281,14 +284,15 @@ function runFinderSearch() {
    const selectedCountries = getSelectedFinderCountries()
    const selectedTags = getSelectedFinderTags()
    const selectedCodebase = finderFilterCodebase.value
-   const minSpeed = Number.parseInt(finderFilterSpeed.value, 10) || 1
+   const minSpeed = Number.parseInt(finderFilterSpeedMin.value, 10) || 1
+   const maxSpeed = Number.parseInt(finderFilterSpeedMax.value, 10) || 10
 
    const matches = DISTRO_FINDER_DATA.filter((distro) => {
       const matchesName = !nameQuery || distro.name.toLowerCase().includes(nameQuery)
       const matchesCodebase = !selectedCodebase || distro.codebase === selectedCodebase
       const matchesCountries = !selectedCountries.length || distro.countries.some((country) => selectedCountries.includes(country))
       const matchesTags = !selectedTags.length || selectedTags.every((tag) => distro.tags.includes(tag))
-      const matchesSpeed = distro.speed >= minSpeed
+      const matchesSpeed = distro.speed >= minSpeed && distro.speed <= maxSpeed
       return matchesName && matchesCodebase && matchesCountries && matchesTags && matchesSpeed
    })
 
@@ -419,8 +423,24 @@ searchInput.addEventListener('input', () => {
    }, 200)
 })
 
-finderFilterSpeed?.addEventListener('input', () => {
-   finderFilterSpeedValue.textContent = String(finderFilterSpeed.value)
+finderFilterSpeedMin?.addEventListener('input', () => {
+   finderFilterSpeedMinValue.textContent = String(finderFilterSpeedMin.value)
+   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10)
+   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10)
+   if (minVal > maxVal) {
+      finderFilterSpeedMin.value = maxVal
+      finderFilterSpeedMinValue.textContent = String(maxVal)
+   }
+})
+
+finderFilterSpeedMax?.addEventListener('input', () => {
+   finderFilterSpeedMaxValue.textContent = String(finderFilterSpeedMax.value)
+   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10)
+   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10)
+   if (maxVal < minVal) {
+      finderFilterSpeedMax.value = minVal
+      finderFilterSpeedMaxValue.textContent = String(minVal)
+   }
 })
 
 finderFilterCountryOpen?.addEventListener('click', openFinderCountryModal)

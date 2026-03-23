@@ -98,26 +98,6 @@
 
          <div class="finder-search__filters" id="finder-filter-options" style="display:none;">
             <div class="finder-search__group">
-               <label class="login__label" for="finder-filter-codebase">Code-Basis</label>
-               <select id="finder-filter-codebase" class="finder-filter__select">
-                  <option value="">Alle</option>
-                  <option value="debian">Debian-basiert</option>
-                  <option value="arch">Arch-basiert</option>
-                  <option value="redhat">Red Hat-basiert</option>
-                  <option value="gentoo">Gentoo-basiert</option>
-                  <option value="independent">Unabhängig</option>
-               </select>
-            </div>
-
-            <div class="finder-search__group">
-               <label class="login__label" for="finder-filter-country-open">Herkunftsland/-länder</label>
-               <button type="button" id="finder-filter-country-open" class="profile-select-trigger finder-country-trigger" aria-haspopup="dialog" aria-controls="finder-country-modal">
-                  <span class="profile-select-trigger__value" id="finder-filter-country-value">Alle Länder</span>
-                  <span class="profile-select-trigger__subvalue" id="finder-filter-country-subvalue">Keine Länder ausgewählt</span>
-               </button>
-            </div>
-
-            <div class="finder-search__group">
                <span class="login__label">Tags</span>
                <div class="finder-filter__tags" id="finder-tags-container">
                   <button type="button" class="finder-filter__tag-option" data-value="gaming">Gaming</button>
@@ -149,10 +129,38 @@
             </div>
 
             <div class="finder-search__group">
-               <label class="login__label" for="finder-filter-speed">Geschwindigkeit (mind.)</label>
-               <div class="finder-filter__range-wrap">
-                  <input type="range" min="1" max="10" value="1" step="1" id="finder-filter-speed" class="finder-filter__range">
-                  <span class="finder-filter__range-value" id="finder-filter-speed-value">1</span>
+               <label class="login__label" for="finder-filter-codebase">Code-Basis</label>
+               <select id="finder-filter-codebase" class="finder-filter__select">
+                  <option value="">Alle</option>
+                  <option value="debian">Debian-basiert</option>
+                  <option value="arch">Arch-basiert</option>
+                  <option value="redhat">Red Hat-basiert</option>
+                  <option value="gentoo">Gentoo-basiert</option>
+                  <option value="independent">Unabhängig</option>
+               </select>
+            </div>
+
+            <div class="finder-search__group">
+               <label class="login__label" for="finder-filter-country-open">Herkunftsland/-länder</label>
+               <button type="button" id="finder-filter-country-open" class="profile-select-trigger finder-country-trigger" aria-haspopup="dialog" aria-controls="finder-country-modal">
+                  <span class="profile-select-trigger__value" id="finder-filter-country-value">Alle Länder</span>
+                  <span class="profile-select-trigger__subvalue" id="finder-filter-country-subvalue">Keine Länder ausgewählt</span>
+               </button>
+            </div>
+
+            <div class="finder-search__group">
+               <label class="login__label">Geschwindigkeit (Min - Max)</label>
+               <div class="finder-filter__range-wrap finder-filter__range-wrap--dual">
+                  <div class="finder-filter__range-item">
+                     <label class="finder-filter__range-label">Min:</label>
+                     <input type="range" min="1" max="10" value="1" step="1" id="finder-filter-speed-min" class="finder-filter__range">
+                     <span class="finder-filter__range-value" id="finder-filter-speed-min-value">1</span>
+                  </div>
+                  <div class="finder-filter__range-item">
+                     <label class="finder-filter__range-label">Max:</label>
+                     <input type="range" min="1" max="10" value="10" step="1" id="finder-filter-speed-max" class="finder-filter__range">
+                     <span class="finder-filter__range-value" id="finder-filter-speed-max-value">10</span>
+                  </div>
                </div>
             </div>
          </div>
