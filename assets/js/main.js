@@ -78,8 +78,21 @@ const FINDER_ISO_SIZE_MIN_MB = 700
 const FINDER_ISO_SIZE_MAX_MB = 5000
 
 const FINDER_COUNTRY_OPTIONS = [
+   { value: 'au', label: 'Australien' },
+   { value: 'br', label: 'Brasilien' },
+   { value: 'ca', label: 'Kanada' },
+   { value: 'ch', label: 'Schweiz' },
    { value: 'de', label: 'Deutschland' },
+   { value: 'es', label: 'Spanien' },
    { value: 'us', label: 'USA' },
+   { value: 'in', label: 'Indien' },
+   { value: 'it', label: 'Italien' },
+   { value: 'jp', label: 'Japan' },
+   { value: 'mx', label: 'Mexiko' },
+   { value: 'nl', label: 'Niederlande' },
+   { value: 'pl', label: 'Polen' },
+   { value: 'se', label: 'Schweden' },
+   { value: 've', label: 'Venezuela' },
    { value: 'uk', label: 'Vereinigtes Königreich' },
    { value: 'fr', label: 'Frankreich' },
    { value: 'ie', label: 'Irland' }
@@ -110,6 +123,9 @@ const DISTRO_FINDER_DATA = [
    { name: 'Fedora Server', codebase: 'redhat', countries: ['us'], isoSizeMb: 2000, tags: ['server', 'cloud', 'verwaltung'] },
    { name: 'Fedora Silverblue', codebase: 'redhat', countries: ['us'], isoSizeMb: 2900, tags: ['immutable', 'programmierer', 'privacy'] },
    { name: 'Nobara', codebase: 'redhat', countries: ['us'], isoSizeMb: 4400, tags: ['gaming', 'content-creation', 'einsteigerfreundlich'] },
+   { name: 'Bazzite', codebase: 'redhat', countries: ['us'], isoSizeMb: 4700, tags: ['gaming', 'immutable', 'einsteigerfreundlich'] },
+   { name: 'ChimeraOS', codebase: 'independent', countries: ['us'], isoSizeMb: 3300, tags: ['gaming', 'rolling', 'fuer-experten'] },
+   { name: 'SteamOS', codebase: 'arch', countries: ['us'], isoSizeMb: 3500, tags: ['gaming', 'rolling', 'immutable'] },
    { name: 'AlmaLinux', codebase: 'redhat', countries: ['us'], isoSizeMb: 960, tags: ['server', 'long-term-support', 'verwaltung'] },
    { name: 'Rocky Linux', codebase: 'redhat', countries: ['us'], isoSizeMb: 1100, tags: ['server', 'long-term-support', 'cloud'] },
    { name: 'openSUSE Tumbleweed', codebase: 'suse', countries: ['de'], isoSizeMb: 1500, tags: ['rolling', 'programmierer', 'forschung'] },
@@ -117,7 +133,22 @@ const DISTRO_FINDER_DATA = [
    { name: 'SLES', codebase: 'suse', countries: ['de'], isoSizeMb: 1200, tags: ['server', 'long-term-support', 'cloud'] },
    { name: 'Gentoo', codebase: 'gentoo', countries: ['us'], isoSizeMb: 2600, tags: ['source-based', 'fuer-experten', 'lightweight'] },
    { name: 'Slackware', codebase: 'slackware', countries: ['us'], isoSizeMb: 3200, tags: ['fuer-experten', 'systemd-free', 'programmierer'] },
-   { name: 'Void Linux', codebase: 'independent', countries: ['fr', 'de'], isoSizeMb: 900, tags: ['lightweight', 'systemd-free', 'rolling'] },
+   { name: 'Void Linux', codebase: 'independent', countries: ['es', 'de'], isoSizeMb: 900, tags: ['lightweight', 'systemd-free', 'rolling'] },
+   { name: 'Nitrux', codebase: 'debian', countries: ['mx'], isoSizeMb: 2900, tags: ['gutes-design', 'einsteigerfreundlich', 'programmierer'] },
+   { name: 'Zentyal Server', codebase: 'ubuntu', countries: ['es'], isoSizeMb: 1800, tags: ['server', 'verwaltung', 'cloud'] },
+   { name: 'AUSTRUMI', codebase: 'independent', countries: ['au'], isoSizeMb: 700, tags: ['lightweight', 'datenrettung', 'einsteigerfreundlich'] },
+   { name: 'AryaLinux', codebase: 'independent', countries: ['in'], isoSizeMb: 2300, tags: ['programmierer', 'fuer-experten', 'source-based'] },
+   { name: 'MIRACLE LINUX', codebase: 'redhat', countries: ['jp'], isoSizeMb: 1300, tags: ['server', 'long-term-support', 'verwaltung'] },
+   { name: 'Regata OS', codebase: 'debian', countries: ['br'], isoSizeMb: 4300, tags: ['gaming', 'content-creation', 'gutes-design'] },
+   { name: 'NethServer', codebase: 'redhat', countries: ['it'], isoSizeMb: 1200, tags: ['server', 'verwaltung', 'cloud'] },
+   { name: 'openmamba', codebase: 'independent', countries: ['it'], isoSizeMb: 2500, tags: ['office', 'einsteigerfreundlich', 'gutes-design'] },
+   { name: 'NimbleX', codebase: 'slackware', countries: ['nl'], isoSizeMb: 1200, tags: ['lightweight', 'datenrettung', 'systemd-free'] },
+   { name: 'LliureX', codebase: 'ubuntu', countries: ['es'], isoSizeMb: 3900, tags: ['bildung', 'office', 'einsteigerfreundlich'] },
+   { name: 'SparkyLinux', codebase: 'debian', countries: ['pl'], isoSizeMb: 2100, tags: ['lightweight', 'rolling', 'einsteigerfreundlich'] },
+   { name: 'Canaima', codebase: 'debian', countries: ['ve'], isoSizeMb: 2800, tags: ['bildung', 'office', 'verwaltung'] },
+   { name: 'ExTiX', codebase: 'ubuntu', countries: ['se'], isoSizeMb: 3600, tags: ['rolling', 'fuer-experten', 'programmierer'] },
+   { name: 'endeavouros-arm', codebase: 'arch', countries: ['ch'], isoSizeMb: 2400, tags: ['rolling', 'programmierer', 'fuer-experten'] },
+   { name: 'Bodhi Linux', codebase: 'ubuntu', countries: ['ca'], isoSizeMb: 900, tags: ['lightweight', 'einsteigerfreundlich', 'bildung'] },
    { name: 'NixOS', codebase: 'independent', countries: ['de'], isoSizeMb: 1600, tags: ['programmierer', 'cloud', 'forschung', 'ki'] },
    { name: 'Qubes OS', codebase: 'independent', countries: ['us'], isoSizeMb: 5000, tags: ['it-sicherheit', 'privacy', 'fuer-experten'] },
    { name: 'KDE neon', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 3000, tags: ['gutes-design', 'office', 'einsteigerfreundlich'] },
@@ -152,7 +183,11 @@ function shouldAutoFocusSearchInputs() {
 }
 
 function getFinderCountryFlagIcon(countryCode) {
-   const flagIconCode = countryCode === 'uk' ? 'gb' : countryCode
+   const flagCodeMap = {
+      uk: 'gb',
+      el: 'gr'
+   }
+   const flagIconCode = flagCodeMap[countryCode] || countryCode
    return `<span class="fi fi-${flagIconCode} finder-country-picker__flag" aria-hidden="true"></span>`
 }
 

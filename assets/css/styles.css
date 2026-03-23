@@ -97,6 +97,16 @@ summary,
   cursor: var(--app-cursor-pointer) !important;
 }
 
+i.fi[class*="fi-rc-"],
+i.fi[class*="fi-rr-"],
+i.fi[class*="fi-rs-"],
+i.fi[class*="fi-rb-"] {
+  width: auto;
+  height: auto;
+  background: none;
+  background-image: none;
+}
+
 @media (min-width: 768px) and (pointer: fine) {
   :root {
     --app-cursor-main: url('../cursors/cursor-44.png') 14 14, url('../cursors/cursor.cur'), auto;
