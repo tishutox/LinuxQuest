@@ -986,7 +986,7 @@ img {
   background-color: var(--container-color);
   padding: 2rem 1.5rem 2.5rem;
   box-shadow: 0 8px 32px hsla(230, 75%, 15%, .2);
-  border-radius: 1rem;
+  border-radius: .5rem;
   row-gap: 1.25rem;
   text-align: center;
   max-height: 82vh;
