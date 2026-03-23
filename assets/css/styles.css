@@ -191,7 +191,7 @@ img {
   background-color: hsla(230, 75%, 15%, .1);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px); /* For safari */
-  padding: 8rem 1.5rem 2rem;
+  padding: 6.5rem 1.5rem 2rem;
   opacity: 0;
   pointer-events: none;
   transition: opacity .4s;
@@ -201,7 +201,7 @@ img {
 .search__close,
 .login__close {
   position: absolute;
-  top: 2rem;
+  top: 1.25rem;
   right: 2rem;
   font-size: 1.5rem;
   color: var(--title-color);
@@ -665,6 +665,11 @@ img {
 .finder-distro-results__list {
   display: grid;
   gap: .35rem;
+  max-height: min(42vh, 18rem);
+  overflow-y: auto;
+  align-content: start;
+  padding-right: .2rem;
+  scrollbar-gutter: stable;
 }
 
 .admin-user-list__form {
@@ -2187,7 +2192,7 @@ body.user-theme-active .profile-background__reset:disabled {
 @media screen and (min-width: 576px) {
   .search,
   .login {
-    padding-top: 10rem;
+    padding-top: 8rem;
   }
 
   .search__form {
@@ -2198,7 +2203,7 @@ body.user-theme-active .profile-background__reset:disabled {
   .search__close,
   .login__close {
     width: max-content;
-    top: 5rem;
+    top: 3.5rem;
     left: 0;
     right: 0;
     margin-inline: auto;

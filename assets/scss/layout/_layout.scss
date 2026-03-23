@@ -48,16 +48,17 @@
    background-color: hsla(230, 75%, 15%, .1);
    backdrop-filter: blur(24px);
    -webkit-backdrop-filter: blur(24px); // For safari
-   padding: 8rem 1.5rem 0;
+   padding: 6.5rem 1.5rem 2rem;
    opacity: 0;
    pointer-events: none;
    transition: opacity .4s;
+   overflow-y: auto;
 }
 
 .search__close,
 .login__close{
    position: absolute;
-   top: 2rem;
+   top: 1.25rem;
    right: 2rem;
    font-size: 1.5rem;
    color: var(--title-color);
