@@ -424,23 +424,33 @@ searchInput.addEventListener('input', () => {
 })
 
 finderFilterSpeedMin?.addEventListener('input', () => {
-   finderFilterSpeedMinValue.textContent = String(finderFilterSpeedMin.value)
    const minVal = Number.parseInt(finderFilterSpeedMin.value, 10)
    const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10)
+   finderFilterSpeedMinValue.textContent = String(minVal)
+   
    if (minVal > maxVal) {
       finderFilterSpeedMin.value = maxVal
       finderFilterSpeedMinValue.textContent = String(maxVal)
    }
+   
+   const minPercent = ((minVal - 1) / 9) * 100
+   finderFilterSpeedMin.parentElement.style.setProperty('--range-min', minPercent + '%')
+   runFinderSearch()
 })
 
 finderFilterSpeedMax?.addEventListener('input', () => {
-   finderFilterSpeedMaxValue.textContent = String(finderFilterSpeedMax.value)
    const minVal = Number.parseInt(finderFilterSpeedMin.value, 10)
    const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10)
+   finderFilterSpeedMaxValue.textContent = String(maxVal)
+   
    if (maxVal < minVal) {
       finderFilterSpeedMax.value = minVal
       finderFilterSpeedMaxValue.textContent = String(minVal)
    }
+   
+   const maxPercent = ((maxVal - 1) / 9) * 100
+   finderFilterSpeedMax.parentElement.style.setProperty('--range-max', maxPercent + '%')
+   runFinderSearch()
 })
 
 finderFilterCountryOpen?.addEventListener('click', openFinderCountryModal)
@@ -456,6 +466,16 @@ finderCountryModal?.addEventListener('click', (event) => {
 
 renderFinderCountrySummary()
 initFinderTagButtons()
+
+// Initialize dual-range slider CSS variables
+const finderRangeWrap = finderFilterSpeedMin?.parentElement
+if (finderRangeWrap) {
+   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10)
+   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10)
+   finderRangeWrap.style.setProperty('--range-min', ((minVal - 1) / 9) * 100 + '%')
+   finderRangeWrap.style.setProperty('--range-max', ((maxVal - 1) / 9) * 100 + '%')
+}
+
 const loginPanel      = document.getElementById('login'),
       registerPanel   = document.getElementById('register'),
       changeUsernamePanel = document.getElementById('change-username'),

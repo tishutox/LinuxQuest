@@ -151,15 +151,13 @@
             <div class="finder-search__group">
                <label class="login__label">Geschwindigkeit (Min - Max)</label>
                <div class="finder-filter__range-wrap finder-filter__range-wrap--dual">
-                  <div class="finder-filter__range-item">
-                     <label class="finder-filter__range-label">Min:</label>
-                     <input type="range" min="1" max="10" value="1" step="1" id="finder-filter-speed-min" class="finder-filter__range">
-                     <span class="finder-filter__range-value" id="finder-filter-speed-min-value">1</span>
-                  </div>
-                  <div class="finder-filter__range-item">
-                     <label class="finder-filter__range-label">Max:</label>
-                     <input type="range" min="1" max="10" value="10" step="1" id="finder-filter-speed-max" class="finder-filter__range">
-                     <span class="finder-filter__range-value" id="finder-filter-speed-max-value">10</span>
+                  <input type="range" min="1" max="10" value="1" step="1" id="finder-filter-speed-min" class="finder-filter__range finder-filter__range--min">
+                  <input type="range" min="1" max="10" value="10" step="1" id="finder-filter-speed-max" class="finder-filter__range finder-filter__range--max">
+                  <div class="finder-filter__range-track"></div>
+                  <div class="finder-filter__range-values">
+                     <span id="finder-filter-speed-min-value">1</span>
+                     <span id="finder-filter-speed-separator"> - </span>
+                     <span id="finder-filter-speed-max-value">10</span>
                   </div>
                </div>
             </div>
