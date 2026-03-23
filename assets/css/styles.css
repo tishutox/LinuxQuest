@@ -2326,6 +2326,22 @@ body.user-theme-active .profile-background__reset:disabled {
 }
 
 @media screen and (max-width: 1023px) {
+  #finder-country-modal {
+    padding: 4.5rem 1rem 1rem;
+  }
+
+  #finder-country-modal .login__form {
+    width: min(100%, 430px);
+    margin-inline: auto;
+    max-height: calc(100vh - 5.5rem);
+    max-height: calc(100dvh - 5.5rem);
+  }
+
+  #finder-country-modal #finder-country-picker-countries {
+    max-height: calc(100vh - 15rem);
+    max-height: calc(100dvh - 15rem);
+  }
+
   body.user-theme-active #profile-modal .profile-select-trigger,
   body.user-theme-active #profile-modal .profile-color-trigger {
     border-color: var(--border-color) !important;
