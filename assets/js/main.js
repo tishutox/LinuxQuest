@@ -104,6 +104,13 @@ let isFinderMode = false
 let finderSelectedCountries = []
 let finderCountryPickerState = []
 
+function shouldAutoFocusSearchInputs() {
+   if (typeof window === 'undefined') return false
+   const isNarrowViewport = window.matchMedia('(max-width: 1023px)').matches
+   const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches
+   return !(isNarrowViewport || hasCoarsePointer)
+}
+
 function getFinderCountryFlagSvg(countryCode) {
    if (countryCode === 'de') {
       return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><g clip-path="url(#DE_svg__a)"><path d="M.746 16.175C2.442 20.745 6.84 24 12 24c5.16 0 9.558-3.257 11.253-7.826L12 15.132.746 16.175Z" fill="#FFDA44"/><path d="M12 0C6.84 0 2.442 3.258.746 7.828L12 8.87l11.253-1.043C21.558 3.257 17.16 0 12 0Z" fill="#000"/><path d="M.746 7.826A11.974 11.974 0 0 0 0 12c0 1.467.264 2.873.746 4.174h22.508c.482-1.3.746-2.707.746-4.174 0-1.468-.264-2.874-.746-4.174H.746Z" fill="#D80027"/></g><defs><clipPath id="DE_svg__a"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></svg>'
@@ -246,7 +253,9 @@ function setFinderMode(active) {
       hideFinderResults()
       updateFinderSpeedRangeUi()
       renderFinderCountrySummary()
-      setTimeout(() => searchInput.focus(), 0)
+      if (shouldAutoFocusSearchInputs()) {
+         setTimeout(() => searchInput.focus(), 0)
+      }
       return
    }
 
@@ -2840,7 +2849,9 @@ async function openAdminUserListModal() {
    hideAll()
    adminUserListModal.classList.add('show-search')
    await loadAdminUserList('')
-   adminUserListSearch.focus()
+   if (shouldAutoFocusSearchInputs()) {
+      adminUserListSearch.focus()
+   }
 }
 
 function renderDeveloperUserList(users, bugReportUsers = []) {
@@ -2991,7 +3002,9 @@ async function openDeveloperUserListModal() {
    hideAll()
    developerUserListModal.classList.add('show-search')
    await loadDeveloperUserList('')
-   developerUserListSearch.focus()
+   if (shouldAutoFocusSearchInputs()) {
+      developerUserListSearch.focus()
+   }
 }
 
 async function openFollowList(type) {
