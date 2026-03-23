@@ -244,8 +244,7 @@ function setFinderMode(active) {
       finderFilterOptions.style.display = 'grid'
       hideSearchResults()
       hideFinderResults()
-      finderFilterSpeedMinValue.textContent = String(finderFilterSpeedMin.value)
-      finderFilterSpeedMaxValue.textContent = String(finderFilterSpeedMax.value)
+      updateFinderSpeedRangeUi()
       renderFinderCountrySummary()
       setTimeout(() => searchInput.focus(), 0)
       return
@@ -298,6 +297,24 @@ function runFinderSearch() {
 
    renderFinderDistroResults(matches)
    finderFilterOptions.style.display = 'none'
+}
+
+function updateFinderSpeedRangeUi() {
+   if (!finderFilterSpeedMin || !finderFilterSpeedMax) return
+
+   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10) || 1
+   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10) || 10
+
+   finderFilterSpeedMinValue.textContent = String(minVal)
+   finderFilterSpeedMaxValue.textContent = String(maxVal)
+
+   const rangeWrap = finderFilterSpeedMin.parentElement
+   if (!rangeWrap) return
+
+   const minPercent = ((minVal - 1) / 9) * 100
+   const maxPercent = ((maxVal - 1) / 9) * 100
+   rangeWrap.style.setProperty('--range-min', minPercent + '%')
+   rangeWrap.style.setProperty('--range-max', maxPercent + '%')
 }
 
 function renderFinderDistroResults(matches) {
@@ -424,33 +441,27 @@ searchInput.addEventListener('input', () => {
 })
 
 finderFilterSpeedMin?.addEventListener('input', () => {
-   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10)
-   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10)
-   finderFilterSpeedMinValue.textContent = String(minVal)
+   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10) || 1
+   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10) || 10
    
    if (minVal > maxVal) {
       finderFilterSpeedMin.value = maxVal
-      finderFilterSpeedMinValue.textContent = String(maxVal)
+      finderFilterSpeedMax.value = maxVal
    }
-   
-   const minPercent = ((minVal - 1) / 9) * 100
-   finderFilterSpeedMin.parentElement.style.setProperty('--range-min', minPercent + '%')
-   runFinderSearch()
+
+   updateFinderSpeedRangeUi()
 })
 
 finderFilterSpeedMax?.addEventListener('input', () => {
-   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10)
-   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10)
-   finderFilterSpeedMaxValue.textContent = String(maxVal)
+   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10) || 1
+   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10) || 10
    
    if (maxVal < minVal) {
       finderFilterSpeedMax.value = minVal
-      finderFilterSpeedMaxValue.textContent = String(minVal)
+      finderFilterSpeedMin.value = minVal
    }
-   
-   const maxPercent = ((maxVal - 1) / 9) * 100
-   finderFilterSpeedMax.parentElement.style.setProperty('--range-max', maxPercent + '%')
-   runFinderSearch()
+
+   updateFinderSpeedRangeUi()
 })
 
 finderFilterCountryOpen?.addEventListener('click', openFinderCountryModal)
@@ -468,13 +479,7 @@ renderFinderCountrySummary()
 initFinderTagButtons()
 
 // Initialize dual-range slider CSS variables
-const finderRangeWrap = finderFilterSpeedMin?.parentElement
-if (finderRangeWrap) {
-   const minVal = Number.parseInt(finderFilterSpeedMin.value, 10)
-   const maxVal = Number.parseInt(finderFilterSpeedMax.value, 10)
-   finderRangeWrap.style.setProperty('--range-min', ((minVal - 1) / 9) * 100 + '%')
-   finderRangeWrap.style.setProperty('--range-max', ((maxVal - 1) / 9) * 100 + '%')
-}
+updateFinderSpeedRangeUi()
 
 const loginPanel      = document.getElementById('login'),
       registerPanel   = document.getElementById('register'),
