@@ -25,6 +25,13 @@
          color: var(--text-color);
       }
    }
+
+   &__results{
+      width: min(100%, 450px);
+      margin-inline: auto;
+      max-height: min(62vh, 30rem);
+      overflow-y: auto;
+   }
 }
 
 /* Show search */
@@ -38,9 +45,11 @@
 }
 
 .finder-search__filters{
+   width: min(100%, 450px);
+   margin-inline: auto;
    border-radius: .5rem;
-   max-height: min(56vh, 24rem);
-   overflow-y: scroll;
+   max-height: min(62vh, 30rem);
+   overflow-y: auto;
    scrollbar-gutter: stable;
 }
 
@@ -53,6 +62,6 @@
 }
 
 #finder-distro-results{
-   max-height: 14rem;
-   overflow-y: scroll;
+   max-height: min(62vh, 30rem);
+   overflow-y: auto;
 }
