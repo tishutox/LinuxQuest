@@ -2279,8 +2279,9 @@ body.user-theme-active .profile-background__reset:disabled {
   }
 
   #finder-country-modal #finder-country-picker-countries {
-    max-height: min(52vh, 24rem);
-    max-height: min(52dvh, 24rem);
+    max-height: min(40vh, 18rem);
+    max-height: min(40dvh, 18rem);
+    max-height: min(40svh, 18rem);
   }
 }
 
@@ -2333,13 +2334,15 @@ body.user-theme-active .profile-background__reset:disabled {
   #finder-country-modal .login__form {
     width: min(100%, 430px);
     margin-inline: auto;
-    max-height: calc(100vh - 5.5rem);
-    max-height: calc(100dvh - 5.5rem);
+    max-height: min(72vh, 34rem);
+    max-height: min(72dvh, 34rem);
+    max-height: min(72svh, 34rem);
   }
 
   #finder-country-modal #finder-country-picker-countries {
-    max-height: calc(100vh - 15rem);
-    max-height: calc(100dvh - 15rem);
+    max-height: min(42vh, 20rem);
+    max-height: min(42dvh, 20rem);
+    max-height: min(42svh, 20rem);
   }
 
   body.user-theme-active #profile-modal .profile-select-trigger,
