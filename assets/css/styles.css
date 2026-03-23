@@ -966,6 +966,11 @@ img {
   border-radius: 1rem;
   row-gap: 1.25rem;
   text-align: center;
+  max-height: 82vh;
+  max-height: 82dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   transform: translateY(-1rem);
   transition: transform .4s;
 }
@@ -1343,6 +1348,11 @@ body.user-theme-active .birth-date-picker__day.is-selected {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: .45rem;
+  max-height: min(40vh, 18rem);
+  overflow-y: auto;
+  align-content: start;
+  padding-right: .2rem;
+  scrollbar-gutter: stable;
 }
 
 .belief-picker__religion {
