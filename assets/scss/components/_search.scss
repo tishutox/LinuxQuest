@@ -61,6 +61,14 @@
    scrollbar-gutter: stable;
 }
 
+.finder-filter__range-wrap--dual .finder-filter__range--min{
+   z-index: 4;
+}
+
+.finder-filter__range-wrap--dual .finder-filter__range--max{
+   z-index: 5;
+}
+
 #finder-distro-results{
    max-height: min(78vh, 42rem);
    overflow-y: auto;

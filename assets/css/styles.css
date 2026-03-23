@@ -643,11 +643,11 @@ img {
 }
 
 .finder-filter__range-wrap--dual .finder-filter__range--min {
-  z-index: 5;
+  z-index: 4;
 }
 
 .finder-filter__range-wrap--dual .finder-filter__range--max {
-  z-index: 4;
+  z-index: 5;
 }
 
 .finder-filter__range-wrap--dual .finder-filter__range::-webkit-slider-thumb {

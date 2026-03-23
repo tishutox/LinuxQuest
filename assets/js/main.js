@@ -314,7 +314,8 @@ function initFinderTagButtons() {
          applyFinderTagButtonState(button, nextState)
 
          if (isFinderMode) {
-            runFinderSearch({ keepFiltersOpen: true })
+            hideFinderResults()
+            finderFilterOptions.style.display = 'grid'
          }
       })
    })
@@ -533,6 +534,22 @@ finderCountryModal?.addEventListener('click', (event) => {
 
 renderFinderCountrySummary()
 initFinderTagButtons()
+
+if (finderFilterSpeedMin && finderFilterSpeedMax) {
+   finderFilterSpeedMin.min = String(FINDER_ISO_SIZE_MIN_MB)
+   finderFilterSpeedMin.max = String(FINDER_ISO_SIZE_MAX_MB)
+   finderFilterSpeedMin.step = '100'
+   finderFilterSpeedMax.min = String(FINDER_ISO_SIZE_MIN_MB)
+   finderFilterSpeedMax.max = String(FINDER_ISO_SIZE_MAX_MB)
+   finderFilterSpeedMax.step = '100'
+
+   const minValue = Number.parseInt(finderFilterSpeedMin.value, 10)
+   const maxValue = Number.parseInt(finderFilterSpeedMax.value, 10)
+   if (!Number.isFinite(minValue)) finderFilterSpeedMin.value = String(FINDER_ISO_SIZE_MIN_MB)
+   if (!Number.isFinite(maxValue) || maxValue <= Number.parseInt(finderFilterSpeedMin.value, 10)) {
+      finderFilterSpeedMax.value = String(FINDER_ISO_SIZE_MAX_MB)
+   }
+}
 
 // Initialize dual-range slider CSS variables
 updateFinderSpeedRangeUi()
