@@ -84,16 +84,16 @@ const FINDER_COUNTRY_LABEL_BY_VALUE = Object.fromEntries(
 )
 
 const DISTRO_FINDER_DATA = [
-   { name: 'Ubuntu', codebase: 'debian', countries: ['uk'], speed: 6, tags: ['beginner', 'stable'] },
-   { name: 'Kubuntu', codebase: 'debian', countries: ['uk'], speed: 6, tags: ['beginner', 'stable'] },
-   { name: 'Linux Mint', codebase: 'debian', countries: ['ie'], speed: 7, tags: ['beginner', 'stable'] },
-   { name: 'Debian', codebase: 'debian', countries: ['us'], speed: 7, tags: ['stable', 'privacy'] },
-   { name: 'Fedora', codebase: 'redhat', countries: ['us'], speed: 7, tags: ['stable'] },
+   { name: 'Ubuntu', codebase: 'debian', countries: ['uk'], speed: 6, tags: ['einsteigerfreundlich', 'long-term-support'] },
+   { name: 'Kubuntu', codebase: 'debian', countries: ['uk'], speed: 6, tags: ['einsteigerfreundlich', 'long-term-support'] },
+   { name: 'Linux Mint', codebase: 'debian', countries: ['ie'], speed: 7, tags: ['einsteigerfreundlich', 'long-term-support'] },
+   { name: 'Debian', codebase: 'debian', countries: ['us'], speed: 7, tags: ['long-term-support', 'privacy'] },
+   { name: 'Fedora', codebase: 'redhat', countries: ['us'], speed: 7, tags: ['long-term-support'] },
    { name: 'Nobara', codebase: 'redhat', countries: ['us'], speed: 8, tags: ['gaming'] },
    { name: 'Arch Linux', codebase: 'arch', countries: ['de'], speed: 9, tags: ['rolling', 'privacy'] },
    { name: 'EndeavourOS', codebase: 'arch', countries: ['de'], speed: 8, tags: ['rolling'] },
-   { name: 'Manjaro', codebase: 'arch', countries: ['de'], speed: 7, tags: ['rolling', 'beginner'] },
-   { name: 'openSUSE Tumbleweed', codebase: 'independent', countries: ['de'], speed: 8, tags: ['rolling', 'stable'] },
+   { name: 'Manjaro', codebase: 'arch', countries: ['de'], speed: 7, tags: ['rolling', 'einsteigerfreundlich'] },
+   { name: 'openSUSE Tumbleweed', codebase: 'independent', countries: ['de'], speed: 8, tags: ['rolling', 'long-term-support'] },
    { name: 'Gentoo', codebase: 'gentoo', countries: ['us'], speed: 9, tags: ['lightweight', 'privacy'] }
 ]
 
