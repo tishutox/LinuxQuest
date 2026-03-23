@@ -151,28 +151,9 @@ function shouldAutoFocusSearchInputs() {
    return !(isNarrowViewport || hasCoarsePointer)
 }
 
-function getFinderCountryFlagSvg(countryCode) {
-   if (countryCode === 'de') {
-      return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><g clip-path="url(#DE_svg__a)"><path d="M.746 16.175C2.442 20.745 6.84 24 12 24c5.16 0 9.558-3.257 11.253-7.826L12 15.132.746 16.175Z" fill="#FFDA44"/><path d="M12 0C6.84 0 2.442 3.258.746 7.828L12 8.87l11.253-1.043C21.558 3.257 17.16 0 12 0Z" fill="#000"/><path d="M.746 7.826A11.974 11.974 0 0 0 0 12c0 1.467.264 2.873.746 4.174h22.508c.482-1.3.746-2.707.746-4.174 0-1.468-.264-2.874-.746-4.174H.746Z" fill="#D80027"/></g><defs><clipPath id="DE_svg__a"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></svg>'
-   }
-
-   if (countryCode === 'fr') {
-      return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="24" x="0" y="0" fill="#0052B4"/><rect width="8" height="24" x="8" y="0" fill="#F0F0F0"/><rect width="8" height="24" x="16" y="0" fill="#D80027"/></svg>'
-   }
-
-   if (countryCode === 'ie') {
-      return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="24" x="0" y="0" fill="#6DA544"/><rect width="8" height="24" x="8" y="0" fill="#F0F0F0"/><rect width="8" height="24" x="16" y="0" fill="#FF9811"/></svg>'
-   }
-
-   if (countryCode === 'us') {
-      return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" fill="#F0F0F0"/><rect width="24" height="2" y="0" fill="#D80027"/><rect width="24" height="2" y="4" fill="#D80027"/><rect width="24" height="2" y="8" fill="#D80027"/><rect width="24" height="2" y="12" fill="#D80027"/><rect width="24" height="2" y="16" fill="#D80027"/><rect width="24" height="2" y="20" fill="#D80027"/><rect width="10.5" height="10" x="0" y="0" fill="#0052B4"/></svg>'
-   }
-
-   if (countryCode === 'uk') {
-      return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" fill="#0052B4"/><path d="M0 3.2L7.2 0h2.3L0 4.9V3.2Zm24 3.2L16.8 0h-2.3L24 4.9V6.4ZM0 20.8 7.2 24h2.3L0 19.1v1.7Zm24-1.7L16.8 24h-2.3L24 19.1v-0.0Z" fill="#F0F0F0"/><path d="M10 0h4v24h-4z" fill="#F0F0F0"/><path d="M0 10h24v4H0z" fill="#F0F0F0"/><path d="M11 0h2v24h-2z" fill="#D80027"/><path d="M0 11h24v2H0z" fill="#D80027"/></svg>'
-   }
-
-   return '<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" fill="#D9D9D9"/></svg>'
+function getFinderCountryFlagIcon(countryCode) {
+   const flagIconCode = countryCode === 'uk' ? 'gb' : countryCode
+   return `<span class="fi fi-${flagIconCode} finder-country-picker__flag" aria-hidden="true"></span>`
 }
 
 function renderFinderCountrySummary() {
@@ -199,7 +180,7 @@ function renderFinderCountryPickerCountries() {
       button.type = 'button'
       button.className = 'belief-picker__religion finder-country-picker__country'
       button.dataset.value = country.value
-      button.innerHTML = `${getFinderCountryFlagSvg(country.value)}<span>${country.label}</span>`
+      button.innerHTML = `${getFinderCountryFlagIcon(country.value)}<span>${country.label}</span>`
 
       if (finderCountryPickerState.includes(country.value)) {
          button.classList.add('is-selected')
