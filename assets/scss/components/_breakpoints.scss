@@ -157,3 +157,34 @@
       max-height: var(--mobile-list-modal-max);
    }
 }
+
+@media screen and (max-width: 1023px){
+   :root{
+      --mobile-modal-top-gap: 4.5rem;
+      --mobile-modal-bottom-gap: max(1.5rem, env(safe-area-inset-bottom));
+      --mobile-modal-content-cap-svh: calc(100svh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap));
+      --mobile-modal-content-cap-dvh: calc(100dvh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap));
+      --mobile-modal-content-cap-vh: calc(100vh - var(--mobile-modal-top-gap) - var(--mobile-modal-bottom-gap));
+   }
+
+   .search,
+   .login{
+      padding-bottom: var(--mobile-modal-bottom-gap) !important;
+   }
+
+   .login .login__form,
+   .search .search__results,
+   #search #finder-filter-options,
+   #search #finder-distro-results,
+   #search #finder-distro-results .finder-distro-results__list,
+   #admin-user-list-modal .admin-user-list__results,
+   #developer-user-list-modal .admin-user-list__results,
+   .belief-picker__religions,
+   #finder-country-modal #finder-country-picker-countries,
+   .follow-list,
+   .admin-reports__list{
+      max-height: var(--mobile-modal-content-cap-svh) !important;
+      max-height: var(--mobile-modal-content-cap-dvh) !important;
+      max-height: var(--mobile-modal-content-cap-vh) !important;
+   }
+}
