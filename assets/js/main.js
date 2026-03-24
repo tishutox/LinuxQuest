@@ -18,24 +18,24 @@ window.addEventListener('beforeinstallprompt', (event) => {
    event.preventDefault()
    deferredInstallPrompt = event
    if (installAppBtn) installAppBtn.style.display = 'inline-flex'
-   {
-      name: "Void Linux",
-      codebase: "Independent",
-      countries: ["Spain"],
-      isoSizeMb: 1029,
-      tags: ["rolling release", "independent", "musl", "glibc", "minimal"]
-   },
+})
+
+installAppBtn?.addEventListener('click', async () => {
+   if (!deferredInstallPrompt) {
+      return
+   }
+
    deferredInstallPrompt.prompt()
    await deferredInstallPrompt.userChoice
    deferredInstallPrompt = null
    installAppBtn.style.display = 'none'
-   {
-      name: "Zentyal Server",
-      codebase: "Ubuntu",
-      countries: ["Spain"],
-      isoSizeMb: 1340,
-      tags: ["server", "gateway", "infrastructure", "mail", "domain controller"]
-   },
+})
+
+window.addEventListener('appinstalled', () => {
+   deferredInstallPrompt = null
+   if (installAppBtn) installAppBtn.style.display = 'none'
+})
+
 if ('serviceWorker' in navigator) {
    window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').then((registration) => {
