@@ -18,24 +18,24 @@ window.addEventListener('beforeinstallprompt', (event) => {
    event.preventDefault()
    deferredInstallPrompt = event
    if (installAppBtn) installAppBtn.style.display = 'inline-flex'
-})
-
-installAppBtn?.addEventListener('click', async () => {
-   if (!deferredInstallPrompt) {
-      return
-   }
-
+   {
+      name: "Void Linux",
+      codebase: "Independent",
+      countries: ["Spain"],
+      isoSizeMb: 1029,
+      tags: ["rolling release", "independent", "musl", "glibc", "minimal"]
+   },
    deferredInstallPrompt.prompt()
    await deferredInstallPrompt.userChoice
    deferredInstallPrompt = null
    installAppBtn.style.display = 'none'
-})
-
-window.addEventListener('appinstalled', () => {
-   deferredInstallPrompt = null
-   if (installAppBtn) installAppBtn.style.display = 'none'
-})
-
+   {
+      name: "Zentyal Server",
+      codebase: "Ubuntu",
+      countries: ["Spain"],
+      isoSizeMb: 1340,
+      tags: ["server", "gateway", "infrastructure", "mail", "domain controller"]
+   },
 if ('serviceWorker' in navigator) {
    window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').then((registration) => {
@@ -113,7 +113,7 @@ const DISTRO_FINDER_DATA = [
    { name: 'Lubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 2200, tags: ['lightweight', 'einsteigerfreundlich', 'bildung'] },
    { name: 'Linux Mint', codebase: 'ubuntu', countries: ['ie'], isoSizeMb: 2700, tags: ['einsteigerfreundlich', 'long-term-support', 'office'] },
    { name: 'Pop!_OS', codebase: 'ubuntu', countries: ['us'], isoSizeMb: 3100, tags: ['gaming', 'programmierer', 'gutes-design'] },
-   { name: 'Kali Linux', codebase: 'debian', countries: ['uk'], isoSizeMb: 4100, tags: ['it-sicherheit', 'forensik', 'fuer-experten'] },
+   { name: 'Kali Linux', codebase: 'debian', countries: ['uk'], isoSizeMb: 4400, tags: ['it-sicherheit', 'forensik', 'fuer-experten'] },
    { name: 'Parrot Security', codebase: 'debian', countries: ['fr', 'us'], isoSizeMb: 4300, tags: ['it-sicherheit', 'forensik', 'privacy'] },
    { name: 'Tails', codebase: 'debian', countries: ['fr'], isoSizeMb: 1300, tags: ['privacy', 'it-sicherheit', 'barrierefreiheit'] },
    { name: 'Debian', codebase: 'debian', countries: ['us'], isoSizeMb: 4700, tags: ['long-term-support', 'server', 'verwaltung'] },
@@ -131,11 +131,11 @@ const DISTRO_FINDER_DATA = [
    { name: 'ChimeraOS', codebase: 'independent', countries: ['us'], isoSizeMb: 3300, tags: ['gaming', 'rolling', 'fuer-experten'] },
    { name: 'SteamOS', codebase: 'arch', countries: ['us'], isoSizeMb: 3500, tags: ['gaming', 'rolling', 'immutable'] },
    { name: 'AlmaLinux', codebase: 'redhat', countries: ['us'], isoSizeMb: 13340, tags: ['server', 'long-term-support', 'verwaltung'] },
-   { name: 'Rocky Linux', codebase: 'redhat', countries: ['us'], isoSizeMb: 1100, tags: ['server', 'long-term-support', 'cloud'] },
+   { name: 'Rocky Linux', codebase: 'redhat', countries: ['us'], isoSizeMb: 9278, tags: ['server', 'long-term-support', 'cloud'] },
    { name: 'openSUSE Tumbleweed', codebase: 'suse', countries: ['de'], isoSizeMb: 1500, tags: ['rolling', 'programmierer', 'forschung'] },
    { name: 'openSUSE Leap', codebase: 'suse', countries: ['de'], isoSizeMb: 4800, tags: ['long-term-support', 'office', 'verwaltung'] },
    { name: 'SLES', codebase: 'suse', countries: ['de'], isoSizeMb: 1200, tags: ['server', 'long-term-support', 'cloud'] },
-   { name: 'Gentoo', codebase: 'gentoo', countries: ['us'], isoSizeMb: 2600, tags: ['source-based', 'fuer-experten', 'lightweight'] },
+   { name: 'Gentoo', codebase: 'gentoo', countries: ['us'], isoSizeMb: 1000, tags: ['source-based', 'fuer-experten', 'lightweight'] },
    { name: 'Slackware', codebase: 'slackware', countries: ['us'], isoSizeMb: 3200, tags: ['fuer-experten', 'systemd-free', 'programmierer'] },
    { name: 'Void Linux', codebase: 'independent', countries: ['es', 'de'], isoSizeMb: 900, tags: ['lightweight', 'systemd-free', 'rolling'] },
    { name: 'Nitrux', codebase: 'debian', countries: ['mx'], isoSizeMb: 2900, tags: ['gutes-design', 'einsteigerfreundlich', 'programmierer'] },
