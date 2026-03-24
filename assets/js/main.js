@@ -130,7 +130,7 @@ const DISTRO_FINDER_DATA = [
    { name: 'Bazzite', codebase: 'redhat', countries: ['us'], isoSizeMb: 4700, tags: ['gaming', 'immutable', 'einsteigerfreundlich'] },
    { name: 'ChimeraOS', codebase: 'independent', countries: ['us'], isoSizeMb: 3300, tags: ['gaming', 'rolling', 'fuer-experten'] },
    { name: 'SteamOS', codebase: 'arch', countries: ['us'], isoSizeMb: 3500, tags: ['gaming', 'rolling', 'immutable'] },
-   { name: 'AlmaLinux', codebase: 'redhat', countries: ['us'], isoSizeMb: 960, tags: ['server', 'long-term-support', 'verwaltung'] },
+   { name: 'AlmaLinux', codebase: 'redhat', countries: ['us'], isoSizeMb: 13340, tags: ['server', 'long-term-support', 'verwaltung'] },
    { name: 'Rocky Linux', codebase: 'redhat', countries: ['us'], isoSizeMb: 1100, tags: ['server', 'long-term-support', 'cloud'] },
    { name: 'openSUSE Tumbleweed', codebase: 'suse', countries: ['de'], isoSizeMb: 1500, tags: ['rolling', 'programmierer', 'forschung'] },
    { name: 'openSUSE Leap', codebase: 'suse', countries: ['de'], isoSizeMb: 4800, tags: ['long-term-support', 'office', 'verwaltung'] },
