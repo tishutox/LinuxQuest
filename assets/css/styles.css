@@ -63,17 +63,17 @@ button {
 }
 
 :root {
-  --app-cursor-main: url('../cursors/Cursor/Normal.ani'), auto;
-  --app-cursor-pointer: url('../cursors/Cursor/Link.ani'), pointer;
-  --app-cursor-text: url('../cursors/Cursor/Text.ani'), text;
-  --app-cursor-move: url('../cursors/Cursor/Move.ani'), move;
-  --app-cursor-busy: url('../cursors/Cursor/Busy.ani'), progress;
-  --app-cursor-help: url('../cursors/Cursor/Help.ani'), help;
-  --app-cursor-unavailable: url('../cursors/Cursor/Unavailable.ani'), not-allowed;
-  --app-cursor-precision: url('../cursors/Cursor/Precision.ani'), crosshair;
-  --app-cursor-handwriting: url('../cursors/Cursor/Handwriting.ani'), auto;
-  --app-cursor-pin: url('../cursors/Cursor/Pin.cur'), pointer;
-  --app-cursor-person: url('../cursors/Cursor/Person.cur'), pointer;
+  --app-cursor-main: url('../cursors/Cursor/Normal.ani'), url('../cursors/Cursor/Normal.cur'), url('../cursors/Cursor/Normal.png'), auto;
+  --app-cursor-pointer: url('../cursors/Cursor/Link.ani'), url('../cursors/Cursor/Link.cur'), url('../cursors/Cursor/Link.png'), pointer;
+  --app-cursor-text: url('../cursors/Cursor/Text.ani'), url('../cursors/Cursor/Text.cur'), url('../cursors/Cursor/Text.png'), text;
+  --app-cursor-move: url('../cursors/Cursor/Move.ani'), url('../cursors/Cursor/Move.cur'), url('../cursors/Cursor/Move.png'), move;
+  --app-cursor-busy: url('../cursors/Cursor/Busy.ani'), url('../cursors/Cursor/Busy.cur'), url('../cursors/Cursor/Busy.png'), progress;
+  --app-cursor-help: url('../cursors/Cursor/Help.ani'), url('../cursors/Cursor/Help.cur'), url('../cursors/Cursor/Help.png'), help;
+  --app-cursor-unavailable: url('../cursors/Cursor/Unavailable.ani'), url('../cursors/Cursor/Unavailable.cur'), url('../cursors/Cursor/Unavailable.png'), not-allowed;
+  --app-cursor-precision: url('../cursors/Cursor/Precision.ani'), url('../cursors/Cursor/Precision.cur'), url('../cursors/Cursor/Precision.png'), crosshair;
+  --app-cursor-handwriting: url('../cursors/Cursor/Handwriting.ani'), url('../cursors/Cursor/Handwriting.cur'), url('../cursors/Cursor/Handwriting.png'), auto;
+  --app-cursor-pin: url('../cursors/Cursor/Pin.cur'), url('../cursors/Cursor/Pin.png'), pointer;
+  --app-cursor-person: url('../cursors/Cursor/Person.cur'), url('../cursors/Cursor/Person.png'), pointer;
 }
 
 body {
