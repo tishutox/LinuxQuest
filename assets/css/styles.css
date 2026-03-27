@@ -64,9 +64,9 @@ button {
 
 :root {
   /* PNG assets as primary; Pin/Person keep .cur hotspot */
-  /* Hotspot minimal weiter nach rechts/unten für exakteren Klickpunkt */
-  --app-cursor-main: url('../cursors/PNG/normal.png') 4 4, auto;
-  --app-cursor-pointer: url('../cursors/PNG/link.png') 4 4, pointer;
+  /* Hotspot noch minimal weiter nach rechts/unten für exakten Klickpunkt */
+  --app-cursor-main: url('../cursors/PNG/normal.png') 5 5, auto;
+  --app-cursor-pointer: url('../cursors/PNG/link.png') 5 5, pointer;
   --app-cursor-text: url('../cursors/PNG/text.png'), text;
   --app-cursor-move: url('../cursors/PNG/move.png'), move;
   --app-cursor-busy: url('../cursors/PNG/busy.png'), progress;
@@ -157,22 +157,22 @@ i.fi[class*="fi-rb-"] {
 
 @media (min-width: 768px) and (pointer: fine) {
   :root {
-    --app-cursor-main: url('../cursors/PNG/normal.png') 4 4, auto;
-    --app-cursor-pointer: url('../cursors/PNG/link.png') 4 4, pointer;
+    --app-cursor-main: url('../cursors/PNG/normal.png') 5 5, auto;
+    --app-cursor-pointer: url('../cursors/PNG/link.png') 5 5, pointer;
   }
 }
 
 @media (min-width: 1280px) and (pointer: fine) {
   :root {
-    --app-cursor-main: url('../cursors/PNG/normal.png') 4 4, auto;
-    --app-cursor-pointer: url('../cursors/PNG/link.png') 4 4, pointer;
+    --app-cursor-main: url('../cursors/PNG/normal.png') 5 5, auto;
+    --app-cursor-pointer: url('../cursors/PNG/link.png') 5 5, pointer;
   }
 }
 
 @media (min-width: 1600px) and (min-resolution: 2dppx) and (pointer: fine) {
   :root {
-    --app-cursor-main: url('../cursors/PNG/normal.png') 4 4, auto;
-    --app-cursor-pointer: url('../cursors/PNG/link.png') 4 4, pointer;
+    --app-cursor-main: url('../cursors/PNG/normal.png') 5 5, auto;
+    --app-cursor-pointer: url('../cursors/PNG/link.png') 5 5, pointer;
   }
 }
 
