@@ -679,6 +679,9 @@ finderCountryModal?.addEventListener('click', (event) => {
 
 renderFinderCountrySummary()
 sortFinderFilterOptions()
+if (finderFilterCodebase) {
+   finderFilterCodebase.value = ''
+}
 initFinderTagButtons()
 
 if (finderFilterSpeedMin && finderFilterSpeedMax) {
