@@ -259,20 +259,30 @@ img {
 .search__close,
 .login__close {
   position: absolute;
-  top: 1.2rem;
+  top: 1rem;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 1.7rem;
-  color: var(--title-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1.5rem;
+  color: var(--first-color);
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 999px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
   cursor: pointer;
-  z-index: 10;
+  z-index: var(--z-modal);
 }
 
 /* Fix: Modal-Close-Icon sichtbar machen */
 .search__close i,
 .login__close i {
   color: var(--first-color) !important;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.12);
 }
 
 /*=============== HEADER & NAV ===============*/
@@ -2379,12 +2389,15 @@ body.user-theme-active .profile-background__reset:disabled {
 
   .search__close,
   .login__close {
-    width: max-content;
     top: 2.1rem;
-    left: 0;
-    right: 0;
-    margin-inline: auto;
-    font-size: 2rem;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    margin-inline: 0;
+    font-size: 1.7rem;
+    width: 2.35rem;
+    height: 2.35rem;
+    background-color: transparent;
   }
 
   .login__form {

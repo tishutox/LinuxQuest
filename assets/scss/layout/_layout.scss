@@ -58,9 +58,21 @@
 .search__close,
 .login__close{
    position: absolute;
-   top: .65rem;
-   right: 2rem;
+   top: 1rem;
+   left: 50%;
+   transform: translateX(-50%);
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   width: 2.25rem;
+   height: 2.25rem;
    font-size: 1.5rem;
-   color: var(--title-color);
+   color: var(--first-color);
+   background-color: transparent;
+   border: none;
+   box-shadow: none;
+   border-radius: 999px;
+   text-shadow: 0 1px 4px rgba(0,0,0,0.2);
    cursor: pointer;
+   z-index: var(--z-modal);
 }
