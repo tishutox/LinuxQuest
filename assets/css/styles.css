@@ -63,8 +63,17 @@ button {
 }
 
 :root {
-  --app-cursor-main: url('../cursors/cursor-36.png') 12 12, url('../cursors/cursor.cur'), auto;
-  --app-cursor-pointer: url('../cursors/pointer-36.png') 12 12, url('../cursors/pointer.cur'), pointer;
+  --app-cursor-main: url('../cursors/Cursor/Normal.ani'), auto;
+  --app-cursor-pointer: url('../cursors/Cursor/Link.ani'), pointer;
+  --app-cursor-text: url('../cursors/Cursor/Text.ani'), text;
+  --app-cursor-move: url('../cursors/Cursor/Move.ani'), move;
+  --app-cursor-busy: url('../cursors/Cursor/Busy.ani'), progress;
+  --app-cursor-help: url('../cursors/Cursor/Help.ani'), help;
+  --app-cursor-unavailable: url('../cursors/Cursor/Unavailable.ani'), not-allowed;
+  --app-cursor-precision: url('../cursors/Cursor/Precision.ani'), crosshair;
+  --app-cursor-handwriting: url('../cursors/Cursor/Handwriting.ani'), auto;
+  --app-cursor-pin: url('../cursors/Cursor/Pin.cur'), pointer;
+  --app-cursor-person: url('../cursors/Cursor/Person.cur'), pointer;
 }
 
 body {
@@ -97,6 +106,43 @@ summary,
   cursor: var(--app-cursor-pointer) !important;
 }
 
+input,
+textarea {
+  cursor: var(--app-cursor-text);
+}
+
+.move-cursor {
+  cursor: var(--app-cursor-move) !important;
+}
+
+.busy-cursor {
+  cursor: var(--app-cursor-busy) !important;
+}
+
+.help-cursor {
+  cursor: var(--app-cursor-help) !important;
+}
+
+.unavailable-cursor {
+  cursor: var(--app-cursor-unavailable) !important;
+}
+
+.precision-cursor {
+  cursor: var(--app-cursor-precision) !important;
+}
+
+.handwriting-cursor {
+  cursor: var(--app-cursor-handwriting) !important;
+}
+
+.pin-cursor {
+  cursor: var(--app-cursor-pin) !important;
+}
+
+.person-cursor {
+  cursor: var(--app-cursor-person) !important;
+}
+
 i.fi[class*="fi-rc-"],
 i.fi[class*="fi-rr-"],
 i.fi[class*="fi-rs-"],
@@ -109,22 +155,22 @@ i.fi[class*="fi-rb-"] {
 
 @media (min-width: 768px) and (pointer: fine) {
   :root {
-    --app-cursor-main: url('../cursors/cursor-44.png') 14 14, url('../cursors/cursor.cur'), auto;
-    --app-cursor-pointer: url('../cursors/pointer-44.png') 14 14, url('../cursors/pointer.cur'), pointer;
+    --app-cursor-main: url('../cursors/Cursor/Normal.ani'), auto;
+    --app-cursor-pointer: url('../cursors/Cursor/Link.ani'), pointer;
   }
 }
 
 @media (min-width: 1280px) and (pointer: fine) {
   :root {
-    --app-cursor-main: url('../cursors/cursor-52.png') 18 18, url('../cursors/cursor.cur'), auto;
-    --app-cursor-pointer: url('../cursors/pointer-52.png') 18 18, url('../cursors/pointer.cur'), pointer;
+    --app-cursor-main: url('../cursors/Cursor/Normal.ani'), auto;
+    --app-cursor-pointer: url('../cursors/Cursor/Link.ani'), pointer;
   }
 }
 
 @media (min-width: 1600px) and (min-resolution: 2dppx) and (pointer: fine) {
   :root {
-    --app-cursor-main: url('../cursors/cursor-68.png') 22 22, url('../cursors/cursor.cur'), auto;
-    --app-cursor-pointer: url('../cursors/pointer-68.png') 22 22, url('../cursors/pointer.cur'), pointer;
+    --app-cursor-main: url('../cursors/Cursor/Normal.ani'), auto;
+    --app-cursor-pointer: url('../cursors/Cursor/Link.ani'), pointer;
   }
 }
 
