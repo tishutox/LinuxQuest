@@ -17,17 +17,18 @@ button{
 }
 
 :root{
-	--app-cursor-main: url('../cursors/Cursor/Normal.ani'), auto;
-	--app-cursor-pointer: url('../cursors/Cursor/Link.ani'), pointer;
-	--app-cursor-text: url('../cursors/Cursor/Text.ani'), text;
-	--app-cursor-move: url('../cursors/Cursor/Move.ani'), move;
-	--app-cursor-busy: url('../cursors/Cursor/Busy.ani'), progress;
-	--app-cursor-help: url('../cursors/Cursor/Help.ani'), help;
-	--app-cursor-unavailable: url('../cursors/Cursor/Unavailable.ani'), not-allowed;
-	--app-cursor-precision: url('../cursors/Cursor/Precision.ani'), crosshair;
-	--app-cursor-handwriting: url('../cursors/Cursor/Handwriting.ani'), auto;
-	--app-cursor-pin: url('../cursors/Cursor/Pin.cur'), pointer;
-	--app-cursor-person: url('../cursors/Cursor/Person.cur'), pointer;
+	/* Reihenfolge: gif (Firefox/Zen), dann ani; nur Pin/Person haben .cur */
+	--app-cursor-main: url('../cursors/GIF/normal.gif'), url('../cursors/Cursor/Normal.ani'), auto;
+	--app-cursor-pointer: url('../cursors/GIF/link.gif'), url('../cursors/Cursor/Link.ani'), pointer;
+	--app-cursor-text: url('../cursors/GIF/text.gif'), url('../cursors/Cursor/Text.ani'), text;
+	--app-cursor-move: url('../cursors/GIF/move.gif'), url('../cursors/Cursor/Move.ani'), move;
+	--app-cursor-busy: url('../cursors/GIF/busy.gif'), url('../cursors/Cursor/Busy.ani'), progress;
+	--app-cursor-help: url('../cursors/GIF/help.gif'), url('../cursors/Cursor/Help.ani'), help;
+	--app-cursor-unavailable: url('../cursors/GIF/unavailable.gif'), url('../cursors/Cursor/Unavailable.ani'), not-allowed;
+	--app-cursor-precision: url('../cursors/GIF/precision.gif'), url('../cursors/Cursor/Precision.ani'), crosshair;
+	--app-cursor-handwriting: url('../cursors/GIF/handwriting.gif'), url('../cursors/Cursor/Handwriting.ani'), auto;
+	--app-cursor-pin: url('../cursors/Cursor/Pin.cur') 8 8, url('../cursors/GIF/alternate.gif'), pointer;
+	--app-cursor-person: url('../cursors/Cursor/Person.cur') 8 8, url('../cursors/GIF/alternate.gif'), pointer;
 }
 
 body{
