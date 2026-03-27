@@ -3986,7 +3986,7 @@ function isSupportedCursorFile(file) {
    if (typeof file.type === 'string' && file.type.startsWith('image/')) return true
 
    const lowerName = String(file.name || '').trim().toLowerCase()
-   return lowerName.endsWith('.cur') || lowerName.endsWith('.ani')
+   return lowerName.endsWith('.cur') || lowerName.endsWith('.png')
 }
 
 function readAndStoreLocalCursorFile(kind, file, inputElement, pickButton, resetButton) {
@@ -4067,7 +4067,7 @@ profileCursorInput.addEventListener('change', () => {
    if (!isSupportedCursorFile(cursorFile)) {
       profileCursorInput.value = ''
       setCursorFilenameLabel('cursor', '')
-      return showMsg('profile-message', 'Bitte wähle eine gültige Cursor-Datei (.cur, .ani oder Bilddatei).', 'error')
+      return showMsg('profile-message', 'Bitte wähle eine gültige Cursor-Datei (.cur oder Bilddatei, z. B. PNG).', 'error')
    }
 
    if (cursorFile.size > 8 * 1024 * 1024) {
@@ -4094,7 +4094,7 @@ profilePointerInput.addEventListener('change', () => {
    if (!isSupportedCursorFile(pointerFile)) {
       profilePointerInput.value = ''
       setCursorFilenameLabel('pointer', '')
-      return showMsg('profile-message', 'Bitte wähle eine gültige Pointer-Datei (.cur, .ani oder Bilddatei).', 'error')
+      return showMsg('profile-message', 'Bitte wähle eine gültige Pointer-Datei (.cur oder Bilddatei, z. B. PNG).', 'error')
    }
 
    if (pointerFile.size > 8 * 1024 * 1024) {

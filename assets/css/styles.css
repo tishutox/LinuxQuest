@@ -63,18 +63,19 @@ button {
 }
 
 :root {
-  /* Order: gif (Firefox/Zen), then ani (Chromium/Win); only Pin/Person have .cur */
-  --app-cursor-main: url('../cursors/GIF/normal.gif'), url('../cursors/Cursor/Normal.ani'), auto;
-  --app-cursor-pointer: url('../cursors/GIF/link.gif'), url('../cursors/Cursor/Link.ani'), pointer;
-  --app-cursor-text: url('../cursors/GIF/text.gif'), url('../cursors/Cursor/Text.ani'), text;
-  --app-cursor-move: url('../cursors/GIF/move.gif'), url('../cursors/Cursor/Move.ani'), move;
-  --app-cursor-busy: url('../cursors/GIF/busy.gif'), url('../cursors/Cursor/Busy.ani'), progress;
-  --app-cursor-help: url('../cursors/GIF/help.gif'), url('../cursors/Cursor/Help.ani'), help;
-  --app-cursor-unavailable: url('../cursors/GIF/unavailable.gif'), url('../cursors/Cursor/Unavailable.ani'), not-allowed;
-  --app-cursor-precision: url('../cursors/GIF/precision.gif'), url('../cursors/Cursor/Precision.ani'), crosshair;
-  --app-cursor-handwriting: url('../cursors/GIF/handwriting.gif'), url('../cursors/Cursor/Handwriting.ani'), auto;
-  --app-cursor-pin: url('../cursors/Cursor/Pin.cur') 8 8, url('../cursors/GIF/alternate.gif'), pointer;
-  --app-cursor-person: url('../cursors/Cursor/Person.cur') 8 8, url('../cursors/GIF/alternate.gif'), pointer;
+  /* PNG assets as primary; Pin/Person keep .cur hotspot */
+  /* Hotspot minimal weiter nach rechts/unten für exakteren Klickpunkt */
+  --app-cursor-main: url('../cursors/PNG/normal.png') 4 4, auto;
+  --app-cursor-pointer: url('../cursors/PNG/link.png') 4 4, pointer;
+  --app-cursor-text: url('../cursors/PNG/text.png'), text;
+  --app-cursor-move: url('../cursors/PNG/move.png'), move;
+  --app-cursor-busy: url('../cursors/PNG/busy.png'), progress;
+  --app-cursor-help: url('../cursors/PNG/help.png'), help;
+  --app-cursor-unavailable: url('../cursors/PNG/unavailable.png'), not-allowed;
+  --app-cursor-precision: url('../cursors/PNG/precision.png'), crosshair;
+  --app-cursor-handwriting: url('../cursors/PNG/handwriting.png'), auto;
+  --app-cursor-pin: url('../cursors/Cursor/Pin.cur') 8 8, url('../cursors/PNG/alternate.png'), pointer;
+  --app-cursor-person: url('../cursors/Cursor/Person.cur') 8 8, url('../cursors/PNG/alternate.png'), pointer;
 }
 
 body {
@@ -156,22 +157,22 @@ i.fi[class*="fi-rb-"] {
 
 @media (min-width: 768px) and (pointer: fine) {
   :root {
-    --app-cursor-main: url('../cursors/Cursor/Normal.ani'), auto;
-    --app-cursor-pointer: url('../cursors/Cursor/Link.ani'), pointer;
+    --app-cursor-main: url('../cursors/PNG/normal.png') 4 4, auto;
+    --app-cursor-pointer: url('../cursors/PNG/link.png') 4 4, pointer;
   }
 }
 
 @media (min-width: 1280px) and (pointer: fine) {
   :root {
-    --app-cursor-main: url('../cursors/Cursor/Normal.ani'), auto;
-    --app-cursor-pointer: url('../cursors/Cursor/Link.ani'), pointer;
+    --app-cursor-main: url('../cursors/PNG/normal.png') 4 4, auto;
+    --app-cursor-pointer: url('../cursors/PNG/link.png') 4 4, pointer;
   }
 }
 
 @media (min-width: 1600px) and (min-resolution: 2dppx) and (pointer: fine) {
   :root {
-    --app-cursor-main: url('../cursors/Cursor/Normal.ani'), auto;
-    --app-cursor-pointer: url('../cursors/Cursor/Link.ani'), pointer;
+    --app-cursor-main: url('../cursors/PNG/normal.png') 4 4, auto;
+    --app-cursor-pointer: url('../cursors/PNG/link.png') 4 4, pointer;
   }
 }
 
