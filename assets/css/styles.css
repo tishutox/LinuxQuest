@@ -1277,6 +1277,12 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
   max-width: 100%;
 }
 
+@media (min-width: 992px) {
+  .info-modal .login__form {
+    max-height: 80vh;
+  }
+}
+
 .info-modal__form {
   text-align: left;
   row-gap: 1rem;

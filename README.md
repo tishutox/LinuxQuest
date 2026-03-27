@@ -1,4 +1,4 @@
-# LinuxQuest – Auth, Profile & Suche
+# TuxoraQuest – Auth, Profile & Suche
 
 Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwaltung und öffentlicher Profilansicht.
 
