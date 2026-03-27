@@ -1532,6 +1532,7 @@ function setImprintContactLink(link, contact, fallback) {
 
    const displayUser = getDisplayUser(contact, fallback)
    link.textContent = `${displayUser.full_name}, ${displayUser.email}`
+   link.href = `mailto:${displayUser.email}`
 }
 
 function updateProjectContactModal(contactKey, contact) {
