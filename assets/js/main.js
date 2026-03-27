@@ -537,7 +537,7 @@ function setDistroLogo(distro) {
    if (!distroModalLogoImg || !distroModalLogoFallback) return
 
    const fallbackLetter = (distro?.name || '?').trim().charAt(0).toUpperCase() || '?'
-   distroModalLogoFallback.textContent = fallbackLetter
+   distroModalLogoFallback.innerHTML = `<i class="ri-camera-line" aria-hidden="true"></i><span>${fallbackLetter}</span>`
 
    if (distro?.logo) {
       distroModalLogoImg.style.display = 'block'

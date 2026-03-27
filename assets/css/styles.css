@@ -895,10 +895,19 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  row-gap: 0.2rem;
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1rem;
   color: var(--title-color);
   background: linear-gradient(135deg, rgba(96, 129, 255, 0.12), rgba(120, 255, 214, 0.18));
+}
+.distro-modal__logo-fallback i {
+  font-size: 1.4rem;
+  color: var(--first-color);
+}
+.distro-modal__logo-fallback span {
+  letter-spacing: 0.05em;
 }
 .distro-modal__title {
   display: flex;
