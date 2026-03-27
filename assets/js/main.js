@@ -134,7 +134,7 @@ const DISTRO_FINDER_DATA = [
    { name: 'Nobara', codebase: 'redhat', countries: ['us'], isoSizeMb: 4400, tags: ['gaming', 'content-creation', 'einsteigerfreundlich'] },
    { name: 'Bazzite', codebase: 'redhat', countries: ['us'], isoSizeMb: 4700, tags: ['gaming', 'immutable', 'einsteigerfreundlich'] },
    { name: 'ChimeraOS', codebase: 'independent', countries: ['us'], isoSizeMb: 3300, tags: ['gaming', 'rolling', 'fuer-experten'] },
-   { name: 'Chachy OS', codebase: 'arch', countries: ['us'], isoSizeMb: 2400, tags: ['lightweight', 'gaming', 'gutes-design'] },
+   { name: 'CachyOS', codebase: 'arch', countries: ['de'], isoSizeMb: 2400, tags: ['lightweight', 'gaming', 'gutes-design'] },
    { name: 'SteamOS', codebase: 'arch', countries: ['us'], isoSizeMb: 3500, tags: ['gaming', 'rolling', 'immutable'] },
    { name: 'AlmaLinux', codebase: 'redhat', countries: ['us'], isoSizeMb: 13340, tags: ['server', 'long-term-support', 'verwaltung'] },
    { name: 'Rocky Linux', codebase: 'redhat', countries: ['us'], isoSizeMb: 9278, tags: ['server', 'long-term-support', 'cloud'] },
