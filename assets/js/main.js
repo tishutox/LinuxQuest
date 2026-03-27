@@ -740,8 +740,10 @@ const loginPanel      = document.getElementById('login'),
 const staticModalTriggers = document.querySelectorAll('[data-modal-target]')
 const staticModalCloseButtons = document.querySelectorAll('[data-modal-close]')
 const staticModalPanels = Array.from(document.querySelectorAll('.info-modal'))
-const imprintArmandLink = document.getElementById('imprint-armand-link')
-const imprintJostLink = document.getElementById('imprint-jost-link')
+const imprintArmandNameLink = document.getElementById('imprint-armand-name')
+const imprintArmandEmailLink = document.getElementById('imprint-armand-email')
+const imprintJostNameLink = document.getElementById('imprint-jost-name')
+const imprintJostEmailLink = document.getElementById('imprint-jost-email')
 
 const projectContactConfig = {
    armand: {
@@ -750,7 +752,8 @@ const projectContactConfig = {
          username: 'armand',
          email: 'armand.patrick.asztalos@tha.de'
       },
-      imprintLink: imprintArmandLink
+      imprintNameLink: imprintArmandNameLink,
+      imprintEmailLink: imprintArmandEmailLink
    },
    jost: {
       fallback: {
@@ -758,7 +761,8 @@ const projectContactConfig = {
          username: 'jost',
          email: 'jost.witthauer@tha.de'
       },
-      imprintLink: imprintJostLink
+      imprintNameLink: imprintJostNameLink,
+      imprintEmailLink: imprintJostEmailLink
    }
 }
 
@@ -1527,12 +1531,21 @@ function getDisplayUser(contact, fallback) {
    return contact || fallback
 }
 
-function setImprintContactLink(link, contact, fallback) {
-   if (!link) return
+function setImprintContactLink(nameLink, emailLink, contact, fallback) {
+   if (!nameLink && !emailLink) return
 
    const displayUser = getDisplayUser(contact, fallback)
-   link.textContent = `${displayUser.full_name}, ${displayUser.email}`
-   link.href = `mailto:${displayUser.email}`
+
+   if (nameLink) {
+      nameLink.textContent = displayUser.full_name
+      nameLink.dataset.publicProfile = displayUser.username || ''
+      nameLink.dataset.modalTarget = 'public-profile-modal'
+   }
+
+   if (emailLink) {
+      emailLink.textContent = displayUser.email
+      emailLink.href = `mailto:${displayUser.email}`
+   }
 }
 
 function updateProjectContactModal(contactKey, contact) {
@@ -1542,7 +1555,7 @@ function updateProjectContactModal(contactKey, contact) {
    const displayUser = getDisplayUser(contact, config.fallback)
    projectContactsByKey[contactKey] = displayUser
 
-   setImprintContactLink(config.imprintLink, contact, config.fallback)
+   setImprintContactLink(config.imprintNameLink, config.imprintEmailLink, contact, config.fallback)
 }
 
 async function refreshProjectContacts({ force = false } = {}) {
