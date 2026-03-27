@@ -60,6 +60,43 @@ summary,
 	cursor: var(--app-cursor-pointer) !important;
 }
 
+input,
+textarea{
+	cursor: var(--app-cursor-text);
+}
+
+.move-cursor{
+	cursor: var(--app-cursor-move) !important;
+}
+
+.busy-cursor{
+	cursor: var(--app-cursor-busy) !important;
+}
+
+.help-cursor{
+	cursor: var(--app-cursor-help) !important;
+}
+
+.unavailable-cursor{
+	cursor: var(--app-cursor-unavailable) !important;
+}
+
+.precision-cursor{
+	cursor: var(--app-cursor-precision) !important;
+}
+
+.handwriting-cursor{
+	cursor: var(--app-cursor-handwriting) !important;
+}
+
+.pin-cursor{
+	cursor: var(--app-cursor-pin) !important;
+}
+
+.person-cursor{
+	cursor: var(--app-cursor-person) !important;
+}
+
 @media (min-width: 768px) and (pointer: fine){
 	:root{
 		--app-cursor-main: url('../cursors/Cursor/Normal.ani'), auto;
