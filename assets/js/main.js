@@ -75,6 +75,18 @@ const finderFilterSpeedMax = document.getElementById('finder-filter-speed-max')
 const finderFilterSpeedMaxValue = document.getElementById('finder-filter-speed-max-value')
 const finderTagsContainer = document.getElementById('finder-tags-container')
 const finderTagButtons = Array.from(finderTagsContainer?.querySelectorAll('.finder-filter__tag-option') || [])
+const distroModal = document.getElementById('distro-modal')
+const distroModalClose = document.getElementById('distro-modal-close')
+const distroModalLogoImg = document.getElementById('distro-modal-logo-img')
+const distroModalLogoFallback = document.getElementById('distro-modal-logo-fallback')
+const distroModalName = document.getElementById('distro-modal-name')
+const distroModalFlags = document.getElementById('distro-modal-flags')
+const distroModalCodebase = document.getElementById('distro-modal-codebase')
+const distroModalIso = document.getElementById('distro-modal-iso')
+const distroModalDocs = document.getElementById('distro-modal-docs')
+const distroModalDownload = document.getElementById('distro-modal-download')
+const distroModalTags = document.getElementById('distro-modal-tags')
+const distroModalDescription = document.getElementById('distro-modal-description')
 
 let finderTagStates = {}
 
@@ -110,25 +122,25 @@ const FINDER_COUNTRY_LABEL_BY_VALUE = Object.fromEntries(
 )
 
 const DISTRO_FINDER_DATA = [
-   { name: 'Ubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 5900, tags: ['einsteigerfreundlich', 'long-term-support', 'office'] },
-   { name: 'Kubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 4900, tags: ['gutes-design', 'einsteigerfreundlich', 'office'] },
-   { name: 'Ubuntu Studio', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 4600, tags: ['content-creation', 'office', 'einsteigerfreundlich'] },
-   { name: 'Xubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 2600, tags: ['lightweight', 'einsteigerfreundlich', 'bildung'] },
-   { name: 'Lubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 2200, tags: ['lightweight', 'einsteigerfreundlich', 'bildung'] },
+   { name: 'Ubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 5900, tags: ['einsteigerfreundlich', 'long-term-support', 'office'], docsUrl: 'https://help.ubuntu.com', downloadUrl: 'https://ubuntu.com/download', description: 'Bekannte Desktop-Distribution mit starkem LTS-Fokus.', logo: 'assets/img/distros/ubuntu.png' },
+   { name: 'Kubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 4900, tags: ['gutes-design', 'einsteigerfreundlich', 'office'], docsUrl: 'https://kubuntu.org/support', downloadUrl: 'https://kubuntu.org/getkubuntu/', description: 'Ubuntu mit KDE Plasma und Fokus auf ein aufgeräumtes Desktop-Erlebnis.', logo: 'assets/img/distros/kubuntu.png' },
+   { name: 'Ubuntu Studio', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 4600, tags: ['content-creation', 'office', 'einsteigerfreundlich'], docsUrl: 'https://ubuntustudio.org/support/', downloadUrl: 'https://ubuntustudio.org/download/', description: 'Ubuntu-Variante für Audio-, Video- und Grafikproduktionen.', logo: 'assets/img/distros/ubuntustudio.png' },
+   { name: 'Xubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 2600, tags: ['lightweight', 'einsteigerfreundlich', 'bildung'], docsUrl: 'https://xubuntu.org/help/', downloadUrl: 'https://xubuntu.org/download', description: 'Leichtgewichtiges Ubuntu mit Xfce-Desktop.', logo: 'assets/img/distros/xubuntu.png' },
+   { name: 'Lubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 2200, tags: ['lightweight', 'einsteigerfreundlich', 'bildung'], docsUrl: 'https://manual.lubuntu.me', downloadUrl: 'https://lubuntu.me/downloads/', description: 'Minimalistisches Ubuntu mit LXQt für ältere Hardware.', logo: 'assets/img/distros/lubuntu.png' },
    { name: 'Linux Mint', codebase: 'ubuntu', countries: ['ie'], isoSizeMb: 2700, tags: ['einsteigerfreundlich', 'long-term-support', 'office'] },
    { name: 'Pop!_OS', codebase: 'ubuntu', countries: ['us'], isoSizeMb: 3100, tags: ['gaming', 'programmierer', 'gutes-design'] },
    { name: 'Kali Linux', codebase: 'debian', countries: ['international'], isoSizeMb: 4400, tags: ['it-sicherheit', 'forensik', 'fuer-experten'] },
    { name: 'Parrot Security', codebase: 'debian', countries: ['it'], isoSizeMb: 4300, tags: ['it-sicherheit', 'forensik', 'privacy'] },
    { name: 'Tails', codebase: 'debian', countries: ['fr'], isoSizeMb: 1300, tags: ['privacy', 'it-sicherheit', 'barrierefreiheit'] },
-   { name: 'Debian', codebase: 'debian', countries: ['international'], isoSizeMb: 4700, tags: ['long-term-support', 'server', 'verwaltung'] },
+   { name: 'Debian', codebase: 'debian', countries: ['international'], isoSizeMb: 4700, tags: ['long-term-support', 'server', 'verwaltung'], docsUrl: 'https://www.debian.org/doc/', downloadUrl: 'https://www.debian.org/distrib/', description: 'Stabile Universal-Distribution mit großem Paket-Ökosystem.', logo: 'assets/img/distros/debian.png' },
    { name: 'MX Linux', codebase: 'debian', countries: ['us'], isoSizeMb: 2200, tags: ['einsteigerfreundlich', 'lightweight', 'systemd-free'] },
    { name: 'Devuan', codebase: 'debian', countries: ['us'], isoSizeMb: 1700, tags: ['systemd-free', 'server', 'privacy'] },
-   { name: 'Arch Linux', codebase: 'arch', countries: ['international'], isoSizeMb: 1400, tags: ['rolling', 'fuer-experten', 'programmierer'] },
-   { name: 'EndeavourOS', codebase: 'arch', countries: ['nl'], isoSizeMb: 2300, tags: ['rolling', 'einsteigerfreundlich', 'programmierer'] },
-   { name: 'Manjaro', codebase: 'arch', countries: ['de'], isoSizeMb: 4000, tags: ['rolling', 'gaming', 'einsteigerfreundlich'] },
+   { name: 'Arch Linux', codebase: 'arch', countries: ['international'], isoSizeMb: 1400, tags: ['rolling', 'fuer-experten', 'programmierer'], docsUrl: 'https://wiki.archlinux.org', downloadUrl: 'https://archlinux.org/download/', description: 'Minimal, rolling-release, mit hervorragender Dokumentation.', logo: 'assets/img/distros/arch.png' },
+   { name: 'EndeavourOS', codebase: 'arch', countries: ['nl'], isoSizeMb: 2300, tags: ['rolling', 'einsteigerfreundlich', 'programmierer'], docsUrl: 'https://discovery.endeavouros.com', downloadUrl: 'https://endeavouros.com/latest-release/', description: 'Community-Arch-Spin mit schnellem Installer und Rolling-Updates.', logo: 'assets/img/distros/endeavouros.png' },
+   { name: 'Manjaro', codebase: 'arch', countries: ['de'], isoSizeMb: 4000, tags: ['rolling', 'gaming', 'einsteigerfreundlich'], docsUrl: 'https://wiki.manjaro.org', downloadUrl: 'https://manjaro.org/download/', description: 'Arch-basiert mit vorgefertigten Desktops und grafischen Tools.', logo: 'assets/img/distros/manjaro.png' },
    { name: 'Garuda Linux', codebase: 'arch', countries: ['in'], isoSizeMb: 4600, tags: ['gaming', 'gutes-design', 'rolling'] },
    { name: 'AthenaOS', codebase: 'arch', countries: ['it'], isoSizeMb: 3400, tags: ['it-sicherheit', 'forensik', 'rolling'] },
-   { name: 'Fedora Workstation', codebase: 'redhat', countries: ['us'], isoSizeMb: 2000, tags: ['programmierer', 'gutes-design', 'bildung', 'ki'] },
+   { name: 'Fedora Workstation', codebase: 'redhat', countries: ['us'], isoSizeMb: 2000, tags: ['programmierer', 'gutes-design', 'bildung', 'ki'], docsUrl: 'https://docs.fedoraproject.org/en-US/quick-docs/', downloadUrl: 'https://fedoraproject.org/workstation/download', description: 'Upstream-nahes GNOME-Desktop-Erlebnis mit schnellen Releases.', logo: 'assets/img/distros/fedora.png' },
    { name: 'Fedora Server', codebase: 'redhat', countries: ['us'], isoSizeMb: 2000, tags: ['server', 'cloud', 'verwaltung'] },
    { name: 'Fedora Silverblue', codebase: 'redhat', countries: ['us'], isoSizeMb: 2900, tags: ['immutable', 'programmierer', 'privacy'] },
    { name: 'Nobara', codebase: 'redhat', countries: ['us'], isoSizeMb: 4400, tags: ['gaming', 'content-creation', 'einsteigerfreundlich'] },
@@ -138,8 +150,8 @@ const DISTRO_FINDER_DATA = [
    { name: 'SteamOS', codebase: 'arch', countries: ['us'], isoSizeMb: 3500, tags: ['gaming', 'rolling', 'immutable'] },
    { name: 'AlmaLinux', codebase: 'redhat', countries: ['us'], isoSizeMb: 13340, tags: ['server', 'long-term-support', 'verwaltung'] },
    { name: 'Rocky Linux', codebase: 'redhat', countries: ['us'], isoSizeMb: 9278, tags: ['server', 'long-term-support', 'cloud'] },
-   { name: 'openSUSE Tumbleweed', codebase: 'suse', countries: ['de'], isoSizeMb: 1500, tags: ['rolling', 'programmierer', 'forschung'] },
-   { name: 'openSUSE Leap', codebase: 'suse', countries: ['de'], isoSizeMb: 4800, tags: ['long-term-support', 'office', 'verwaltung'] },
+   { name: 'openSUSE Tumbleweed', codebase: 'suse', countries: ['de'], isoSizeMb: 1500, tags: ['rolling', 'programmierer', 'forschung'], docsUrl: 'https://en.opensuse.org/Portal:Tumbleweed', downloadUrl: 'https://get.opensuse.org/tumbleweed/', description: 'Rolling-Release mit Snapper/Btrfs-Tools und YaST.', logo: 'assets/img/distros/opensuse-tw.png' },
+   { name: 'openSUSE Leap', codebase: 'suse', countries: ['de'], isoSizeMb: 4800, tags: ['long-term-support', 'office', 'verwaltung'], docsUrl: 'https://en.opensuse.org/Portal:Leap', downloadUrl: 'https://get.opensuse.org/leap/', description: 'Stabile SUSE-Basis mit YaST und Snapper.', logo: 'assets/img/distros/opensuse-leap.png' },
    { name: 'SLES', codebase: 'suse', countries: ['de'], isoSizeMb: 1200, tags: ['server', 'long-term-support', 'cloud'] },
    { name: 'Gentoo', codebase: 'gentoo', countries: ['us'], isoSizeMb: 1000, tags: ['source-based', 'fuer-experten', 'lightweight'] },
    { name: 'Slackware', codebase: 'slackware', countries: ['us'], isoSizeMb: 3200, tags: ['fuer-experten', 'systemd-free', 'programmierer'] },
@@ -160,11 +172,11 @@ const DISTRO_FINDER_DATA = [
    { name: 'Canaima', codebase: 'debian', countries: ['ve'], isoSizeMb: 2800, tags: ['bildung', 'office', 'verwaltung'] },
    { name: 'ExTiX', codebase: 'ubuntu', countries: ['se'], isoSizeMb: 3600, tags: ['rolling', 'fuer-experten', 'programmierer'] },
    { name: 'endeavouros-arm', codebase: 'arch', countries: ['nl'], isoSizeMb: 2400, tags: ['rolling', 'programmierer', 'fuer-experten'] },
-   { name: 'NixOS', codebase: 'independent', countries: ['nl'], isoSizeMb: 1600, tags: ['programmierer', 'cloud', 'forschung', 'ki'] },
+   { name: 'NixOS', codebase: 'independent', countries: ['nl'], isoSizeMb: 1600, tags: ['programmierer', 'cloud', 'forschung', 'ki'], docsUrl: 'https://nixos.org/learn.html', downloadUrl: 'https://nixos.org/download', description: 'Deklaratives System mit atomaren Rollbacks über den Nix-Paketmanager.', logo: 'assets/img/distros/nixos.png' },
    { name: 'Qubes OS', codebase: 'independent', countries: ['international'], isoSizeMb: 5000, tags: ['it-sicherheit', 'privacy', 'fuer-experten'] },
-   { name: 'KDE neon', codebase: 'ubuntu', countries: ['de'], isoSizeMb: 3000, tags: ['gutes-design', 'office', 'einsteigerfreundlich'] },
-   { name: 'Elementary OS', codebase: 'ubuntu', countries: ['us'], isoSizeMb: 2900, tags: ['gutes-design', 'einsteigerfreundlich', 'office'] },
-   { name: 'Zorin OS', codebase: 'ubuntu', countries: ['ie'], isoSizeMb: 3300, tags: ['barrierefreiheit', 'einsteigerfreundlich', 'office'] },
+   { name: 'KDE neon', codebase: 'ubuntu', countries: ['de'], isoSizeMb: 3000, tags: ['gutes-design', 'office', 'einsteigerfreundlich'], docsUrl: 'https://neon.kde.org/faq', downloadUrl: 'https://neon.kde.org/download', description: 'KDEs Referenz-Desktop mit aktuellen Plasma-Versionen auf Ubuntu-Basis.', logo: 'assets/img/distros/kdeneon.png' },
+   { name: 'Elementary OS', codebase: 'ubuntu', countries: ['us'], isoSizeMb: 2900, tags: ['gutes-design', 'einsteigerfreundlich', 'office'], docsUrl: 'https://support.elementary.io', downloadUrl: 'https://elementary.io/', description: 'Designorientierte Ubuntu-Variante mit Pantheon-Desktop.', logo: 'assets/img/distros/elementary.png' },
+   { name: 'Zorin OS', codebase: 'ubuntu', countries: ['ie'], isoSizeMb: 3300, tags: ['barrierefreiheit', 'einsteigerfreundlich', 'office'], docsUrl: 'https://help.zorin.com', downloadUrl: 'https://zorin.com/os/download/', description: 'Windows-ähnliche Oberfläche für Umsteiger, basierend auf Ubuntu.', logo: 'assets/img/distros/zorin.png' },
    { name: 'Rescatux', codebase: 'debian', countries: ['es'], isoSizeMb: 800, tags: ['datenrettung', 'disk-management', 'einsteigerfreundlich'] },
    { name: 'SystemRescue', codebase: 'independent', countries: ['fr'], isoSizeMb: 900, tags: ['datenrettung', 'disk-management', 'forensik'] },
    { name: 'Clonezilla Live', codebase: 'debian', countries: ['tw'], isoSizeMb: 4200, tags: ['datenrettung', 'disk-management', 'verwaltung'] },
@@ -521,6 +533,105 @@ function formatFinderIsoSize(sizeMb) {
    return `${sizeMb} MB`
 }
 
+function setDistroLogo(distro) {
+   if (!distroModalLogoImg || !distroModalLogoFallback) return
+
+   const fallbackLetter = (distro?.name || '?').trim().charAt(0).toUpperCase() || '?'
+   distroModalLogoFallback.textContent = fallbackLetter
+
+   if (distro?.logo) {
+      distroModalLogoImg.style.display = 'block'
+      distroModalLogoImg.alt = `${distro.name || 'Distro'} Logo`
+      distroModalLogoImg.src = distro.logo
+      distroModalLogoImg.onerror = () => {
+         distroModalLogoImg.style.display = 'none'
+         distroModalLogoFallback.style.display = 'flex'
+      }
+      distroModalLogoImg.onload = () => {
+         distroModalLogoFallback.style.display = 'none'
+      }
+   } else {
+      distroModalLogoImg.style.display = 'none'
+      distroModalLogoFallback.style.display = 'flex'
+   }
+}
+
+function renderDistroFlags(countries = []) {
+   if (!distroModalFlags) return
+   if (!countries.length) {
+      distroModalFlags.innerHTML = ''
+      return
+   }
+
+   distroModalFlags.innerHTML = countries.map((country) => getFinderCountryFlagIcon(country)).join('')
+}
+
+function setDistroLink(anchor, url) {
+   if (!anchor) return
+   if (url) {
+      anchor.style.display = 'inline-flex'
+      anchor.href = url
+   } else {
+      anchor.style.display = 'none'
+      anchor.removeAttribute('href')
+   }
+}
+
+function renderDistroTags(tags = []) {
+   if (!distroModalTags) return
+   distroModalTags.innerHTML = ''
+
+   if (!Array.isArray(tags) || !tags.length) {
+      distroModalTags.style.display = 'none'
+      return
+   }
+
+   tags.forEach((tag) => {
+      const pill = document.createElement('span')
+      pill.className = 'distro-modal__tag'
+      pill.textContent = tag
+      distroModalTags.appendChild(pill)
+   })
+
+   distroModalTags.style.display = 'flex'
+}
+
+function openDistroModal(distro) {
+   if (!distroModal || !distro) return
+
+   hideFinderResults()
+   hideSearchResults()
+   search.classList.remove('show-search')
+
+   setDistroLogo(distro)
+   renderDistroFlags(distro.countries)
+
+   if (distroModalName) {
+      distroModalName.textContent = distro.name || 'Unbekannte Distro'
+   }
+
+   if (distroModalCodebase) {
+      distroModalCodebase.textContent = distro.codebase ? `Codebasis: ${distro.codebase}` : 'Keine Codebasis hinterlegt'
+   }
+
+   if (distroModalIso) {
+      distroModalIso.textContent = distro.isoSizeMb ? `ISO: ${formatFinderIsoSize(distro.isoSizeMb)}` : 'Keine ISO-Größe hinterlegt'
+   }
+
+   setDistroLink(distroModalDocs, distro.docsUrl)
+   setDistroLink(distroModalDownload, distro.downloadUrl)
+
+   renderDistroTags(distro.tags)
+
+   if (distroModalDescription) {
+      const hasText = Boolean(distro.description)
+      distroModalDescription.textContent = distro.description || ''
+      distroModalDescription.style.display = hasText ? 'block' : 'none'
+   }
+
+   distroModal.classList.add('show-login')
+}
+
 function renderFinderDistroResults(matches) {
    finderDistroResults.innerHTML = ''
 
@@ -546,7 +657,10 @@ function renderFinderDistroResults(matches) {
          item.type = 'button'
          item.className = 'search-results__item'
          item.textContent = distro.name
-         item.addEventListener('click', (event) => event.preventDefault())
+         item.addEventListener('click', (event) => {
+            event.preventDefault()
+            openDistroModal(distro)
+         })
          list.appendChild(item)
       })
 
@@ -679,6 +793,16 @@ finderCountryModal?.addEventListener('click', (event) => {
    }
 })
 
+distroModalClose?.addEventListener('click', () => {
+   distroModal?.classList.remove('show-login')
+})
+
+distroModal?.addEventListener('click', (event) => {
+   if (event.target === distroModal) {
+      distroModal.classList.remove('show-login')
+   }
+})
+
 renderFinderCountrySummary()
 sortFinderFilterOptions()
 if (finderFilterCodebase) {
@@ -775,10 +899,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
