@@ -2342,15 +2342,15 @@ function applyUserCursor(cursorSource, pointerSource) {
    if (cursorSource) {
       document.documentElement.style.setProperty('--app-cursor-main', `url("${cursorSource}") 8 8, auto`)
    } else {
-      // Fallback auf Standard-Cursor
-      document.documentElement.style.setProperty('--app-cursor-main', "url('../cursors/Cursor/Normal.ani'), auto")
+      // Remove overrides so the stylesheet defaults (with proper asset paths) take effect
+      document.documentElement.style.removeProperty('--app-cursor-main')
    }
 
    if (pointerSource) {
       document.documentElement.style.setProperty('--app-cursor-pointer', `url("${pointerSource}") 8 8, pointer`)
    } else {
-      // Fallback auf Standard-Link-Cursor
-      document.documentElement.style.setProperty('--app-cursor-pointer', "url('../cursors/Cursor/Link.ani'), pointer")
+      // Remove overrides so the stylesheet defaults (with proper asset paths) take effect
+      document.documentElement.style.removeProperty('--app-cursor-pointer')
    }
 }
 
