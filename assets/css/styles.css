@@ -2179,6 +2179,44 @@ body.user-theme-active .profile-background__reset:disabled {
   border-radius: .75rem;
 }
 
+#distro-modal .info-modal__avatar-wrap {
+  position: relative;
+  width: 100%;
+  margin-bottom: .9rem;
+}
+
+#distro-modal .public-profile__avatar-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  z-index: 2;
+}
+
+#distro-modal .public-profile__action--bookmark-float {
+  width: auto;
+  height: auto;
+  padding: 0;
+  background: transparent;
+  font-size: var(--nav-icon-size) !important;
+  line-height: 1;
+  color: var(--text-color);
+}
+
+#distro-modal .public-profile__action--bookmark-float i,
+#distro-modal .public-profile__action--bookmark-float i::before {
+  font-size: var(--nav-icon-size) !important;
+  line-height: 1;
+  transform: none;
+}
+
+#distro-modal .public-profile__action--bookmark-float:hover,
+#distro-modal .public-profile__action--bookmark-float:focus-visible {
+  color: var(--first-color);
+}
+
 /* =============== DISTRO MODAL TAGS =============== */
 #distro-modal .distro-modal__tags {
   display: flex;
