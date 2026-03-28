@@ -529,44 +529,35 @@
          <i class="fi fi-rr-cross-small login__close" id="public-profile-close"></i>
       </div>
 
+      <!--==================== DISTRO MODAL ====================-->
       <div class="login" id="distro-modal">
-         <div class="login__form profile__form distro-modal__card">
+         <div class="login__form profile__form">
             <div class="login__message" id="distro-modal-message"></div>
 
-            <div class="distro-modal__header">
-               <div class="distro-modal__logo" id="distro-modal-logo">
-                  <img src="" alt="Distro-Logo" class="distro-modal__logo-img" id="distro-modal-logo-img">
-                  <span class="distro-modal__logo-fallback" id="distro-modal-logo-fallback"></span>
-               </div>
+            <div class="info-modal__avatar-wrap">
+               <img src="" alt="Distro-Logo" class="info-modal__avatar" id="distro-modal-avatar">
+            </div>
 
-               <div class="distro-modal__title">
-                  <div class="distro-modal__name-row">
-                     <p class="distro-modal__name" id="distro-modal-name"></p>
-                     <span class="distro-modal__flags" id="distro-modal-flags"></span>
-                  </div>
+            <div class="public-profile__name-row" id="distro-modal-name-row">
+               <p class="profile__display-name" id="distro-modal-name"></p>
+               <span class="public-profile__pronouns" id="distro-modal-codebase" style="display:none;"></span>
+            </div>
 
-                  <div class="distro-modal__meta-row">
-                     <span class="distro-modal__meta" id="distro-modal-codebase"></span>
-                     <span class="distro-modal__divider" aria-hidden="true">|</span>
-                     <span class="distro-modal__meta" id="distro-modal-iso"></span>
-                  </div>
-
-                  <div class="distro-modal__links-row">
-                     <a class="distro-modal__link" id="distro-modal-docs" href="#" target="_blank" rel="noopener" style="display:none;">
-                        <i class="fi fi-rc-document" aria-hidden="true"></i>
-                        <span>Dokumentation</span>
-                     </a>
-                     <a class="distro-modal__link" id="distro-modal-download" href="#" target="_blank" rel="noopener" style="display:none;">
-                        <i class="fi fi-rc-download" aria-hidden="true"></i>
-                        <span>Download</span>
-                     </a>
-                  </div>
+            <div class="public-profile__username-row">
+               <p class="public-profile__username" id="distro-modal-iso"></p>
+               <div class="public-profile__actions">
+                  <a class="public-profile__action" id="distro-modal-docs" href="#" target="_blank" rel="noopener" style="display:none;" aria-label="Dokumentation">
+                     <i class="fi fi-rc-document" aria-hidden="true"></i>
+                  </a>
+                  <a class="public-profile__action" id="distro-modal-download" href="#" target="_blank" rel="noopener" style="display:none;" aria-label="Download">
+                     <i class="fi fi-rc-download" aria-hidden="true"></i>
+                  </a>
                </div>
             </div>
 
-            <div class="distro-modal__tags" id="distro-modal-tags" style="display:none;"></div>
-
-            <div class="distro-modal__description" id="distro-modal-description" style="display:none;"></div>
+            <div class="public-profile__bio-box" id="distro-modal-description-box" style="display:none;">
+               <p class="public-profile__bio-text" id="distro-modal-description"></p>
+            </div>
          </div>
 
          <i class="fi fi-rr-cross-small login__close" id="distro-modal-close"></i>

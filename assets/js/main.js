@@ -77,15 +77,13 @@ const finderTagsContainer = document.getElementById('finder-tags-container')
 const finderTagButtons = Array.from(finderTagsContainer?.querySelectorAll('.finder-filter__tag-option') || [])
 const distroModal = document.getElementById('distro-modal')
 const distroModalClose = document.getElementById('distro-modal-close')
-const distroModalLogoImg = document.getElementById('distro-modal-logo-img')
-const distroModalLogoFallback = document.getElementById('distro-modal-logo-fallback')
+const distroModalAvatar = document.getElementById('distro-modal-avatar')
 const distroModalName = document.getElementById('distro-modal-name')
-const distroModalFlags = document.getElementById('distro-modal-flags')
 const distroModalCodebase = document.getElementById('distro-modal-codebase')
 const distroModalIso = document.getElementById('distro-modal-iso')
 const distroModalDocs = document.getElementById('distro-modal-docs')
 const distroModalDownload = document.getElementById('distro-modal-download')
-const distroModalTags = document.getElementById('distro-modal-tags')
+const distroModalDescriptionBox = document.getElementById('distro-modal-description-box')
 const distroModalDescription = document.getElementById('distro-modal-description')
 
 let finderTagStates = {}
@@ -135,7 +133,7 @@ const DISTRO_FINDER_DATA = [
    { name: 'Debian', codebase: 'debian', countries: ['international'], isoSizeMb: 4700, tags: ['long-term-support', 'server', 'verwaltung'], docsUrl: 'https://www.debian.org/doc/', downloadUrl: 'https://www.debian.org/distrib/', description: 'Stabile Universal-Distribution mit großem Paket-Ökosystem.', logo: 'assets/img/distros/debian.png' },
    { name: 'MX Linux', codebase: 'debian', countries: ['us'], isoSizeMb: 2200, tags: ['einsteigerfreundlich', 'lightweight', 'systemd-free'] },
    { name: 'Devuan', codebase: 'debian', countries: ['us'], isoSizeMb: 1700, tags: ['systemd-free', 'server', 'privacy'] },
-   { name: 'Arch Linux', codebase: 'arch', countries: ['international'], isoSizeMb: 1400, tags: ['rolling', 'fuer-experten', 'programmierer'], docsUrl: 'https://wiki.archlinux.org', downloadUrl: 'https://archlinux.org/download/', description: 'Minimal, rolling-release, mit hervorragender Dokumentation.', logo: 'assets/img/distros/arch.png' },
+   { name: 'Arch Linux', codebase: 'arch', countries: ['international'], isoSizeMb: 1400, tags: ['rolling', 'fuer-experten', 'programmierer'], docsUrl: 'https://wiki.archlinux.org', downloadUrl: 'https://archlinux.org/download/', description: 'Minimal, rolling-release, mit hervorragender Dokumentation.', logo: 'assets/img/distros/arch-linux.png' },
    { name: 'EndeavourOS', codebase: 'arch', countries: ['nl'], isoSizeMb: 2300, tags: ['rolling', 'einsteigerfreundlich', 'programmierer'], docsUrl: 'https://discovery.endeavouros.com', downloadUrl: 'https://endeavouros.com/latest-release/', description: 'Community-Arch-Spin mit schnellem Installer und Rolling-Updates.', logo: 'assets/img/distros/endeavouros.png' },
    { name: 'Manjaro', codebase: 'arch', countries: ['de'], isoSizeMb: 4000, tags: ['rolling', 'gaming', 'einsteigerfreundlich'], docsUrl: 'https://wiki.manjaro.org', downloadUrl: 'https://manjaro.org/download/', description: 'Arch-basiert mit vorgefertigten Desktops und grafischen Tools.', logo: 'assets/img/distros/manjaro.png' },
    { name: 'Garuda Linux', codebase: 'arch', countries: ['in'], isoSizeMb: 4600, tags: ['gaming', 'gutes-design', 'rolling'] },
@@ -533,37 +531,19 @@ function formatFinderIsoSize(sizeMb) {
    return `${sizeMb} MB`
 }
 
-function setDistroLogo(distro) {
-   if (!distroModalLogoImg || !distroModalLogoFallback) return
-
-   const fallbackLetter = (distro?.name || '?').trim().charAt(0).toUpperCase() || '?'
-   distroModalLogoFallback.innerHTML = `<i class="ri-camera-line" aria-hidden="true"></i><span>${fallbackLetter}</span>`
+function setDistroAvatar(distro) {
+   if (!distroModalAvatar) return
 
    if (distro?.logo) {
-      distroModalLogoImg.style.display = 'block'
-      distroModalLogoImg.alt = `${distro.name || 'Distro'} Logo`
-      distroModalLogoImg.src = distro.logo
-      distroModalLogoImg.onerror = () => {
-         distroModalLogoImg.style.display = 'none'
-         distroModalLogoFallback.style.display = 'flex'
-      }
-      distroModalLogoImg.onload = () => {
-         distroModalLogoFallback.style.display = 'none'
-      }
-   } else {
-      distroModalLogoImg.style.display = 'none'
-      distroModalLogoFallback.style.display = 'flex'
-   }
-}
-
-function renderDistroFlags(countries = []) {
-   if (!distroModalFlags) return
-   if (!countries.length) {
-      distroModalFlags.innerHTML = ''
+      distroModalAvatar.src = distro.logo
+      distroModalAvatar.alt = `${distro.name || 'Distro'} Logo`
+      distroModalAvatar.style.display = 'block'
       return
    }
 
-   distroModalFlags.innerHTML = countries.map((country) => getFinderCountryFlagIcon(country)).join('')
+   distroModalAvatar.removeAttribute('src')
+   distroModalAvatar.alt = 'Kein Logo vorhanden'
+   distroModalAvatar.style.display = 'none'
 }
 
 function setDistroLink(anchor, url) {
@@ -577,25 +557,6 @@ function setDistroLink(anchor, url) {
    }
 }
 
-function renderDistroTags(tags = []) {
-   if (!distroModalTags) return
-   distroModalTags.innerHTML = ''
-
-   if (!Array.isArray(tags) || !tags.length) {
-      distroModalTags.style.display = 'none'
-      return
-   }
-
-   tags.forEach((tag) => {
-      const pill = document.createElement('span')
-      pill.className = 'distro-modal__tag'
-      pill.textContent = tag
-      distroModalTags.appendChild(pill)
-   })
-
-   distroModalTags.style.display = 'flex'
-}
-
 function openDistroModal(distro) {
    if (!distroModal || !distro) return
 
@@ -603,30 +564,30 @@ function openDistroModal(distro) {
    hideSearchResults()
    search.classList.remove('show-search')
 
-   setDistroLogo(distro)
-   renderDistroFlags(distro.countries)
+   setDistroAvatar(distro)
 
    if (distroModalName) {
       distroModalName.textContent = distro.name || 'Unbekannte Distro'
    }
 
    if (distroModalCodebase) {
-      distroModalCodebase.textContent = distro.codebase ? `Codebasis: ${distro.codebase}` : 'Keine Codebasis hinterlegt'
+      const hasCodebase = Boolean(distro.codebase)
+      distroModalCodebase.textContent = hasCodebase ? distro.codebase : ''
+      distroModalCodebase.style.display = hasCodebase ? 'inline' : 'none'
    }
 
    if (distroModalIso) {
-      distroModalIso.textContent = distro.isoSizeMb ? `ISO: ${formatFinderIsoSize(distro.isoSizeMb)}` : 'Keine ISO-Größe hinterlegt'
+      const hasIso = Number.isFinite(distro.isoSizeMb)
+      distroModalIso.textContent = hasIso ? `ISO: ${formatFinderIsoSize(distro.isoSizeMb)}` : ''
    }
 
    setDistroLink(distroModalDocs, distro.docsUrl)
    setDistroLink(distroModalDownload, distro.downloadUrl)
 
-   renderDistroTags(distro.tags)
-
-   if (distroModalDescription) {
+   if (distroModalDescription && distroModalDescriptionBox) {
       const hasText = Boolean(distro.description)
       distroModalDescription.textContent = distro.description || ''
-      distroModalDescription.style.display = hasText ? 'block' : 'none'
+      distroModalDescriptionBox.style.display = hasText ? 'block' : 'none'
    }
 
    distroModal.classList.add('show-login')

@@ -2174,6 +2174,11 @@ body.user-theme-active .profile-background__reset:disabled {
   color: var(--public-profile-accent-color);
 }
 
+/* =============== DISTRO MODAL AVATAR =============== */
+#distro-modal .info-modal__avatar {
+  border-radius: .75rem;
+}
+
 #public-profile-modal #public-profile-follow-btn {
   background-color: var(--public-profile-accent-color);
 }
