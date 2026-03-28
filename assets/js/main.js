@@ -75,6 +75,9 @@ const finderFilterSpeedMax = document.getElementById('finder-filter-speed-max')
 const finderFilterSpeedMaxValue = document.getElementById('finder-filter-speed-max-value')
 const finderTagsContainer = document.getElementById('finder-tags-container')
 const finderTagButtons = Array.from(finderTagsContainer?.querySelectorAll('.finder-filter__tag-option') || [])
+const FINDER_TAG_LABEL_BY_VALUE = Object.fromEntries(
+   finderTagButtons.map((button) => [button.dataset.value, button.textContent.trim()])
+)
 const distroModal = document.getElementById('distro-modal')
 const distroModalClose = document.getElementById('distro-modal-close')
 const distroModalAvatar = document.getElementById('distro-modal-avatar')
@@ -83,6 +86,7 @@ const distroModalCodebase = document.getElementById('distro-modal-codebase')
 const distroModalIso = document.getElementById('distro-modal-iso')
 const distroModalDocs = document.getElementById('distro-modal-docs')
 const distroModalDownload = document.getElementById('distro-modal-download')
+const distroModalTags = document.getElementById('distro-modal-tags')
 const distroModalDescriptionBox = document.getElementById('distro-modal-description-box')
 const distroModalDescription = document.getElementById('distro-modal-description')
 
@@ -557,6 +561,27 @@ function setDistroLink(anchor, url) {
    }
 }
 
+function renderDistroTags(tags = []) {
+   if (!distroModalTags) return
+
+   distroModalTags.innerHTML = ''
+
+   if (!Array.isArray(tags) || !tags.length) {
+      distroModalTags.style.display = 'none'
+      return
+   }
+
+   tags.forEach((tag) => {
+      const label = FINDER_TAG_LABEL_BY_VALUE[tag] || tag
+      const pill = document.createElement('span')
+      pill.className = 'distro-modal__tag'
+      pill.textContent = label
+      distroModalTags.appendChild(pill)
+   })
+
+   distroModalTags.style.display = 'flex'
+}
+
 function openDistroModal(distro) {
    if (!distroModal || !distro) return
 
@@ -583,6 +608,8 @@ function openDistroModal(distro) {
 
    setDistroLink(distroModalDocs, distro.docsUrl)
    setDistroLink(distroModalDownload, distro.downloadUrl)
+
+   renderDistroTags(distro.tags)
 
    if (distroModalDescription && distroModalDescriptionBox) {
       const hasText = Boolean(distro.description)

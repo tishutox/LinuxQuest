@@ -2179,6 +2179,27 @@ body.user-theme-active .profile-background__reset:disabled {
   border-radius: .75rem;
 }
 
+/* =============== DISTRO MODAL TAGS =============== */
+#distro-modal .distro-modal__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin: .25rem 0 .25rem;
+}
+
+#distro-modal .distro-modal__tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: .35rem .65rem;
+  color: var(--text-color);
+  font-size: .85rem;
+  background: transparent;
+}
+
 #public-profile-modal #public-profile-follow-btn {
   background-color: var(--public-profile-accent-color);
 }
