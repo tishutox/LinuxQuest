@@ -833,7 +833,7 @@ function openDistroRatingModal() {
 
    const defaultRating = currentDistroUserReview?.rating || 0
    distroRatingText.value = currentDistroUserReview?.message || ''
-   distroRatingCounter.textContent = `${distroRatingText.value.length}/1000`
+   updateCounter(distroRatingCounter, distroRatingText.value, 1000)
    updateDistroRatingSelection(defaultRating)
    setDistroRatingMessage('')
 
@@ -1082,9 +1082,7 @@ if (distroRatingSelectStars) {
 
 distroRatingText?.addEventListener('input', () => {
    const length = distroRatingText.value.length
-   if (distroRatingCounter) {
-      distroRatingCounter.textContent = `${length}/1000`
-   }
+   updateCounter(distroRatingCounter, distroRatingText.value, 1000)
 })
 
 distroRatingCancel?.addEventListener('click', closeDistroRatingModal)
