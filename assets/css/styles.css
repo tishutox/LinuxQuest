@@ -2418,6 +2418,10 @@ body.user-theme-active .profile-background__reset:disabled {
   transition: color .15s ease;
 }
 
+.distro-rating-modal__star i::before {
+  color: inherit !important;
+}
+
 .distro-rating-modal__selected {
   margin-left: auto;
   font-weight: var(--font-semi-bold);
