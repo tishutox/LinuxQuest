@@ -692,7 +692,7 @@ function renderRatingStars(container, filledCount = 0) {
    for (let i = 1; i <= 5; i += 1) {
       const icon = document.createElement('i')
       const isFilled = i <= safeFilled
-      icon.className = isFilled ? 'fi fi-sc-star' : 'fi fi-rc-star'
+      icon.className = isFilled ? 'fi fi-br-star' : 'fi fi-rr-star'
       icon.ariaHidden = 'true'
 
       const wrapper = document.createElement('span')
@@ -823,7 +823,7 @@ function updateDistroRatingSelection(value) {
 
       const icon = button.querySelector('i')
       if (icon) {
-         icon.className = isActive ? 'fi fi-sc-star' : 'fi fi-rc-star'
+         icon.className = isActive ? 'fi fi-br-star' : 'fi fi-rr-star'
       }
    })
 }
