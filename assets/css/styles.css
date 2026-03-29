@@ -2283,8 +2283,9 @@ body.user-theme-active .profile-background__reset:disabled {
 .distro-rating__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: .75rem;
+  flex-wrap: wrap;
 }
 
 .distro-rating__average {
@@ -2335,6 +2336,8 @@ body.user-theme-active .profile-background__reset:disabled {
   margin: 1rem 0 1.2rem;
   display: inline-flex;
   align-items: center;
+  width: auto;
+  align-self: flex-start;
   padding-inline: 1rem;
 }
 
@@ -2400,11 +2403,13 @@ body.user-theme-active .profile-background__reset:disabled {
   transition: color .15s ease;
   cursor: pointer;
   color: var(--text-color-light);
+  opacity: .75;
   padding: 0;
 }
 
 .distro-rating-modal__star.is-active {
   color: var(--first-color);
+  opacity: 1;
 }
 
 .distro-rating-modal__star i {
@@ -2418,6 +2423,16 @@ body.user-theme-active .profile-background__reset:disabled {
 
 .distro-rating-modal__actions {
   margin-top: .6rem;
+}
+
+#distro-rating-modal #distro-rating-text {
+  border-color: var(--border-color);
+  box-shadow: none;
+}
+
+#distro-rating-modal #distro-rating-text:focus {
+  border-color: var(--first-color);
+  outline: none;
 }
 
 #distro-rating-counter {
