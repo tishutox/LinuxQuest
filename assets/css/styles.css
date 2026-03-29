@@ -504,9 +504,9 @@ img {
 }
 
 #finder-distro-results {
-  max-height: clamp(32rem, calc(100vh - 8rem), 64rem);
-  max-height: clamp(32rem, calc(100dvh - 8rem), 64rem);
-  max-height: clamp(32rem, calc(100svh - 8rem), 64rem);
+  max-height: clamp(24rem, calc(100vh - 14rem), 48rem);
+  max-height: clamp(24rem, calc(100dvh - 14rem), 48rem);
+  max-height: clamp(24rem, calc(100svh - 14rem), 48rem);
   overflow-y: auto;
 }
 
@@ -818,9 +818,9 @@ img {
 .finder-distro-results__list {
   display: grid;
   gap: .35rem;
-  max-height: clamp(28rem, calc(100vh - 10rem), 60rem);
-  max-height: clamp(28rem, calc(100dvh - 10rem), 60rem);
-  max-height: clamp(28rem, calc(100svh - 10rem), 60rem);
+  max-height: clamp(24rem, calc(100vh - 14rem), 48rem);
+  max-height: clamp(24rem, calc(100dvh - 14rem), 48rem);
+  max-height: clamp(24rem, calc(100svh - 14rem), 48rem);
   overflow-y: auto;
   align-content: start;
   padding-right: .2rem;
@@ -828,9 +828,9 @@ img {
 }
 
 #finder-distro-results .finder-distro-results__list {
-  max-height: clamp(32rem, calc(100vh - 10rem), 64rem);
-  max-height: clamp(32rem, calc(100dvh - 10rem), 64rem);
-  max-height: clamp(32rem, calc(100svh - 10rem), 64rem);
+  max-height: clamp(24rem, calc(100vh - 14rem), 48rem);
+  max-height: clamp(24rem, calc(100dvh - 14rem), 48rem);
+  max-height: clamp(24rem, calc(100svh - 14rem), 48rem);
   overflow-y: auto;
 }
 
