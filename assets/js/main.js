@@ -89,6 +89,8 @@ const distroModalDownload = document.getElementById('distro-modal-download')
 const distroModalTags = document.getElementById('distro-modal-tags')
 const distroModalDescriptionBox = document.getElementById('distro-modal-description-box')
 const distroModalDescription = document.getElementById('distro-modal-description')
+const distroModalVideo = document.getElementById('distro-modal-video')
+const distroModalVideoIframe = document.getElementById('distro-modal-video-iframe')
 
 let finderTagStates = {}
 
@@ -137,16 +139,16 @@ const DISTRO_FINDER_DATA = [
    { name: 'Debian', codebase: 'debian', countries: ['international'], isoSizeMb: 4700, tags: ['long-term-support', 'server', 'verwaltung'], docsUrl: 'https://www.debian.org/doc/', downloadUrl: 'https://www.debian.org/distrib/', description: 'Stabile Universal-Distribution mit großem Paket-Ökosystem.', logo: 'assets/img/distros/Debian.png' },
    { name: 'MX Linux', codebase: 'debian', countries: ['us'], isoSizeMb: 2200, tags: ['einsteigerfreundlich', 'lightweight', 'systemd-free'], docsUrl: 'https://mxlinux.org/wiki/', downloadUrl: 'https://mxlinux.org/downloads/', description: 'Debian Stable mit Xfce/Fluxbox, systemd-frei und sehr einsteigerfreundlich.', logo: 'assets/img/distros/MX Linux.png' },
    { name: 'Devuan', codebase: 'debian', countries: ['us'], isoSizeMb: 1700, tags: ['systemd-free', 'server', 'privacy'], docsUrl: 'https://wiki.devuan.org/', downloadUrl: 'https://www.devuan.org/get-devuan', description: 'Systemd-freier Debian-Fork mit Fokus auf Init-Wahlfreiheit.', logo: 'assets/img/distros/Devuan.png' },
-   { name: 'Arch Linux', codebase: 'arch', countries: ['international'], isoSizeMb: 1400, tags: ['rolling', 'fuer-experten', 'programmierer'], docsUrl: 'https://wiki.archlinux.org', downloadUrl: 'https://archlinux.org/download/', description: 'Minimal, rolling-release, mit hervorragender Dokumentation.', logo: 'assets/img/distros/Arch Linux.png' },
+   { name: 'Arch Linux', codebase: 'arch', countries: ['international'], isoSizeMb: 1400, tags: ['rolling', 'fuer-experten', 'programmierer'], docsUrl: 'https://wiki.archlinux.org', downloadUrl: 'https://archlinux.org/download/', description: 'Minimal, rolling-release, mit hervorragender Dokumentation.', logo: 'assets/img/distros/Arch Linux.png', videoUrl: 'https://youtu.be/LiG2wMkcrFE?si=83Sk3QSxblFCYZMV' },
    { name: 'EndeavourOS', codebase: 'arch', countries: ['nl'], isoSizeMb: 2300, tags: ['rolling', 'einsteigerfreundlich', 'programmierer'], docsUrl: 'https://discovery.endeavouros.com', downloadUrl: 'https://endeavouros.com/latest-release/', description: 'Community-Arch-Spin mit schnellem Installer und Rolling-Updates.', logo: 'assets/img/distros/EndeavourOS.png' },
    { name: 'Manjaro', codebase: 'arch', countries: ['de'], isoSizeMb: 4000, tags: ['rolling', 'gaming', 'einsteigerfreundlich'], docsUrl: 'https://wiki.manjaro.org', downloadUrl: 'https://manjaro.org/download/', description: 'Arch-basiert mit vorgefertigten Desktops und grafischen Tools.', logo: 'assets/img/distros/Manjaro.png' },
    { name: 'Garuda Linux', codebase: 'arch', countries: ['in'], isoSizeMb: 4600, tags: ['gaming', 'gutes-design', 'rolling'], docsUrl: 'https://garudalinux.org/docs', downloadUrl: 'https://garudalinux.org/downloads.html', description: 'Arch-basiert mit Btrfs-Snapshots, Gaming-Tuning und KDE-zentriertem Design.', logo: 'assets/img/distros/Garuda Linux.png' },
-   { name: 'AthenaOS', codebase: 'arch', countries: ['it'], isoSizeMb: 3400, tags: ['it-sicherheit', 'forensik', 'rolling'], docsUrl: 'https://athenaos.org/en/getting-started/athenaos/', downloadUrl: 'https://athenaos.org/en/getting-started/download/', description: 'Arch-basierte Security-Distribution mit forensischem Fokus.', logo: 'assets/img/distros/AthenaOS.png' },
+   { name: 'AthenaOS', codebase: 'arch', countries: ['it'], isoSizeMb: 3400, tags: ['it-sicherheit', 'forensik', 'rolling'], docsUrl: 'https://athenaos.org/en/getting-started/athenaos/', downloadUrl: 'https://athenaos.org/en/getting-started/download/', description: 'Arch-basierte Security-Distribution mit forensischem Fokus.', logo: 'assets/img/distros/AthenaOS.png', videoUrl: 'https://youtu.be/j0xJ30WtsgA?si=4hqJ7QPPjOVv2W4M' },
    { name: 'Fedora Workstation', codebase: 'redhat', countries: ['us'], isoSizeMb: 2000, tags: ['programmierer', 'gutes-design', 'bildung', 'ki'], docsUrl: 'https://docs.fedoraproject.org/en-US/quick-docs/', downloadUrl: 'https://fedoraproject.org/workstation/download', description: 'Upstream-nahes GNOME-Desktop-Erlebnis mit schnellen Releases.', logo: 'assets/img/distros/Fedora Workstation.png' },
    { name: 'Fedora Server', codebase: 'redhat', countries: ['us'], isoSizeMb: 2000, tags: ['server', 'cloud', 'verwaltung'], docsUrl: 'https://docs.fedoraproject.org/en-US/fedora-server/', downloadUrl: 'https://getfedora.org/en/server/download/', description: 'Server-Edition mit Cockpit-Admin-Tools und kurzem Release-Zyklus.', logo: 'assets/img/distros/Fedora Server.png' },
    { name: 'Fedora Silverblue', codebase: 'redhat', countries: ['us'], isoSizeMb: 2900, tags: ['immutable', 'programmierer', 'privacy'], docsUrl: 'https://docs.fedoraproject.org/en-US/fedora-silverblue/', downloadUrl: 'https://fedoraproject.org/silverblue/', description: 'Unveränderliches Fedora mit rpm-ostree und GNOME für stabile Desktops.', logo: 'assets/img/distros/Fedora Silverblue.png' },
    { name: 'Nobara', codebase: 'redhat', countries: ['us'], isoSizeMb: 4400, tags: ['gaming', 'content-creation', 'einsteigerfreundlich'], docsUrl: 'https://nobara.org/docs', downloadUrl: 'https://nobara.org/download', description: 'Gaming-/Creator-orientierter Fedora-Spin mit vorinstallierten Tweaks.', logo: 'assets/img/distros/Nobara.png' },
-   { name: 'Bazzite', codebase: 'redhat', countries: ['us'], isoSizeMb: 4700, tags: ['gaming', 'immutable', 'einsteigerfreundlich'], docsUrl: 'https://docs.bazzite.gg/', downloadUrl: 'https://github.com/ublue-os/bazzite/releases', description: 'Fedora-Atomic-Variante optimiert für Gaming und Streaming (Universal Blue).', logo: 'assets/img/distros/Bazzite.png' },
+   { name: 'Bazzite', codebase: 'redhat', countries: ['us'], isoSizeMb: 4700, tags: ['gaming', 'immutable', 'einsteigerfreundlich'], docsUrl: 'https://docs.bazzite.gg/', downloadUrl: 'https://github.com/ublue-os/bazzite/releases', description: 'Fedora-Atomic-Variante optimiert für Gaming und Streaming (Universal Blue).', logo: 'assets/img/distros/Bazzite.png', videoUrl: 'https://youtu.be/MfAZea_qkBI?si=fg8WKfENGQRrYFrH' },
    { name: 'ChimeraOS', codebase: 'independent', countries: ['us'], isoSizeMb: 3300, tags: ['gaming', 'rolling', 'fuer-experten'], docsUrl: 'https://github.com/ChimeraOS/chimeraos/wiki', downloadUrl: 'https://chimeraos.org/download', description: 'Gaming-fokussierte Rolling-Distribution mit Steam-Big-Picture-Erlebnis.', logo: 'assets/img/distros/ChimeraOS.png' },
    { name: 'CachyOS', codebase: 'arch', countries: ['de'], isoSizeMb: 2400, tags: ['lightweight', 'gaming', 'gutes-design'], docsUrl: 'https://wiki.cachyos.org', downloadUrl: 'https://cachyos.org/download/', description: 'Arch-basiert mit Performance-Optimierungen, ZFS/Btrfs-Optionen und Gaming-Fokus.', logo: 'assets/img/distros/CachyOS.png' },
    { name: 'SteamOS', codebase: 'arch', countries: ['us'], isoSizeMb: 3500, tags: ['gaming', 'rolling', 'immutable'], docsUrl: 'https://help.steampowered.com/en/faqs/view/3F7F-2E2A-5D28-3E4F', downloadUrl: 'https://store.steampowered.com/steamos/download', description: 'Valve/Arch-basierte Gaming-Distribution für Steam Deck und PC, rolling/immutable.', logo: 'assets/img/distros/SteamOS.png' },
@@ -159,8 +161,8 @@ const DISTRO_FINDER_DATA = [
    { name: 'Void Linux', codebase: 'independent', countries: ['es'], isoSizeMb: 900, tags: ['lightweight', 'systemd-free', 'rolling'], docsUrl: 'https://docs.voidlinux.org', downloadUrl: 'https://voidlinux.org/download/', description: 'Unabhängige Rolling-Distribution mit runit-Init und musl/glibc-Optionen.', logo: 'assets/img/distros/Void Linux.png' },
    { name: 'Nitrux', codebase: 'debian', countries: ['mx'], isoSizeMb: 2900, tags: ['gutes-design', 'einsteigerfreundlich', 'programmierer'], docsUrl: 'https://nxos.org/faq/', downloadUrl: 'https://nxos.org/download/', description: 'Debian-basierte Desktop-Distribution mit Maui Shell/KDE und AppImage-Fokus.', logo: 'assets/img/distros/Nitrux.png' },
    { name: 'Zentyal Server', codebase: 'ubuntu', countries: ['es'], isoSizeMb: 1800, tags: ['server', 'verwaltung', 'cloud'], docsUrl: 'https://doc.zentyal.org', downloadUrl: 'https://zentyal.com/community/', description: 'Small-Business-Server auf Ubuntu-Basis mit AD/Samba-Integration.', logo: 'assets/img/distros/Zentyal Server.png' },
-   { name: 'AUSTRUMI', codebase: 'independent', countries: ['lv'], isoSizeMb: 700, tags: ['lightweight', 'datenrettung', 'einsteigerfreundlich'], docsUrl: 'https://austrumi.lv/', downloadUrl: 'https://sourceforge.net/projects/austrumi/files/', description: 'Leichtgewichtige lettische Live-Distribution für ältere Hardware und Rettungseinsätze.', logo: 'assets/img/distros/AUSTRUMI.png' },
-   { name: 'AryaLinux', codebase: 'independent', countries: ['in'], isoSizeMb: 2300, tags: ['programmierer', 'fuer-experten', 'source-based'], docsUrl: 'https://aryalinux.org/', downloadUrl: 'https://aryalinux.org/?page_id=36', description: 'Quellbasierte Distribution mit eigenem Build-System für erfahrene Nutzer.', logo: 'assets/img/distros/AryaLinux.png' },
+   { name: 'AUSTRUMI', codebase: 'independent', countries: ['lv'], isoSizeMb: 700, tags: ['lightweight', 'datenrettung', 'einsteigerfreundlich'], docsUrl: 'https://austrumi.lv/', downloadUrl: 'https://sourceforge.net/projects/austrumi/files/', description: 'Leichtgewichtige lettische Live-Distribution für ältere Hardware und Rettungseinsätze.', logo: 'assets/img/distros/AUSTRUMI.png', videoUrl: 'https://youtu.be/wrJ0ALGixtE?si=SiYnbeXaOEswX84r' },
+   { name: 'AryaLinux', codebase: 'independent', countries: ['in'], isoSizeMb: 2300, tags: ['programmierer', 'fuer-experten', 'source-based'], docsUrl: 'https://aryalinux.org/', downloadUrl: 'https://aryalinux.org/?page_id=36', description: 'Quellbasierte Distribution mit eigenem Build-System für erfahrene Nutzer.', logo: 'assets/img/distros/AryaLinux.png', videoUrl: 'https://youtu.be/8tefbIDEQC0?si=xR3GpnkDT3vWMCpR' },
    { name: 'MIRACLE LINUX', codebase: 'redhat', countries: ['jp'], isoSizeMb: 1300, tags: ['server', 'long-term-support', 'verwaltung'], docsUrl: 'https://www.cybertrust.co.jp/miracle-linux/', downloadUrl: 'https://www.cybertrust.co.jp/miracle-linux/', description: 'RHEL-kompatible Enterprise-Distribution aus Japan.', logo: 'assets/img/distros/MIRACLE LINUX.png' },
    { name: 'Regata OS', codebase: 'suse', countries: ['br'], isoSizeMb: 4300, tags: ['gaming', 'content-creation', 'gutes-design'], docsUrl: 'https://www.regataos.com.br/', downloadUrl: 'https://www.regataos.com.br/', description: 'openSUSE-basierte Desktop-Distribution mit Gaming-Tools und Multimedia-Fokus.', logo: 'assets/img/distros/Regata OS.png' },
    { name: 'NethServer', codebase: 'redhat', countries: ['it'], isoSizeMb: 1200, tags: ['server', 'verwaltung', 'cloud'], docsUrl: 'https://docs.nethserver.org', downloadUrl: 'https://www.nethserver.org/download', description: 'Modularer Small-Business-Server (ehemals CentOS/RHEL-basiert).', logo: 'assets/img/distros/NethServer.png'},
@@ -190,7 +192,7 @@ const DISTRO_FINDER_DATA = [
    { name: 'Edubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 4200, tags: ['bildung', 'einsteigerfreundlich', 'office'], docsUrl: 'https://edubuntu.org/', downloadUrl: 'https://edubuntu.org/download', description: 'Ubuntu-Variante mit vorinstallierten Bildungs- und Klassenraumtools.', logo: 'assets/img/distros/Edubuntu.png' },
    { name: 'Clear Linux', codebase: 'independent', countries: ['us'], isoSizeMb: 1200, tags: ['fuer-experten', 'cloud', 'programmierer'], docsUrl: 'https://www.clearlinux.org/documentation', downloadUrl: 'https://www.clearlinux.org/downloads', description: 'Intel-optimierte Performance-Distribution mit Fokus auf Cloud/Workstation.', logo: 'assets/img/distros/Clear Linux.png' },
    { name: 'RHEL', codebase: 'redhat', countries: ['us'], isoSizeMb: 1300, tags: ['server', 'long-term-support', 'verwaltung'], docsUrl: 'https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux', downloadUrl: 'https://access.redhat.com/products/red-hat-enterprise-linux/evaluation', description: 'Enterprise-Distribution mit zertifiziertem Support und langem Lebenszyklus.', logo: 'assets/img/distros/RHEL.png' },
-   { name: 'Alpine Linux', codebase: 'independent', countries: ['us'], isoSizeMb: 700, tags: ['lightweight', 'server', 'it-sicherheit'], docsUrl: 'https://docs.alpinelinux.org', downloadUrl: 'https://alpinelinux.org/downloads/', description: 'Musl-/BusyBox-basierte Minimal-Distribution, beliebt für Container und Server.', logo: 'assets/img/distros/Alpine Linux.png' }
+   { name: 'Alpine Linux', codebase: 'independent', countries: ['us'], isoSizeMb: 700, tags: ['lightweight', 'server', 'it-sicherheit'], docsUrl: 'https://docs.alpinelinux.org', downloadUrl: 'https://alpinelinux.org/downloads/', description: 'Musl-/BusyBox-basierte Minimal-Distribution, beliebt für Container und Server.', logo: 'assets/img/distros/Alpine Linux.png', videoUrl: 'https://youtu.be/NKggFBdee94?si=txReivLxz1R6rFDn' }
 ]
 
 let searchDebounceTimer = null
@@ -548,6 +550,46 @@ function setDistroAvatar(distro) {
    distroModalAvatar.style.display = 'none'
 }
 
+function getYoutubeIdFromUrl(url = '') {
+   if (!url) return ''
+
+   try {
+      const parsed = new URL(url)
+      if (parsed.hostname.includes('youtu.be')) {
+         return parsed.pathname.replace('/', '')
+      }
+
+      if (parsed.searchParams.has('v')) {
+         return parsed.searchParams.get('v') || ''
+      }
+
+      const embedMatch = parsed.pathname.match(/\/embed\/([^/?#]+)/)
+      if (embedMatch?.[1]) return embedMatch[1]
+   } catch (_) {
+      // ignore
+   }
+
+   return ''
+}
+
+function setDistroVideo(distro) {
+   if (!distroModalVideo || !distroModalVideoIframe) return
+
+   const directId = distro.videoId || ''
+   const derivedId = getYoutubeIdFromUrl(distro.videoUrl || '')
+   const videoId = directId || derivedId
+
+   if (!videoId) {
+      distroModalVideo.style.display = 'none'
+      distroModalVideoIframe.removeAttribute('src')
+      return
+   }
+
+   const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`
+   distroModalVideoIframe.src = embedUrl
+   distroModalVideo.style.display = 'block'
+}
+
 function setDistroLink(anchor, url) {
    if (!anchor) return
    if (url) {
@@ -614,6 +656,8 @@ function openDistroModal(distro) {
       distroModalDescription.textContent = distro.description || ''
       distroModalDescriptionBox.style.display = hasText ? 'block' : 'none'
    }
+
+   setDistroVideo(distro)
 
    distroModal.classList.add('show-login')
 }

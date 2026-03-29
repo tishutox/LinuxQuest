@@ -2224,6 +2224,18 @@ body.user-theme-active .profile-background__reset:disabled {
   margin: .25rem 0 .25rem;
 }
 
+#distro-modal .distro-modal__video {
+  margin-top: .75rem;
+}
+
+#distro-modal .distro-modal__video iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  border-radius: .6rem;
+  background: #000;
+}
+
 #distro-modal .distro-modal__tag {
   display: inline-flex;
   align-items: center;
