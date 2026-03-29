@@ -234,4 +234,22 @@ db.exec(`
 db.exec('CREATE INDEX IF NOT EXISTS idx_bug_reports_user_id ON bug_reports(reported_user_id)');
 db.exec('CREATE INDEX IF NOT EXISTS idx_bug_reports_closed ON bug_reports(closed)');
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS distro_reviews (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    distro_key  TEXT    NOT NULL,
+    distro_name TEXT    NOT NULL,
+    rating      INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    message     TEXT    DEFAULT NULL,
+    user_id     INTEGER NOT NULL,
+    created_at  TEXT    DEFAULT (datetime('now')),
+    updated_at  TEXT    DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE (distro_key, user_id)
+  )
+`);
+
+db.exec('CREATE INDEX IF NOT EXISTS idx_distro_reviews_distro_key ON distro_reviews(distro_key)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_distro_reviews_user_id ON distro_reviews(user_id)');
+
 module.exports = db;

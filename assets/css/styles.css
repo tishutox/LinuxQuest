@@ -2239,6 +2239,138 @@ body.user-theme-active .profile-background__reset:disabled {
   align-items: center;
   justify-content: center;
   gap: .45rem;
+#distro-modal .distro-rating {
+  margin-top: .8rem;
+  padding: .85rem .95rem;
+  border: 1px solid var(--border-color);
+  border-radius: .75rem;
+  background: var(--container-color);
+}
+
+.distro-rating__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.distro-rating__average {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-weight: var(--font-semi-bold);
+}
+
+.distro-rating__value {
+  font-size: 1.4rem;
+  color: var(--title-color);
+}
+
+.distro-rating__count {
+  color: var(--text-color-light);
+  font-size: var(--small-font-size);
+}
+
+.distro-rating__stars,
+.distro-rating__review-stars {
+  display: inline-flex;
+  gap: .2rem;
+  color: var(--first-color);
+}
+
+.distro-rating__star.is-filled {
+  color: var(--first-color);
+}
+
+.distro-rating__star:not(.is-filled) {
+  color: var(--text-color-light);
+}
+
+.distro-rating__action {
+  white-space: nowrap;
+}
+
+.distro-rating__reviews {
+  margin-top: .8rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.distro-rating__review {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .65rem;
+  align-items: flex-start;
+}
+
+.distro-rating__review-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}
+
+.distro-rating__review-header {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.distro-rating__review-name {
+  font-weight: var(--font-semi-bold);
+  color: var(--title-color);
+}
+
+.distro-rating__review-text {
+  margin: .15rem 0 0;
+  color: var(--text-color);
+}
+
+.distro-rating__empty,
+.distro-rating__error {
+  color: var(--text-color-light);
+}
+
+#distro-rating-modal .distro-rating-modal__stars {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin-bottom: .9rem;
+}
+
+.distro-rating-modal__star {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  border-radius: .65rem;
+  background: var(--body-color);
+  transition: border-color .2s ease, background .2s ease, color .2s ease;
+  cursor: pointer;
+}
+
+.distro-rating-modal__star.is-active {
+  border-color: var(--first-color);
+  background: rgba(94, 95, 243, .12);
+  color: var(--first-color);
+}
+
+.distro-rating-modal__star i {
+  font-size: 1.3rem;
+}
+
+.distro-rating-modal__selected {
+  margin-left: auto;
+  font-weight: var(--font-semi-bold);
+}
+
+.distro-rating-modal__actions {
+  margin-top: .6rem;
+}
   font-weight: var(--font-semi-bold);
   letter-spacing: .01em;
   cursor: pointer;

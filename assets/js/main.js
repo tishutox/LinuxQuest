@@ -92,8 +92,26 @@ const distroModalDescription = document.getElementById('distro-modal-description
 const distroModalVideo = document.getElementById('distro-modal-video')
 const distroModalVideoIframe = document.getElementById('distro-modal-video-iframe')
 const distroModalVideoPlay = document.getElementById('distro-modal-video-play')
+const distroRatingAverage = document.getElementById('distro-rating-average')
+const distroRatingStars = document.getElementById('distro-rating-stars')
+const distroRatingCount = document.getElementById('distro-rating-count')
+const distroRatingReviews = document.getElementById('distro-rating-reviews')
+const distroRatingOpenBtn = document.getElementById('distro-rating-open')
+const distroRatingModal = document.getElementById('distro-rating-modal')
+const distroRatingModalClose = document.getElementById('distro-rating-modal-close')
+const distroRatingSelectStars = document.getElementById('distro-rating-select-stars')
+const distroRatingSelectedValue = document.getElementById('distro-rating-selected-value')
+const distroRatingText = document.getElementById('distro-rating-text')
+const distroRatingCounter = document.getElementById('distro-rating-counter')
+const distroRatingSubmit = document.getElementById('distro-rating-submit')
+const distroRatingCancel = document.getElementById('distro-rating-cancel')
+const distroRatingMessage = document.getElementById('distro-rating-message')
 
 let finderTagStates = {}
+let currentDistroKey = ''
+let currentDistroName = ''
+let currentDistroUserReview = null
+let distroRatingSelection = 0
 
 const FINDER_ISO_SIZE_MIN_MB = 700
 const FINDER_ISO_SIZE_MAX_MB = 5000
@@ -536,6 +554,15 @@ function formatFinderIsoSize(sizeMb) {
    return `${sizeMb} MB`
 }
 
+function normalizeDistroKey(name = '') {
+   return String(name)
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\s_-]/g, '')
+      .replace(/\s+/g, '-')
+      .slice(0, 80)
+}
+
 function setDistroAvatar(distro) {
    if (!distroModalAvatar) return
 
@@ -650,6 +677,177 @@ function renderDistroTags(tags = []) {
    distroModalTags.style.display = 'flex'
 }
 
+function setDistroRatingMessage(text = '', type = '') {
+   if (!distroRatingMessage) return
+   const normalizedType = type ? ` ${type}` : ''
+   distroRatingMessage.textContent = text
+   distroRatingMessage.className = `login__message${normalizedType}`
+}
+
+function renderRatingStars(container, filledCount = 0) {
+   if (!container) return
+
+   const safeFilled = Math.max(0, Math.min(5, Math.round(filledCount)))
+   container.innerHTML = ''
+
+   for (let i = 1; i <= 5; i += 1) {
+      const icon = document.createElement('i')
+      const isFilled = i <= safeFilled
+      icon.className = isFilled ? 'fi fi-sc-star' : 'fi fi-rc-star'
+      icon.ariaHidden = 'true'
+
+      const wrapper = document.createElement('span')
+      wrapper.className = 'distro-rating__star' + (isFilled ? ' is-filled' : '')
+      wrapper.appendChild(icon)
+      container.appendChild(wrapper)
+   }
+}
+
+function renderDistroReviews(reviews = []) {
+   if (!distroRatingReviews) return
+
+   distroRatingReviews.innerHTML = ''
+
+   if (!Array.isArray(reviews) || !reviews.length) {
+      const empty = document.createElement('p')
+      empty.className = 'distro-rating__empty'
+      empty.textContent = 'Noch keine Rezensionen vorhanden.'
+      distroRatingReviews.appendChild(empty)
+      return
+   }
+
+   reviews.slice(0, 3).forEach((review) => {
+      const item = document.createElement('article')
+      item.className = 'distro-rating__review'
+
+      const avatar = document.createElement('img')
+      avatar.className = 'distro-rating__review-avatar'
+      avatar.src = getAvatarUrl({ avatar: review.avatar, full_name: review.full_name || review.username || 'Nutzer' })
+      avatar.alt = review.profile_name || review.username || 'Nutzer'
+
+      const body = document.createElement('div')
+      body.className = 'distro-rating__review-body'
+
+      const header = document.createElement('div')
+      header.className = 'distro-rating__review-header'
+
+      const name = document.createElement('span')
+      name.className = 'distro-rating__review-name'
+      name.textContent = review.profile_name || review.username || 'Unbekannt'
+
+      const stars = document.createElement('div')
+      stars.className = 'distro-rating__review-stars'
+      renderRatingStars(stars, Number(review.rating) || 0)
+
+      header.appendChild(name)
+      header.appendChild(stars)
+
+      const text = document.createElement('p')
+      text.className = 'distro-rating__review-text'
+      text.textContent = review.message || 'Keine Nachricht hinterlassen.'
+
+      body.appendChild(header)
+      body.appendChild(text)
+
+      item.appendChild(avatar)
+      item.appendChild(body)
+
+      distroRatingReviews.appendChild(item)
+   })
+}
+
+function applyDistroRatingState(payload = {}) {
+   if (!distroRatingAverage || !distroRatingStars || !distroRatingCount) return
+
+   const average = Number(payload.average || 0)
+   const count = Number(payload.count || 0)
+
+   distroRatingAverage.textContent = average.toFixed(1)
+   distroRatingCount.textContent = `(${count})`
+   renderRatingStars(distroRatingStars, average)
+   renderDistroReviews(payload.reviews || [])
+
+   currentDistroUserReview = payload.userReview || null
+
+   if (distroRatingOpenBtn) {
+      distroRatingOpenBtn.style.display = currentUser ? 'inline-flex' : 'none'
+   }
+}
+
+async function loadDistroRatings(distro) {
+   if (!distro) return
+
+   currentDistroName = distro.name || ''
+   currentDistroKey = normalizeDistroKey(distro.name)
+
+   if (!currentDistroKey) {
+      applyDistroRatingState({ average: 0, count: 0, reviews: [], userReview: null })
+      return
+   }
+
+   try {
+      const response = await fetch(`/api/auth/distros/${encodeURIComponent(currentDistroKey)}/ratings`, {
+         credentials: 'include'
+      })
+
+      if (!response.ok) {
+         throw new Error('Failed to load ratings')
+      }
+
+      const data = await response.json()
+      applyDistroRatingState(data)
+   } catch (_) {
+      applyDistroRatingState({ average: 0, count: 0, reviews: [], userReview: null })
+
+      if (distroRatingReviews) {
+         const error = document.createElement('p')
+         error.className = 'distro-rating__error'
+         error.textContent = 'Bewertungen konnten nicht geladen werden.'
+         distroRatingReviews.innerHTML = ''
+         distroRatingReviews.appendChild(error)
+      }
+   }
+}
+
+function updateDistroRatingSelection(value) {
+   distroRatingSelection = Math.max(0, Math.min(5, Number(value) || 0))
+
+   if (distroRatingSelectedValue) {
+      distroRatingSelectedValue.textContent = `${distroRatingSelection}/5`
+   }
+
+   if (!distroRatingSelectStars) return
+
+   const starButtons = Array.from(distroRatingSelectStars.querySelectorAll('.distro-rating-modal__star'))
+   starButtons.forEach((button) => {
+      const starValue = Number(button.dataset.value)
+      const isActive = distroRatingSelection >= starValue
+      button.classList.toggle('is-active', isActive)
+
+      const icon = button.querySelector('i')
+      if (icon) {
+         icon.className = isActive ? 'fi fi-sc-star' : 'fi fi-rc-star'
+      }
+   })
+}
+
+function openDistroRatingModal() {
+   if (!distroRatingModal) return
+
+   const defaultRating = currentDistroUserReview?.rating || 0
+   distroRatingText.value = currentDistroUserReview?.message || ''
+   distroRatingCounter.textContent = `${distroRatingText.value.length}/1000`
+   updateDistroRatingSelection(defaultRating)
+   setDistroRatingMessage('')
+
+   distroRatingModal.classList.add('show-login')
+}
+
+function closeDistroRatingModal() {
+   if (!distroRatingModal) return
+   distroRatingModal.classList.remove('show-login')
+}
+
 function openDistroModal(distro) {
    if (!distroModal || !distro) return
 
@@ -686,6 +884,8 @@ function openDistroModal(distro) {
    }
 
    setDistroVideo(distro)
+
+   loadDistroRatings(distro)
 
    distroModal.classList.add('show-login')
 }
@@ -863,6 +1063,97 @@ distroModal?.addEventListener('click', (event) => {
    }
 })
 
+distroRatingOpenBtn?.addEventListener('click', () => {
+   if (!currentUser) {
+      showLogin()
+      return
+   }
+
+   openDistroRatingModal()
+})
+
+if (distroRatingSelectStars) {
+   const buttons = Array.from(distroRatingSelectStars.querySelectorAll('.distro-rating-modal__star'))
+   buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+         updateDistroRatingSelection(Number(button.dataset.value))
+      })
+   })
+
+   updateDistroRatingSelection(0)
+}
+
+distroRatingText?.addEventListener('input', () => {
+   const length = distroRatingText.value.length
+   if (distroRatingCounter) {
+      distroRatingCounter.textContent = `${length}/1000`
+   }
+})
+
+distroRatingCancel?.addEventListener('click', closeDistroRatingModal)
+distroRatingModalClose?.addEventListener('click', closeDistroRatingModal)
+
+distroRatingModal?.addEventListener('click', (event) => {
+   if (event.target === distroRatingModal) {
+      closeDistroRatingModal()
+   }
+})
+
+distroRatingSubmit?.addEventListener('click', async () => {
+   if (!currentUser) {
+      showLogin()
+      return
+   }
+
+   if (!currentDistroKey) {
+      setDistroRatingMessage('Keine Distro ausgewählt.', 'error')
+      return
+   }
+
+   if (distroRatingSelection < 1 || distroRatingSelection > 5) {
+      setDistroRatingMessage('Bitte wähle zwischen 1 und 5 Sternen.', 'error')
+      return
+   }
+
+   const message = (distroRatingText?.value || '').trim()
+   if (message.length > 1000) {
+      setDistroRatingMessage('Die Nachricht ist zu lang.', 'error')
+      return
+   }
+
+   distroRatingSubmit.disabled = true
+   distroRatingSubmit.textContent = 'Wird gesendet...'
+   setDistroRatingMessage('')
+
+   try {
+      const response = await fetch(`/api/auth/distros/${encodeURIComponent(currentDistroKey)}/ratings`, {
+         method: 'POST',
+         credentials: 'include',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+            rating: distroRatingSelection,
+            message,
+            distroName: currentDistroName
+         })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+         setDistroRatingMessage(data.error || 'Bewertung konnte nicht gespeichert werden.', 'error')
+         return
+      }
+
+      applyDistroRatingState(data)
+      closeDistroRatingModal()
+   } catch (_) {
+      setDistroRatingMessage('Serverfehler. Bitte versuche es erneut.', 'error')
+   } finally {
+      distroRatingSubmit.disabled = false
+      distroRatingSubmit.textContent = 'Senden'
+   }
+})
+
 renderFinderCountrySummary()
 sortFinderFilterOptions()
 if (finderFilterCodebase) {
@@ -959,10 +1250,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
-const hideAll      = () => { resetDistroVideo(); loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const hideAll      = () => { resetDistroVideo(); loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -3544,6 +3835,9 @@ function setLoggedIn(user) {
    loginBtn.style.display   = 'none'
    navUser.style.display    = 'flex'
    navAvatar.src = getAvatarUrl(user)
+   if (distroRatingOpenBtn) {
+      distroRatingOpenBtn.style.display = currentDistroKey ? 'inline-flex' : 'none'
+   }
    updateProfileView(user)
    refreshProjectContacts()
    startRestrictionCheck()
@@ -3559,6 +3853,9 @@ function setLoggedOut() {
    updateNavDeveloperToolsVisibility(null)
    loginBtn.style.display  = ''
    navUser.style.display   = 'none'
+    if (distroRatingOpenBtn) {
+       distroRatingOpenBtn.style.display = 'none'
+    }
    navAvatar.src           = ''
    profileAvatarImage.src  = ''
    profileFullNameInput.value = ''

@@ -12,6 +12,7 @@
       <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/4.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css'>
       <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/4.0.0/uicons-regular-chubby/css/uicons-regular-chubby.css'>
       <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/4.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+      <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/4.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css'>
 
       <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
 
@@ -559,6 +560,19 @@
                <p class="public-profile__bio-text" id="distro-modal-description"></p>
             </div>
 
+            <div class="distro-rating" id="distro-rating" aria-live="polite">
+               <div class="distro-rating__header">
+                  <div class="distro-rating__average" aria-label="Durchschnittliche Bewertung">
+                     <span class="distro-rating__value" id="distro-rating-average">0.0</span>
+                     <div class="distro-rating__stars" id="distro-rating-stars" aria-hidden="true"></div>
+                     <span class="distro-rating__count" id="distro-rating-count">(0)</span>
+                  </div>
+                  <button type="button" class="login__button distro-rating__action" id="distro-rating-open" style="display:none;">Bewertung abgeben</button>
+               </div>
+
+               <div class="distro-rating__reviews" id="distro-rating-reviews"></div>
+            </div>
+
             <div class="distro-modal__video" id="distro-modal-video" style="display:none;">
                <button type="button" class="distro-modal__video-play" id="distro-modal-video-play" aria-label="Video abspielen">
                   <span aria-hidden="true">▶</span>
@@ -569,6 +583,47 @@
          </div>
 
          <i class="fi fi-rr-cross-small login__close" id="distro-modal-close"></i>
+      </div>
+
+      <!--==================== DISTRO RATING MODAL ====================-->
+      <div class="login" id="distro-rating-modal">
+         <div class="login__form profile__form">
+            <h2 class="login__title">Bewertung abgeben</h2>
+
+            <p class="login__message" id="distro-rating-message"></p>
+
+            <div class="distro-rating-modal__stars" id="distro-rating-select-stars" role="radiogroup" aria-label="Bewertung auswählen">
+               <button type="button" class="distro-rating-modal__star" data-value="1" aria-label="1 von 5 Sternen">
+                  <i class="fi fi-rc-star" aria-hidden="true"></i>
+               </button>
+               <button type="button" class="distro-rating-modal__star" data-value="2" aria-label="2 von 5 Sternen">
+                  <i class="fi fi-rc-star" aria-hidden="true"></i>
+               </button>
+               <button type="button" class="distro-rating-modal__star" data-value="3" aria-label="3 von 5 Sternen">
+                  <i class="fi fi-rc-star" aria-hidden="true"></i>
+               </button>
+               <button type="button" class="distro-rating-modal__star" data-value="4" aria-label="4 von 5 Sternen">
+                  <i class="fi fi-rc-star" aria-hidden="true"></i>
+               </button>
+               <button type="button" class="distro-rating-modal__star" data-value="5" aria-label="5 von 5 Sternen">
+                  <i class="fi fi-rc-star" aria-hidden="true"></i>
+               </button>
+               <span class="distro-rating-modal__selected" id="distro-rating-selected-value">0/5</span>
+            </div>
+
+            <div>
+               <label for="distro-rating-text" class="login__label">Nachricht (optional, max. 1000 Zeichen)</label>
+               <textarea id="distro-rating-text" class="login__input profile__bio-input" maxlength="1000" placeholder="Wie gefällt dir die Distribution?" aria-label="Bewertungstext"></textarea>
+               <p class="profile__input-counter" id="distro-rating-counter">0/1000</p>
+            </div>
+
+            <div class="report-modal__actions distro-rating-modal__actions">
+               <button type="button" class="login__button profile__delete-button" id="distro-rating-cancel">Abbrechen</button>
+               <button type="button" class="login__button" id="distro-rating-submit">Senden</button>
+            </div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" id="distro-rating-modal-close"></i>
       </div>
 
       <!--==================== REPORT MODAL ====================-->

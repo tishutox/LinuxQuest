@@ -21,6 +21,64 @@ function createAuthCoreRouter({
 }) {
   const router = express.Router();
 
+  const MAX_DISTRO_REVIEW_LENGTH = 1000;
+
+  function normalizeDistroKey(value) {
+    if (typeof value !== 'string') return '';
+    return value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\s_-]/g, '')
+      .replace(/\s+/g, '-')
+      .slice(0, 80);
+  }
+
+  function normalizeDistroName(value, fallback) {
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim().slice(0, 120);
+    }
+    return fallback || '';
+  }
+
+  function trimReviewMessage(message) {
+    if (typeof message !== 'string') return '';
+    return message.trim().slice(0, MAX_DISTRO_REVIEW_LENGTH);
+  }
+
+  function getDistroRatingsPayload(distroKey, currentUserId = null) {
+    const aggregate = db.prepare(`
+      SELECT COUNT(*) AS count, AVG(rating) AS average
+      FROM distro_reviews
+      WHERE distro_key = ?
+    `).get(distroKey) || { count: 0, average: null };
+
+    const reviews = db.prepare(`
+      SELECT dr.rating, dr.message, dr.created_at, u.username, u.profile_name, u.full_name, u.avatar
+      FROM distro_reviews dr
+      JOIN users u ON dr.user_id = u.id
+      WHERE dr.distro_key = ?
+      ORDER BY dr.created_at DESC
+      LIMIT 3
+    `).all(distroKey);
+
+    let userReview = null;
+    if (currentUserId) {
+      userReview = db.prepare(`
+        SELECT rating, message
+        FROM distro_reviews
+        WHERE distro_key = ? AND user_id = ?
+      `).get(distroKey, currentUserId) || null;
+    }
+
+    return {
+      distroKey,
+      average: aggregate?.average ? Number(aggregate.average) : 0,
+      count: aggregate?.count ? Number(aggregate.count) : 0,
+      reviews: Array.isArray(reviews) ? reviews : [],
+      userReview
+    };
+  }
+
   async function sendVerificationCodeEmail(email, code, subject) {
     const mailConfig = getMailConfig();
 
@@ -485,6 +543,74 @@ function createAuthCoreRouter({
     } catch (err) {
       console.error('[REPORT BUG ERROR]', err);
       return res.status(500).json({ error: 'Serverfehler beim Melden des Bugs.' });
+    }
+  });
+
+  router.get('/distros/:distroKey/ratings', (req, res) => {
+    const distroKey = normalizeDistroKey(req.params.distroKey);
+
+    if (!distroKey) {
+      return res.status(400).json({ error: 'Ungültige Distro.' });
+    }
+
+    try {
+      const payload = getDistroRatingsPayload(distroKey, req.session?.userId || null);
+      return res.json(payload);
+    } catch (err) {
+      console.error('[GET DISTRO RATINGS ERROR]', err);
+      return res.status(500).json({ error: 'Bewertungen konnten nicht geladen werden.' });
+    }
+  });
+
+  router.post('/distros/:distroKey/ratings', (req, res) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Du musst angemeldet sein, um zu bewerten.' });
+    }
+
+    const distroKey = normalizeDistroKey(req.params.distroKey);
+    const rawRating = Number(req.body?.rating);
+    const distroName = normalizeDistroName(req.body?.distroName, req.body?.fallbackName || req.params.distroKey);
+    const message = trimReviewMessage(req.body?.message);
+
+    if (!distroKey) {
+      return res.status(400).json({ error: 'Ungültige Distro.' });
+    }
+
+    if (!Number.isFinite(rawRating) || rawRating < 1 || rawRating > 5) {
+      return res.status(400).json({ error: 'Bewertung muss zwischen 1 und 5 Sternen liegen.' });
+    }
+
+    if (message.length > MAX_DISTRO_REVIEW_LENGTH) {
+      return res.status(400).json({ error: 'Die Nachricht ist zu lang.' });
+    }
+
+    const userRecord = db.prepare('SELECT id, is_restricted FROM users WHERE id = ?').get(req.session.userId);
+    if (!userRecord) {
+      return res.status(401).json({ error: 'Ungültige Session.' });
+    }
+
+    if (userRecord.is_restricted === 1) {
+      return res.status(403).json({ error: 'Eingeschränkte Konten können keine Bewertungen abgeben.' });
+    }
+
+    try {
+      db.prepare(`
+        INSERT INTO distro_reviews (distro_key, distro_name, rating, message, user_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+        ON CONFLICT(distro_key, user_id) DO UPDATE SET
+          rating = excluded.rating,
+          message = excluded.message,
+          distro_name = excluded.distro_name,
+          updated_at = datetime('now')
+      `).run(distroKey, distroName || distroKey, rawRating, message || null, userRecord.id);
+
+      touchUserActivity(userRecord.id);
+
+      const payload = getDistroRatingsPayload(distroKey, userRecord.id);
+      return res.status(201).json({ message: 'Bewertung gespeichert.', ...payload });
+    } catch (err) {
+      console.error('[CREATE DISTRO RATING ERROR]', err);
+      return res.status(500).json({ error: 'Bewertung konnte nicht gespeichert werden.' });
     }
   });
 
