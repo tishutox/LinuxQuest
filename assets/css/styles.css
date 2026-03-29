@@ -2234,7 +2234,7 @@ body.user-theme-active .profile-background__reset:disabled {
   border: 1px solid var(--border-color);
   border-radius: .6rem;
   background: linear-gradient(135deg, #0f172a, #111827);
-  color: var(--title-color);
+  color: var(--container-color);
   display: inline-flex;
   align-items: center;
   justify-content: center;
