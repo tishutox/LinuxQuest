@@ -94,7 +94,6 @@ const distroModalVideoIframe = document.getElementById('distro-modal-video-ifram
 const distroModalVideoPlay = document.getElementById('distro-modal-video-play')
 const distroRatingAverage = document.getElementById('distro-rating-average')
 const distroRatingStars = document.getElementById('distro-rating-stars')
-const distroRatingCount = document.getElementById('distro-rating-count')
 const distroRatingReviews = document.getElementById('distro-rating-reviews')
 const distroRatingOpenBtn = document.getElementById('distro-rating-open')
 const distroRatingModal = document.getElementById('distro-rating-modal')
@@ -757,13 +756,11 @@ function renderDistroReviews(reviews = []) {
 }
 
 function applyDistroRatingState(payload = {}) {
-   if (!distroRatingAverage || !distroRatingStars || !distroRatingCount) return
+   if (!distroRatingAverage || !distroRatingStars) return
 
    const average = Number(payload.average || 0)
-   const count = Number(payload.count || 0)
 
    distroRatingAverage.textContent = average.toFixed(1)
-   distroRatingCount.textContent = `(${count})`
    renderRatingStars(distroRatingStars, average)
    renderDistroReviews(payload.reviews || [])
 
