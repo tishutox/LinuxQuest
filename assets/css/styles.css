@@ -2403,7 +2403,7 @@ body.user-theme-active .profile-background__reset:disabled {
   transition: color .15s ease;
   cursor: pointer;
   color: var(--text-color-light);
-  opacity: .75;
+  opacity: .8;
   padding: 0;
 }
 
@@ -2414,6 +2414,8 @@ body.user-theme-active .profile-background__reset:disabled {
 
 .distro-rating-modal__star i {
   font-size: 1.3rem;
+  color: inherit;
+  transition: color .15s ease;
 }
 
 .distro-rating-modal__selected {
@@ -2423,6 +2425,21 @@ body.user-theme-active .profile-background__reset:disabled {
 
 .distro-rating-modal__actions {
   margin-top: .6rem;
+}
+
+#distro-rating-counter {
+  color: var(--text-color-light);
+  transition: color .2s ease, opacity .2s ease;
+}
+
+#distro-rating-counter.profile__input-counter--warn {
+  color: hsl(35, 90%, 52%);
+  opacity: 1;
+}
+
+#distro-rating-counter.profile__input-counter--danger {
+  color: hsl(0, 75%, 56%);
+  opacity: 1;
 }
 
 #distro-rating-modal #distro-rating-text {
