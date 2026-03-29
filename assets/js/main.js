@@ -91,6 +91,7 @@ const distroModalDescriptionBox = document.getElementById('distro-modal-descript
 const distroModalDescription = document.getElementById('distro-modal-description')
 const distroModalVideo = document.getElementById('distro-modal-video')
 const distroModalVideoIframe = document.getElementById('distro-modal-video-iframe')
+const distroModalVideoPlay = document.getElementById('distro-modal-video-play')
 
 let finderTagStates = {}
 
@@ -572,23 +573,50 @@ function getYoutubeIdFromUrl(url = '') {
    return ''
 }
 
+function resetDistroVideo() {
+   if (distroModalVideoIframe) {
+      distroModalVideoIframe.removeAttribute('src')
+      distroModalVideoIframe.style.display = 'none'
+   }
+
+   if (distroModalVideoPlay) {
+      distroModalVideoPlay.style.display = 'none'
+      distroModalVideoPlay.dataset.embedUrl = ''
+   }
+
+   if (distroModalVideo) {
+      distroModalVideo.style.display = 'none'
+   }
+}
+
 function setDistroVideo(distro) {
-   if (!distroModalVideo || !distroModalVideoIframe) return
+   if (!distroModalVideo || !distroModalVideoIframe || !distroModalVideoPlay) return
+
+   resetDistroVideo()
 
    const directId = distro.videoId || ''
    const derivedId = getYoutubeIdFromUrl(distro.videoUrl || '')
    const videoId = directId || derivedId
 
-   if (!videoId) {
-      distroModalVideo.style.display = 'none'
-      distroModalVideoIframe.removeAttribute('src')
-      return
-   }
+   if (!videoId) return
 
-   const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`
-   distroModalVideoIframe.src = embedUrl
+   const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`
+
    distroModalVideo.style.display = 'block'
+   distroModalVideoPlay.style.display = 'inline-flex'
+   distroModalVideoPlay.dataset.embedUrl = embedUrl
 }
+
+distroModalVideoPlay?.addEventListener('click', () => {
+   if (!distroModalVideoIframe || !distroModalVideoPlay) return
+
+   const embedUrl = distroModalVideoPlay.dataset.embedUrl
+   if (!embedUrl) return
+
+   distroModalVideoPlay.style.display = 'none'
+   distroModalVideoIframe.style.display = 'block'
+   distroModalVideoIframe.src = embedUrl
+})
 
 function setDistroLink(anchor, url) {
    if (!anchor) return
@@ -824,11 +852,13 @@ finderCountryModal?.addEventListener('click', (event) => {
 })
 
 distroModalClose?.addEventListener('click', () => {
+   resetDistroVideo()
    distroModal?.classList.remove('show-login')
 })
 
 distroModal?.addEventListener('click', (event) => {
    if (event.target === distroModal) {
+      resetDistroVideo()
       distroModal.classList.remove('show-login')
    }
 })
@@ -932,7 +962,7 @@ function hideStaticModals() {
 const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
 const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
 const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
-const hideAll      = () => { loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search'); hideStaticModals() }
+const hideAll      = () => { resetDistroVideo(); loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)

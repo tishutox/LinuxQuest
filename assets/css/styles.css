@@ -2228,6 +2228,34 @@ body.user-theme-active .profile-background__reset:disabled {
   margin-top: .75rem;
 }
 
+#distro-modal .distro-modal__video-play {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--border-color);
+  border-radius: .6rem;
+  background: linear-gradient(135deg, #0f172a, #111827);
+  color: var(--title-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  font-weight: var(--font-semi-bold);
+  letter-spacing: .01em;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+#distro-modal .distro-modal__video-play:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, .15);
+  background: linear-gradient(135deg, #111827, #0b1226);
+}
+
+#distro-modal .distro-modal__video-play span:first-child {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
 #distro-modal .distro-modal__video iframe {
   width: 100%;
   aspect-ratio: 16 / 9;

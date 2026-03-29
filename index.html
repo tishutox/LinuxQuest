@@ -560,7 +560,11 @@
             </div>
 
             <div class="distro-modal__video" id="distro-modal-video" style="display:none;">
-               <iframe id="distro-modal-video-iframe" title="Distro Video" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+               <button type="button" class="distro-modal__video-play" id="distro-modal-video-play" aria-label="Video abspielen">
+                  <span aria-hidden="true">▶</span>
+                  <span>Video abspielen</span>
+               </button>
+               <iframe id="distro-modal-video-iframe" title="Distro Video" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" style="display:none;"></iframe>
             </div>
          </div>
 
