@@ -155,26 +155,7 @@ i.fi[class*="fi-rb-"] {
   background-image: none;
 }
 
-@media (min-width: 768px) and (pointer: fine) {
-  :root {
-    --app-cursor-main: url('../cursors/PNG/normal.png') 5 5, auto;
-    --app-cursor-pointer: url('../cursors/PNG/link.png') 5 5, pointer;
-  }
-}
 
-@media (min-width: 1280px) and (pointer: fine) {
-  :root {
-    --app-cursor-main: url('../cursors/PNG/normal.png') 5 5, auto;
-    --app-cursor-pointer: url('../cursors/PNG/link.png') 5 5, pointer;
-  }
-}
-
-@media (min-width: 1600px) and (min-resolution: 2dppx) and (pointer: fine) {
-  :root {
-    --app-cursor-main: url('../cursors/PNG/normal.png') 5 5, auto;
-    --app-cursor-pointer: url('../cursors/PNG/link.png') 5 5, pointer;
-  }
-}
 
 input,
 button {
