@@ -560,6 +560,14 @@
                <p class="public-profile__bio-text" id="distro-modal-description"></p>
             </div>
 
+            <div class="distro-modal__video" id="distro-modal-video" style="display:none;">
+               <button type="button" class="distro-modal__video-play" id="distro-modal-video-play" aria-label="Video abspielen">
+                  <span aria-hidden="true">▶</span>
+                  <span>Video abspielen</span>
+               </button>
+               <iframe id="distro-modal-video-iframe" title="Distro Video" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" style="display:none;"></iframe>
+            </div>
+
             <div class="distro-rating" id="distro-rating" aria-live="polite">
                <div class="distro-rating__header">
                   <div class="distro-rating__average" aria-label="Durchschnittliche Bewertung">
@@ -571,14 +579,6 @@
                </div>
 
                <div class="distro-rating__reviews" id="distro-rating-reviews"></div>
-            </div>
-
-            <div class="distro-modal__video" id="distro-modal-video" style="display:none;">
-               <button type="button" class="distro-modal__video-play" id="distro-modal-video-play" aria-label="Video abspielen">
-                  <span aria-hidden="true">▶</span>
-                  <span>Video abspielen</span>
-               </button>
-               <iframe id="distro-modal-video-iframe" title="Distro Video" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" style="display:none;"></iframe>
             </div>
          </div>
 
