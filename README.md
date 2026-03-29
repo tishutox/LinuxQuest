@@ -81,6 +81,13 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 	- Username
 - Klick auf Treffer öffnet direkt das jeweilige Profil
 
+### Distro Finder & Bewertungen
+- Kuratierte Distro-Liste mit Logos, Codebase, Länder-Herkunft, Tags und ISO-Größe
+- Filter: Tags (Multi-Select), Codebase-Dropdown, Länder-Picker mit Flaggen (Multi-Select), ISO-Größen-Slider (Min/Max)
+- Detail-Modal mit Beschreibung, Doku-Link, Download-Link und optionalem Video-Trailer (YouTube-nocookie, erst beim Klick geladen)
+- Bewertungen: 1–5 Sterne pro Nutzer*in und Distro, optionaler Review-Text
+- Aggregierte Anzeige (Durchschnitt, Sterne, Anzahl), Review-Liste, „Bewertung bearbeiten“-Flow
+
 ### Lokaler Custom-Background
 - Nur für eingeloggte Nutzer im Profil konfigurierbar
 - Wird ausschließlich lokal im Browser gespeichert (nicht serverseitig synchronisiert)
