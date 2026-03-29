@@ -580,6 +580,10 @@
                <button type="button" class="login__button distro-rating__action" id="distro-rating-open" style="display:none;">Bewertung abgeben</button>
 
                <div class="distro-rating__reviews" id="distro-rating-reviews"></div>
+
+               <div class="distro-rating__view-all" id="distro-rating-view-all" style="display:none;">
+                  <button type="button" class="distro-rating__view-all-btn">Alle Bewertungen anzeigen</button>
+               </div>
             </div>
          </div>
 
@@ -625,6 +629,21 @@
          </div>
 
          <i class="fi fi-rr-cross-small login__close" id="distro-rating-modal-close"></i>
+      </div>
+
+      <!--==================== DISTRO REVIEWS MODAL ====================-->
+      <div class="login" id="distro-reviews-modal">
+         <div class="login__form profile__form">
+            <h2 class="login__title">Alle Bewertungen</h2>
+
+            <div class="distro-rating__reviews" id="distro-reviews-modal-list"></div>
+
+            <div class="report-modal__actions">
+               <button type="button" class="login__button profile__delete-button" id="distro-reviews-close-btn">Schließen</button>
+            </div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" id="distro-reviews-modal-close"></i>
       </div>
 
       <!--==================== REPORT MODAL ====================-->

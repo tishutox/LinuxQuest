@@ -95,6 +95,7 @@ const distroModalVideoPlay = document.getElementById('distro-modal-video-play')
 const distroRatingAverage = document.getElementById('distro-rating-average')
 const distroRatingStars = document.getElementById('distro-rating-stars')
 const distroRatingReviews = document.getElementById('distro-rating-reviews')
+const distroRatingViewAll = document.getElementById('distro-rating-view-all')
 const distroRatingOpenBtn = document.getElementById('distro-rating-open')
 const distroRatingModal = document.getElementById('distro-rating-modal')
 const distroRatingModalClose = document.getElementById('distro-rating-modal-close')
@@ -105,12 +106,17 @@ const distroRatingCounter = document.getElementById('distro-rating-counter')
 const distroRatingSubmit = document.getElementById('distro-rating-submit')
 const distroRatingCancel = document.getElementById('distro-rating-cancel')
 const distroRatingMessage = document.getElementById('distro-rating-message')
+const distroReviewsModal = document.getElementById('distro-reviews-modal')
+const distroReviewsModalClose = document.getElementById('distro-reviews-modal-close')
+const distroReviewsModalCloseBtn = document.getElementById('distro-reviews-close-btn')
+const distroReviewsModalList = document.getElementById('distro-reviews-modal-list')
 
 let finderTagStates = {}
 let currentDistroKey = ''
 let currentDistroName = ''
 let currentDistroUserReview = null
 let distroRatingSelection = 0
+let currentDistroReviews = []
 
 const FINDER_ISO_SIZE_MIN_MB = 700
 const FINDER_ISO_SIZE_MAX_MB = 5000
@@ -702,67 +708,130 @@ function renderRatingStars(container, filledCount = 0) {
    }
 }
 
+function createReviewElement(review = {}, { maxLength = 200 } = {}) {
+   const item = document.createElement('article')
+   item.className = 'distro-rating__review'
+
+   const avatar = document.createElement('img')
+   avatar.className = 'distro-rating__review-avatar'
+   avatar.src = getAvatarUrl({ avatar: review.avatar, full_name: review.full_name || review.username || 'Nutzer' })
+   avatar.alt = review.profile_name || review.username || 'Nutzer'
+   if (review.username) {
+      avatar.style.cursor = 'pointer'
+      avatar.addEventListener('click', () => openPublicProfileByUsername(review.username))
+   }
+
+   const body = document.createElement('div')
+   body.className = 'distro-rating__review-body'
+
+   const header = document.createElement('div')
+   header.className = 'distro-rating__review-header'
+
+   const name = document.createElement('span')
+   name.className = 'distro-rating__review-name'
+   name.textContent = review.profile_name || review.username || 'Unbekannt'
+   if (review.username) {
+      name.classList.add('is-clickable')
+      name.addEventListener('click', () => openPublicProfileByUsername(review.username))
+   }
+
+   const stars = document.createElement('div')
+   stars.className = 'distro-rating__review-stars'
+   renderRatingStars(stars, Number(review.rating) || 0)
+
+   header.appendChild(name)
+   header.appendChild(stars)
+
+   const text = document.createElement('p')
+   text.className = 'distro-rating__review-text'
+   const fullText = review.message || 'Keine Nachricht hinterlassen.'
+   const truncated = fullText.length > maxLength ? `${fullText.slice(0, maxLength)}…` : fullText
+   text.textContent = truncated
+   text.dataset.fullText = fullText
+   text.dataset.truncatedText = truncated
+   text.dataset.state = fullText.length > maxLength ? 'truncated' : 'full'
+   if (fullText.length > maxLength) {
+      text.classList.add('distro-rating__review-text--truncatable')
+      text.addEventListener('click', () => {
+         const isTruncated = text.dataset.state !== 'full'
+         text.textContent = isTruncated ? fullText : text.dataset.truncatedText
+         text.dataset.state = isTruncated ? 'full' : 'truncated'
+      })
+   }
+
+   body.appendChild(header)
+   body.appendChild(text)
+
+   item.appendChild(avatar)
+   item.appendChild(body)
+
+   return item
+}
+
 function renderDistroReviews(reviews = []) {
    if (!distroRatingReviews) return
 
+   const safeReviews = Array.isArray(reviews) ? reviews : []
    distroRatingReviews.innerHTML = ''
 
-   if (!Array.isArray(reviews) || !reviews.length) {
+   if (!safeReviews.length) {
       const empty = document.createElement('p')
       empty.className = 'distro-rating__empty'
       empty.textContent = 'Noch keine Rezensionen vorhanden.'
       distroRatingReviews.appendChild(empty)
+      if (distroRatingViewAll) {
+         distroRatingViewAll.style.display = 'none'
+      }
       return
    }
 
-   reviews.slice(0, 3).forEach((review) => {
-      const item = document.createElement('article')
-      item.className = 'distro-rating__review'
-
-      const avatar = document.createElement('img')
-      avatar.className = 'distro-rating__review-avatar'
-      avatar.src = getAvatarUrl({ avatar: review.avatar, full_name: review.full_name || review.username || 'Nutzer' })
-      avatar.alt = review.profile_name || review.username || 'Nutzer'
-
-      const body = document.createElement('div')
-      body.className = 'distro-rating__review-body'
-
-      const header = document.createElement('div')
-      header.className = 'distro-rating__review-header'
-
-      const name = document.createElement('span')
-      name.className = 'distro-rating__review-name'
-      name.textContent = review.profile_name || review.username || 'Unbekannt'
-
-      const stars = document.createElement('div')
-      stars.className = 'distro-rating__review-stars'
-      renderRatingStars(stars, Number(review.rating) || 0)
-
-      header.appendChild(name)
-      header.appendChild(stars)
-
-      const text = document.createElement('p')
-      text.className = 'distro-rating__review-text'
-      text.textContent = review.message || 'Keine Nachricht hinterlassen.'
-
-      body.appendChild(header)
-      body.appendChild(text)
-
-      item.appendChild(avatar)
-      item.appendChild(body)
-
-      distroRatingReviews.appendChild(item)
+   safeReviews.slice(0, 3).forEach((review) => {
+      distroRatingReviews.appendChild(createReviewElement(review))
    })
+
+   if (distroRatingViewAll) {
+      distroRatingViewAll.style.display = safeReviews.length > 3 ? 'inline-flex' : 'none'
+   }
+}
+
+function renderAllDistroReviewsModal() {
+   if (!distroReviewsModalList) return
+   distroReviewsModalList.innerHTML = ''
+
+   const safeReviews = Array.isArray(currentDistroReviews) ? currentDistroReviews : []
+   if (!safeReviews.length) {
+      const empty = document.createElement('p')
+      empty.className = 'distro-rating__empty'
+      empty.textContent = 'Noch keine Rezensionen vorhanden.'
+      distroReviewsModalList.appendChild(empty)
+      return
+   }
+
+   safeReviews.forEach((review) => {
+      distroReviewsModalList.appendChild(createReviewElement(review))
+   })
+}
+
+function openDistroReviewsModal() {
+   if (!distroReviewsModal) return
+   renderAllDistroReviewsModal()
+   distroReviewsModal.classList.add('show-login')
+}
+
+function closeDistroReviewsModal() {
+   if (!distroReviewsModal) return
+   distroReviewsModal.classList.remove('show-login')
 }
 
 function applyDistroRatingState(payload = {}) {
    if (!distroRatingAverage || !distroRatingStars) return
 
    const average = Number(payload.average || 0)
+   currentDistroReviews = Array.isArray(payload.reviews) ? payload.reviews : []
 
    distroRatingAverage.textContent = average.toFixed(1)
    renderRatingStars(distroRatingStars, average)
-   renderDistroReviews(payload.reviews || [])
+   renderDistroReviews(currentDistroReviews)
 
    currentDistroUserReview = payload.userReview || null
 
@@ -1079,6 +1148,16 @@ if (distroRatingSelectStars) {
 
    updateDistroRatingSelection(0)
 }
+
+distroRatingViewAll?.addEventListener('click', openDistroReviewsModal)
+distroReviewsModalClose?.addEventListener('click', closeDistroReviewsModal)
+distroReviewsModalCloseBtn?.addEventListener('click', closeDistroReviewsModal)
+
+distroReviewsModal?.addEventListener('click', (event) => {
+   if (event.target === distroReviewsModal) {
+      closeDistroReviewsModal()
+   }
+})
 
 distroRatingText?.addEventListener('input', () => {
    const length = distroRatingText.value.length
