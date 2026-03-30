@@ -24,7 +24,7 @@
       background-color: transparent;
       border: none;
       appearance: none;
-      color: var(--title-color);
+      color: var(--user-accent-color, var(--first-color));
       font-weight: var(--font-semi-bold);
       line-height: 1;
       text-decoration: underline;
@@ -40,7 +40,7 @@
       }
 
       &:visited{
-         color: var(--title-color);
+         color: var(--user-accent-color, var(--first-color));
       }
 
       &:focus-visible{

@@ -261,7 +261,7 @@ img {
   width: 2.25rem;
   height: 2.25rem;
   font-size: 1.5rem;
-  color: var(--first-color);
+  color: var(--user-accent-color, var(--first-color));
   background-color: transparent;
   border: none;
   box-shadow: none;
@@ -443,7 +443,7 @@ img {
   background-color: transparent;
   border: none;
   appearance: none;
-  color: var(--title-color);
+  color: var(--user-accent-color, var(--first-color));
   font-weight: var(--font-semi-bold);
   line-height: 1;
   text-decoration: underline;
@@ -460,7 +460,7 @@ img {
 }
 
 .footer__link:visited {
-  color: var(--title-color);
+  color: var(--user-accent-color, var(--first-color));
 }
 
 .footer__link:focus-visible {
