@@ -24,7 +24,7 @@
       background-color: transparent;
       border: none;
       appearance: none;
-      color: var(--user-accent-color, var(--first-color));
+      color: var(--title-color);
       font-weight: var(--font-semi-bold);
       line-height: 1;
       text-decoration: underline;
@@ -40,7 +40,7 @@
       }
 
       &:visited{
-         color: var(--user-accent-color, var(--first-color));
+         color: var(--title-color);
       }
 
       &:focus-visible{
@@ -75,8 +75,18 @@
       line-height: 1.6;
 
       a{
-         color: var(--first-color);
+         color: var(--title-color);
          font-weight: var(--font-medium);
+         transition: color .3s ease;
+
+         &:hover{
+            color: var(--user-accent-color, var(--first-color));
+         }
+
+         &:focus-visible{
+            outline: 2px dotted var(--user-accent-color, var(--first-color));
+            outline-offset: .2rem;
+         }
       }
    }
 

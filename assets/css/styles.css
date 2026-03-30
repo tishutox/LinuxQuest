@@ -261,7 +261,7 @@ img {
   width: 2.25rem;
   height: 2.25rem;
   font-size: 1.5rem;
-  color: var(--user-accent-color, var(--first-color));
+  color: var(--title-color);
   background-color: transparent;
   border: none;
   box-shadow: none;
@@ -460,7 +460,7 @@ img {
 }
 
 .footer__link:visited {
-  color: var(--user-accent-color, var(--first-color));
+  color: var(--title-color);
 }
 
 .footer__link:focus-visible {
@@ -1304,14 +1304,15 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
 .info-modal__body a {
   color: var(--title-color);
   font-weight: var(--font-medium);
+  transition: color .3s ease;
 }
 
 .info-modal__body a:hover {
-  color: var(--first-color);
+  color: var(--user-accent-color, var(--first-color));
 }
 
 .info-modal__body a:focus-visible {
-  outline: 2px dotted var(--first-color);
+  outline: 2px dotted var(--user-accent-color, var(--first-color));
   outline-offset: .2rem;
 }
 
