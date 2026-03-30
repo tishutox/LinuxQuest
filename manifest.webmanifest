@@ -4,7 +4,7 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F5F7FF",
-  "theme_color": "#352C59",
+  "theme_color": "#3379AC",
   "description": "TuxoraQuest als installierbare Webapp.",
   "icons": [
     {

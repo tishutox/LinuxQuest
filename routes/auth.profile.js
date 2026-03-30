@@ -394,7 +394,7 @@ function createAuthProfileRouter({
 
       const normalizedAccentColor = normalizeAccentColor(accent_color);
       if (typeof accent_color === 'string' && accent_color.trim() && !normalizedAccentColor) {
-        return res.status(400).json({ error: 'Die Profilfarbe muss ein gültiger Hex-Farbwert sein (z. B. #352C59).' });
+        return res.status(400).json({ error: 'Die Profilfarbe muss ein gültiger Hex-Farbwert sein (z. B. #3379AC).' });
       }
 
       const normalizedBirthDate = normalizeBirthDate(trimmedBirthDate);

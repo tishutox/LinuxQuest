@@ -1844,7 +1844,7 @@ async function openDeveloperBugReports(username) {
    await loadAdminBugReports(username)
 }
 
-const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=352C59&color=fff&name='
+const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=3379AC&color=fff&name='
 let currentUser = null
 let restrictionCheckInterval = null
 let isDraggingAccentWheel = false
@@ -2191,7 +2191,7 @@ function updateNavDeveloperToolsVisibility(user) {
 function getDefaultAccentColor() {
    const cssValue = getComputedStyle(document.documentElement).getPropertyValue('--first-color').trim()
    if (/^#[0-9A-Fa-f]{6}$/.test(cssValue)) return cssValue.toUpperCase()
-   return '#352C59'
+   return '#3379AC'
 }
 
 function normalizeHexColor(value) {

@@ -9,7 +9,7 @@
 
   /*========== Colors ==========*/
   /*Color mode HSL(hue, saturation, lightness)*/
-  --first-color: #352C59;
+  --first-color: #3379AC;
   --user-accent-color: var(--first-color);
   --user-accent-text-color: #fff;
   --accent-picker-text-color: #fff;
