@@ -41,7 +41,7 @@
       transition: color .4s;
    }
    :is(&__logo, &__search, &__login, &__toggle, &__link):hover{
-      color: var(--first-color);
+      color: var(--user-accent-color, var(--first-color));
    }
    // Navigation for mobile devices
    &__menu{

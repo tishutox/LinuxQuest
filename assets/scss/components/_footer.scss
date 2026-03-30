@@ -35,7 +35,7 @@
       cursor: pointer;
 
       &:hover{
-         color: var(--first-color);
+         color: var(--user-accent-color, var(--first-color));
          text-decoration-color: currentColor;
       }
 
@@ -44,7 +44,7 @@
       }
 
       &:focus-visible{
-         outline: 2px dotted var(--first-color);
+         outline: 2px dotted var(--user-accent-color, var(--first-color));
          outline-offset: .3rem;
       }
    }
