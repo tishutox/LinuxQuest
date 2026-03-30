@@ -24,7 +24,7 @@
       background-color: transparent;
       border: none;
       appearance: none;
-      color: var(--title-color);
+      color: #000;
       font-weight: var(--font-semi-bold);
       line-height: 1;
       text-decoration: underline;
@@ -34,13 +34,13 @@
       transition: color .4s, text-decoration-color .4s;
       cursor: pointer;
 
+      &:visited{
+         color: #000;
+      }
+
       &:hover{
          color: var(--user-accent-color, var(--first-color));
          text-decoration-color: currentColor;
-      }
-
-      &:visited{
-         color: var(--title-color);
       }
 
       &:focus-visible{

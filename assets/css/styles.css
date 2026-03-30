@@ -364,11 +364,11 @@ img {
 }
 
 :is(.nav__logo, .nav__admin-tools, .nav__developer-tools, .nav__search, .nav__login, .nav__toggle, .nav__link):hover {
-  color: var(--user-accent-color, var(--first-color));
+  color: #000;
 }
 
 .nav__link:hover {
-  color: var(--user-accent-color, var(--first-color));
+  color: #000;
 }
 
 /* Navigation for mobile devices */
@@ -443,7 +443,7 @@ img {
   background-color: transparent;
   border: none;
   appearance: none;
-  color: var(--user-accent-color, var(--first-color));
+  color: #000;
   font-weight: var(--font-semi-bold);
   line-height: 1;
   text-decoration: underline;
@@ -454,13 +454,13 @@ img {
   cursor: pointer;
 }
 
+.footer__link:visited {
+  color: #000;
+}
+
 .footer__link:hover {
   color: var(--user-accent-color, var(--first-color));
   text-decoration-color: currentColor;
-}
-
-.footer__link:visited {
-  color: var(--title-color);
 }
 
 .footer__link:focus-visible {
