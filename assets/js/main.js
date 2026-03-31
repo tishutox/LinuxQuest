@@ -223,6 +223,246 @@ const DISTRO_FINDER_DATA = [
    { name: 'Alpine Linux', codebase: 'independent', countries: ['us'], isoSizeMb: 700, tags: ['lightweight', 'server', 'it-sicherheit'], docsUrl: 'https://docs.alpinelinux.org', downloadUrl: 'https://alpinelinux.org/downloads/', description: 'Musl-/BusyBox-basierte Minimal-Distribution, beliebt für Container und Server.', logo: 'assets/img/distros/Alpine Linux.png', videoUrl: 'https://youtu.be/NKggFBdee94?si=txReivLxz1R6rFDn' }
 ]
 
+// Fallback-Vor- und Nachteile für Distros, die noch keine pros/cons im Hauptdatensatz haben
+const DISTRO_PROS_CONS = {
+   'Ubuntu Studio': {
+      pros: ['Audio/Video/Grafik-Tools vorinstalliert', 'Ubuntu-LTS-Basis für Stabilität'],
+      cons: ['Großes ISO, braucht mehr Speicher', 'Mehr RAM-Verbrauch durch Kreativ-Stack']
+   },
+   'Xubuntu': {
+      pros: ['Sehr leichtgewichtiges Xfce', 'Stabile Ubuntu-Basis mit LTS-Option'],
+      cons: ['Weniger Eye-Candy als KDE/GNOME', 'Standard-Apps wirken schlicht']
+   },
+   'Lubuntu': {
+      pros: ['LXQt ist extrem ressourcenschonend', 'Gut für sehr alte Hardware'],
+      cons: ['Weniger Komfort-Features als große Desktops', 'Kleinere Auswahl an LXQt-Tools']
+   },
+   'Kali Linux': {
+      pros: ['Umfangreiche Pentesting-Toolchains', 'Rolling mit schnellen Paket-Updates'],
+      cons: ['Nicht für Alltags-Desktop gedacht', 'Kann Hardware/Netzwerkrestriktionen triggern']
+   },
+   'Parrot Security': {
+      pros: ['Security/Privacy-Fokus mit vorkonfigurierten Tools', 'Leichter als viele Pentesting-Distros'],
+      cons: ['Kleinere Community als Kali', 'Rolling kann gelegentlich instabil sein']
+   },
+   'Tails': {
+      pros: ['Amnesisches System, speichert nichts lokal', 'Tor-by-default für hohe Privatsphäre'],
+      cons: ['Bewusst langsamer wegen Tor-Routing', 'Persistenz nur optional und begrenzt']
+   },
+   'MX Linux': {
+      pros: ['Einsteigerfreundlich trotz Debian Stable', 'Systemd-frei-Option und eigene MX-Tools'],
+      cons: ['Pakete oft älter als Upstream', 'UI wirkt teils konservativ']
+   },
+   'Devuan': {
+      pros: ['Debian ohne systemd', 'Stabile Basis mit Init-Wahl'],
+      cons: ['Kleinere Community/Repo-Auswahl', 'Manchmal weniger Pakete verfügbar']
+   },
+   'EndeavourOS': {
+      pros: ['Einfacher Einstieg in Arch dank Installer', 'Rolling, relativ nah an Upstream'],
+      cons: ['Rolling erfordert Pflege und Updates', 'Kleinere Community als Ubuntu/Debian']
+   },
+   'Garuda Linux': {
+      pros: ['Gaming-Tuning und Btrfs-Snapshots out of the box', 'Optisch starkes KDE-Setup'],
+      cons: ['Höherer Ressourcenbedarf', 'Aggressive Tweaks können Fehler erzeugen']
+   },
+   'AthenaOS': {
+      pros: ['Security/Forensik-Tools vorkonfiguriert', 'Arch-rolling für aktuelle Pakete'],
+      cons: ['Nichts für Einsteiger', 'Dokumentation kleiner']
+   },
+   'Fedora Server': {
+      pros: ['Cockpit-Webverwaltung inklusive', 'Aktuelle Kernel und SELinux standard'],
+      cons: ['Kurzer Support-Zyklus, häufige Upgrades nötig', 'Weniger Third-Party-Pakete als Debian/Ubuntu']
+   },
+   'Fedora Silverblue': {
+      pros: ['Immutable rpm-ostree mit atomaren Rollbacks', 'Flatpak-first für Desktop-Apps'],
+      cons: ['Layering/Custom Kernel aufwendiger', 'Manche Workflows erfordern Toolbox/Container']
+   },
+   'Nobara': {
+      pros: ['Gaming-/Creator-Tweaks ab Werk', 'Codecs und QoL-Patches schon integriert'],
+      cons: ['Kleine Maintainer-Gruppe', 'Updates hängen von wenigen Personen ab']
+   },
+   'Bazzite': {
+      pros: ['Optimiert für Gaming/Steam Deck', 'Immutable Fedora Atomic Basis'],
+      cons: ['Benötigt mehr Plattenplatz', 'Abhängig von uBlue-Projekt für Images']
+   },
+   'ChimeraOS': {
+      pros: ['Living-Room/Steam-Big-Picture Fokus', 'Automatisierte Updates und Gamepad-UX'],
+      cons: ['Stark auf Gaming beschränkt', 'Wenig Desktop-Produktivitätstools']
+   },
+   'CachyOS': {
+      pros: ['Performance-optimierte Kernel und Compiler-Flags', 'Installer erleichtert Arch-Setup'],
+      cons: ['Rolling mit vielen Eigen-Tweaks', 'Kleinere Community']
+   },
+   'SteamOS': {
+      pros: ['Optimiert für Steam Deck/Game Mode', 'Gute Controller-/HTPC-Erfahrung'],
+      cons: ['Desktop-Nutzung eingeschränkt', 'Updates primär Deck-getrieben']
+   },
+   'openSUSE Tumbleweed': {
+      pros: ['Rolling mit Snapper/Btrfs-Snapshots', 'YaST als starke Admin-Suite'],
+      cons: ['Regelmäßige Upgrades nötig', 'Snapshots brauchen zusätzlichen Speicher']
+   },
+   'openSUSE Leap': {
+      pros: ['Stabile Basis mit SUSE-Tools', 'YaST und Snapper inklusive'],
+      cons: ['Pakete konservativer/älter', 'Größere Upgrades zwischen Releases']
+   },
+   'SLES': {
+      pros: ['Enterprise-Support und Zertifizierungen', 'AutoYaST/YaST für Deployment'],
+      cons: ['Lizenzkosten', 'Sehr konservative Paketstände']
+   },
+   'Gentoo': {
+      pros: ['Maximale Anpassung via USE-Flags', 'Feinjustierte Performance möglich'],
+      cons: ['Hoher Build-/Wartungsaufwand', 'Steile Lernkurve']
+   },
+   'Slackware': {
+      pros: ['KISS-Ansatz, sehr stabil', 'Systemd-frei, klassische Unix-Struktur'],
+      cons: ['Mehr Handarbeit bei Paketen/Deps', 'Langsamere Paketupdates']
+   },
+   'VectorLinux': {
+      pros: ['Slackware-basiert und leichtgewichtig', 'Läuft gut auf älterer Hardware'],
+      cons: ['Kleine Community und Repos', 'Weniger häufige Updates']
+   },
+   'Void Linux': {
+      pros: ['runit-Init startet sehr schnell', 'Rolling mit musl-Option'],
+      cons: ['Kleineres Paket-Repo', 'Weniger Komfort-Tools out of the box']
+   },
+   'Nitrux': {
+      pros: ['AppImage-first Ansatz', 'Maui Shell/KDE-Design'],
+      cons: ['Kleinere Community', 'Eigenes Repo/Release-Modell erfordert Vertrauen']
+   },
+   'Zentyal Server': {
+      pros: ['AD/Samba-Integration vorkonfiguriert', 'Web-UI für häufige Admin-Aufgaben'],
+      cons: ['Schlankes Ökosystem', 'Weniger generische Pakete als pures Ubuntu']
+   },
+   'AUSTRUMI': {
+      pros: ['Extrem leichtgewichtiges Live-System', 'Gut für sehr alte Hardware'],
+      cons: ['Sehr kleine Community', 'Begrenzte Paketauswahl']
+   },
+   'AryaLinux': {
+      pros: ['Source-based, lehrreich', 'Eigenes Build-System gibt Kontrolle'],
+      cons: ['Hoher Installationsaufwand', 'Kleine Nutzerbasis']
+   },
+   'MIRACLE LINUX': {
+      pros: ['RHEL-kompatibel für Enterprise', 'Japanischer Unternehmenssupport'],
+      cons: ['Dokumentation oft japanisch', 'Kleine Community']
+   },
+   'Regata OS': {
+      pros: ['Gaming- und Multimedia-Tools vorinstalliert', 'openSUSE-Basis'],
+      cons: ['Kleinere Community', 'Weniger Doku außerhalb Portugiesisch/Englisch']
+   },
+   'NethServer': {
+      pros: ['Modulare Server-Module mit Web-UI', 'AD/Backup/Groupware schnell aktivierbar'],
+      cons: ['Kleinere Community', 'Historischer CentOS-Shift sorgt für Umstellungen']
+   },
+   'openmamba': {
+      pros: ['Rolling, KDE-orientiert', 'Eigenes Repo mit Kuratierung'],
+      cons: ['Kleine Nutzerbasis', 'Weniger englische Dokumentation']
+   },
+   'NimbleX': {
+      pros: ['Sehr kleines Live-System', 'Gut für Rescue oder alte PCs'],
+      cons: ['Begrenzte Paketauswahl', 'Kleines Team, seltene Releases']
+   },
+   'NuTyX': {
+      pros: ['cards-Paketmanager, rolling', 'Schlank und anpassbar'],
+      cons: ['Kleine Community', 'Doku überschaubar']
+   },
+   'LliureX': {
+      pros: ['Bildungs-Stack out of the box', 'Stabile Ubuntu-Basis'],
+      cons: ['Stark auf Bildungs-Usecases fokussiert', 'Doku vor allem auf Spanisch/Katalanisch']
+   },
+   'SparkyLinux': {
+      pros: ['Debian-basiert und leichtgewichtig', 'Semi-rolling/rolling Varianten verfügbar'],
+      cons: ['Häufigere Updates einplanen', 'Kleinere Community']
+   },
+   'Canaima': {
+      pros: ['Fokus auf Bildung/Verwaltung', 'Spanischsprachige Materialien'],
+      cons: ['Regionaler Fokus, weniger globaler Support', 'Ältere Paketstände (Debian-basiert)']
+   },
+   'ExTiX': {
+      pros: ['Häufige Releases, viele Desktop-Spins', 'Rolling-Charakter'],
+      cons: ['Kann instabiler sein', 'Kleines Team']
+   },
+   'endeavouros-arm': {
+      pros: ['Arch-Erlebnis auf ARM mit Installer', 'Community-Images'],
+      cons: ['Hardware-Support je Board unterschiedlich', 'Rolling erfordert Pflege']
+   },
+   'NixOS': {
+      pros: ['Deklarative Konfiguration, reproduzierbar', 'Atomare Rollbacks mit Generationen'],
+      cons: ['Nix-Syntax Lernkurve', 'Ungewohnte Pfad-/Store-Logik']
+   },
+   'Qubes OS': {
+      pros: ['Starke Isolation via Xen-VMs', 'Security by compartmentalization'],
+      cons: ['Hohe Hardware-Anforderungen', 'Komplexes VM-Management']
+   },
+   'KDE neon': {
+      pros: ['Immer aktuelles KDE Plasma', 'Ubuntu LTS als Basis'],
+      cons: ['Manchmal App/Qt-Version-Mismatches', 'GNOME-/GTK-Apps teils älter']
+   },
+   'Elementary OS': {
+      pros: ['Klares, konsistentes Design', 'Kuratiertes AppCenter'],
+      cons: ['Weniger Anpassungsmöglichkeiten', 'Kleineres App-Ökosystem']
+   },
+   'Zorin OS': {
+      pros: ['Windows-ähnliches UX für Umsteiger', 'Gute Defaults und Codecs'],
+      cons: ['Manche Features in Pro-Edition', 'Updates leicht verzögert vs. Upstream']
+   },
+   'Rescatux': {
+      pros: ['GUI-Assistenten für Bootloader/Passwort-Reparatur', 'Live-System schnell startklar'],
+      cons: ['Nischen-Usecase', 'Seltenere Releases']
+   },
+   'SystemRescue': {
+      pros: ['Umfangreiches Rescue-Toolkit', 'Stabil und CLI-fokussiert'],
+      cons: ['Kaum GUI-Komfort', 'Live-Einsatz ohne Installer']
+   },
+   'Clonezilla Live': {
+      pros: ['Sehr schnelles Imaging/Klonen', 'Effizient bei großen Datenträgern'],
+      cons: ['Textbasierte UI', 'Kein paralleles Multi-Imaging im UI']
+   },
+   'Trisquel': {
+      pros: ['100% freie Software, FSF-konform', 'Ubuntu-LTS-Basis'],
+      cons: ['Keine proprietären Treiber/Codecs', 'Kleinere Repos/Hardware-Unterstützung']
+   },
+   'Puppy Linux': {
+      pros: ['Ultraleicht, läuft komplett im RAM', 'Ideal für sehr alte Rechner/USB'],
+      cons: ['Altmodisches UI', 'Persistenz/Savefile-Handling nötig']
+   },
+   'Oracle Linux': {
+      pros: ['RHEL-kompatibel, Ksplice Kernel-Livepatch', 'Stabil für Oracle-Stack'],
+      cons: ['Enterprise-Support ggf. kostenpflichtig', 'Community kleiner als Alma/Rocky'],
+   },
+   'Photon OS': {
+      pros: ['VMware- und Container-optimiert', 'Sehr kleines, schnelles Base-Image'],
+      cons: ['Primär für Container/VMs, Desktop ungeeignet', 'Schlankes Repo'],
+   },
+   'Ubuntu Server': {
+      pros: ['Großes Ökosystem, LTS-Support', 'Cloud-Images und Snap/apt Auswahl'],
+      cons: ['Snap-Services teils unerwünscht', 'HWE/Kernel-Wahl erfordert Aufmerksamkeit'],
+   },
+   'Fedora Kinoite': {
+      pros: ['Immutable KDE-Variante mit rpm-ostree', 'Sehr aktuelle Pakete'],
+      cons: ['Layering/Codec/Nvidia-Setup aufwendiger', 'Kleiner als Fedora Workstation Community'],
+   },
+   'Bodhi Linux': {
+      pros: ['Moksha-Desktop extrem leicht', 'Minimal und anpassbar'],
+      cons: ['Kleine Community', 'Wenig vorinstallierte Apps'],
+   },
+   'Edubuntu': {
+      pros: ['Bildungs-/Klassenraum-Pakete vorkonfiguriert', 'Ubuntu-LTS-Basis'],
+      cons: ['Großer Footprint', 'Fokus eng auf Bildung'],
+   },
+   'Clear Linux': {
+      pros: ['Intel-optimierte Performance', 'Stark für Cloud/Container Benchmarks'],
+      cons: ['Nicht alle Desktop-Pakete verfügbar', 'Minimaler Desktop-Comfort'],
+   },
+   'RHEL': {
+      pros: ['Enterprise-Support und Zertifizierungen', 'Langer Lebenszyklus/SLAs'],
+      cons: ['Lizenzkosten', 'Konservative Paketversionen'],
+   },
+   'Alpine Linux': {
+      pros: ['Sehr kleines musl/BusyBox-Base', 'Sicherheitsfokus, beliebt für Container'],
+      cons: ['musl-Inkompatibilitäten möglich', 'Desktop-UX minimal'],
+   }
+}
+
 let searchDebounceTimer = null
 let isFinderMode = false
 let finderSelectedCountries = []
@@ -1007,12 +1247,16 @@ function openDistroModal(distro) {
       distroModalDescriptionBox.style.display = hasText ? 'block' : 'none'
    }
 
-   renderDistroPointList(distroModalProsList, distroModalProsBox, distro.pros, {
+   const fallbackProsCons = DISTRO_PROS_CONS[distro.name] || {}
+   const pros = distro.pros ?? fallbackProsCons.pros
+   const cons = distro.cons ?? fallbackProsCons.cons
+
+   renderDistroPointList(distroModalProsList, distroModalProsBox, pros, {
       symbol: '+',
       emptyText: 'Noch keine Vorteile hinterlegt.'
    })
 
-   renderDistroPointList(distroModalConsList, distroModalConsBox, distro.cons, {
+   renderDistroPointList(distroModalConsList, distroModalConsBox, cons, {
       symbol: '-',
       emptyText: 'Noch keine Nachteile hinterlegt.'
    })
