@@ -89,6 +89,10 @@ const distroModalDownload = document.getElementById('distro-modal-download')
 const distroModalTags = document.getElementById('distro-modal-tags')
 const distroModalDescriptionBox = document.getElementById('distro-modal-description-box')
 const distroModalDescription = document.getElementById('distro-modal-description')
+const distroModalProsBox = document.getElementById('distro-modal-pros-box')
+const distroModalProsList = document.getElementById('distro-modal-pros')
+const distroModalConsBox = document.getElementById('distro-modal-cons-box')
+const distroModalConsList = document.getElementById('distro-modal-cons')
 const distroModalVideo = document.getElementById('distro-modal-video')
 const distroModalVideoIframe = document.getElementById('distro-modal-video-iframe')
 const distroModalVideoPlay = document.getElementById('distro-modal-video-play')
@@ -150,25 +154,25 @@ const FINDER_COUNTRY_LABEL_BY_VALUE = Object.fromEntries(
 )
 
 const DISTRO_FINDER_DATA = [
-   { name: 'Ubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 5900, tags: ['einsteigerfreundlich', 'long-term-support', 'office'], docsUrl: 'https://help.ubuntu.com', downloadUrl: 'https://ubuntu.com/download', description: 'Bekannte Desktop-Distribution mit starkem LTS-Fokus.', logo: 'assets/img/distros/Ubuntu Server.png' },
-   { name: 'Kubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 4900, tags: ['gutes-design', 'einsteigerfreundlich', 'office'], docsUrl: 'https://help.ubuntu.com/community/Kubuntu', downloadUrl: 'https://kubuntu.org/getkubuntu/', description: 'Ubuntu mit KDE Plasma und Fokus auf ein aufgeräumtes Desktop-Erlebnis.', logo: 'assets/img/distros/Kubuntu.png', videoUrl: 'https://youtu.be/P_CJmrFYcic?si=O-v4VXB8Vaequ1dc' },
+   { name: 'Ubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 5900, tags: ['einsteigerfreundlich', 'long-term-support', 'office'], docsUrl: 'https://help.ubuntu.com', downloadUrl: 'https://ubuntu.com/download', description: 'Bekannte Desktop-Distribution mit starkem LTS-Fokus.', logo: 'assets/img/distros/Ubuntu Server.png', pros: ['Große Community und sehr viel Dokumentation', 'LTS-Versionen mit langem Sicherheitssupport', 'Breite Hardware-Unterstützung out of the box'], cons: ['Snap-Standardpakete starten teils langsamer', 'Relativ umfangreiche Default-Installation'] },
+   { name: 'Kubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 4900, tags: ['gutes-design', 'einsteigerfreundlich', 'office'], docsUrl: 'https://help.ubuntu.com/community/Kubuntu', downloadUrl: 'https://kubuntu.org/getkubuntu/', description: 'Ubuntu mit KDE Plasma und Fokus auf ein aufgeräumtes Desktop-Erlebnis.', logo: 'assets/img/distros/Kubuntu.png', videoUrl: 'https://youtu.be/P_CJmrFYcic?si=O-v4VXB8Vaequ1dc', pros: ['KDE Plasma mit vielen GUI-Tools ab Werk', 'Geringere Hardware-Anforderungen als GNOME-Varianten', 'Stabile Basis dank Ubuntu LTS'], cons: ['Updates teilweise verzögert gegenüber Ubuntu GNOME', 'Mischung aus DEB, Flatpak und wenigen Snaps notwendig'] },
    { name: 'Ubuntu Studio', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 4600, tags: ['content-creation', 'office', 'einsteigerfreundlich'], docsUrl: 'https://ubuntustudio.org/support/', downloadUrl: 'https://ubuntustudio.org/download/', description: 'Ubuntu-Variante für Audio-, Video- und Grafikproduktionen.', logo: 'assets/img/distros/Ubuntu Studio.png', videoUrl: 'https://youtu.be/SW4xlWedCpI?si=5QREH5SV6HNOHkuR' },
    { name: 'Xubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 2600, tags: ['lightweight', 'einsteigerfreundlich', 'bildung'], docsUrl: 'https://xubuntu.org/help/', downloadUrl: 'https://xubuntu.org/download', description: 'Leichtgewichtiges Ubuntu mit Xfce-Desktop.', logo: 'assets/img/distros/Xubuntu.png', videoUrl: 'https://youtu.be/zYpFXSAaGmg?si=Q8f2lYrhAFveUfVB' },
    { name: 'Lubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 2200, tags: ['lightweight', 'einsteigerfreundlich', 'bildung'], docsUrl: 'https://manual.lubuntu.me', downloadUrl: 'https://lubuntu.me/downloads/', description: 'Minimalistisches Ubuntu mit LXQt für ältere Hardware.', logo: 'assets/img/distros/Lubuntu.png', videoUrl: 'https://youtu.be/RQEsA3ZzmvY?si=bvzSnaQzTCVc3JlD' },
-   { name: 'Linux Mint', codebase: 'ubuntu', countries: ['ie'], isoSizeMb: 2700, tags: ['einsteigerfreundlich', 'long-term-support', 'office'], docsUrl: 'https://linuxmint-installation-guide.readthedocs.io/', downloadUrl: 'https://www.linuxmint.com/download.php', description: 'Ubuntu-basiert mit Cinnamon/MATE/Xfce; nutzerfreundlich und LTS-orientiert.', logo: 'assets/img/distros/Linux Mint.png', videoUrl: 'https://youtu.be/PZZz790YnzU?si=gaXM44FeOhNQG7QS' },
-   { name: 'Pop!_OS', codebase: 'ubuntu', countries: ['us'], isoSizeMb: 3100, tags: ['gaming', 'programmierer', 'gutes-design'], docsUrl: 'https://support.system76.com/', downloadUrl: 'https://pop.system76.com/', description: 'System76-Distribution mit Cosmic/GNOME, GPU-Optimierungen und Dev-/Creator-Fokus.', logo: 'assets/img/distros/Pop!_OS.png', videoUrl: 'https://youtu.be/oz6TjmCEAik?si=ioV-Yalc3_9UZOwb' },
+   { name: 'Linux Mint', codebase: 'ubuntu', countries: ['ie'], isoSizeMb: 2700, tags: ['einsteigerfreundlich', 'long-term-support', 'office'], docsUrl: 'https://linuxmint-installation-guide.readthedocs.io/', downloadUrl: 'https://www.linuxmint.com/download.php', description: 'Ubuntu-basiert mit Cinnamon/MATE/Xfce; nutzerfreundlich und LTS-orientiert.', logo: 'assets/img/distros/Linux Mint.png', videoUrl: 'https://youtu.be/PZZz790YnzU?si=gaXM44FeOhNQG7QS', pros: ['Cinnamon-Oberfläche vertraut für Windows-Umsteiger', 'Keine Snap-Pflicht, bevorzugt DEB und Flatpak', 'Multimedia-Codecs und Essentials direkt dabei'], cons: ['Konservative Paketbasis durch Ubuntu LTS', 'Keine Rolling- oder Enterprise-Variante verfügbar'] },
+   { name: 'Pop!_OS', codebase: 'ubuntu', countries: ['us'], isoSizeMb: 3100, tags: ['gaming', 'programmierer', 'gutes-design'], docsUrl: 'https://support.system76.com/', downloadUrl: 'https://pop.system76.com/', description: 'System76-Distribution mit Cosmic/GNOME, GPU-Optimierungen und Dev-/Creator-Fokus.', logo: 'assets/img/distros/Pop!_OS.png', videoUrl: 'https://youtu.be/oz6TjmCEAik?si=ioV-Yalc3_9UZOwb', pros: ['COSMIC-Workflow mit vielen Tastenkürzeln', 'Gute GPU- und Firmware-Tools inkl. Hybrid-Switching', 'Flatpak-freundliche Defaults für Dev und Creator'], cons: ['Kein aktuelles LTS-Release verfügbar', 'Stark auf GNOME/COSMIC zugeschnitten, wenige offizielle Spins'] },
    { name: 'Kali Linux', codebase: 'debian', countries: ['international'], isoSizeMb: 4400, tags: ['it-sicherheit', 'forensik', 'fuer-experten'], docsUrl: 'https://www.kali.org/docs/', downloadUrl: 'https://www.kali.org/get-kali/', description: 'Offensive-Security-Distribution mit umfangreichen Pen-Testing-Tools.', logo: 'assets/img/distros/Kali Linux.png', videoUrl: 'https://youtu.be/56VTPxJ0QEc?si=SHsBZJpwojFrA8Nj' },
    { name: 'Parrot Security', codebase: 'debian', countries: ['it'], isoSizeMb: 4300, tags: ['it-sicherheit', 'forensik', 'privacy'], docsUrl: 'https://www.parrotsec.org/docs/', downloadUrl: 'https://parrotsec.org/download/', description: 'Security- und Forensik-Distribution mit Fokus auf Privacy und leichte Images.', logo: 'assets/img/distros/Parrot Security.png', videoUrl: 'https://youtu.be/aT6tetm8_04?si=aS__kzmsw9u7vnGa' },
    { name: 'Tails', codebase: 'debian', countries: ['fr'], isoSizeMb: 1300, tags: ['privacy', 'it-sicherheit', 'barrierefreiheit'], docsUrl: 'https://tails.net/doc/index.en.html', downloadUrl: 'https://tails.net/install/index.en.html', description: 'Amnesische Live-Distribution für Anonymität über Tor; keine Spuren auf dem Host.', logo: 'assets/img/distros/Tails.png', videoUrl: 'https://youtu.be/gO9fTnMxwYw?si=nEHxz7ehSjqwtOHB' },
-   { name: 'Debian', codebase: 'debian', countries: ['international'], isoSizeMb: 4700, tags: ['long-term-support', 'server', 'verwaltung'], docsUrl: 'https://www.debian.org/doc/', downloadUrl: 'https://www.debian.org/distrib/', description: 'Stabile Universal-Distribution mit großem Paket-Ökosystem.', logo: 'assets/img/distros/Debian.png', videoUrl: 'https://youtu.be/LW7Z892bsG4?si=eqcev5hlaVEn8JOL' },
+   { name: 'Debian', codebase: 'debian', countries: ['international'], isoSizeMb: 4700, tags: ['long-term-support', 'server', 'verwaltung'], docsUrl: 'https://www.debian.org/doc/', downloadUrl: 'https://www.debian.org/distrib/', description: 'Stabile Universal-Distribution mit großem Paket-Ökosystem.', logo: 'assets/img/distros/Debian.png', videoUrl: 'https://youtu.be/LW7Z892bsG4?si=eqcev5hlaVEn8JOL', pros: ['Sehr stabiler Release-Zyklus', 'Enormes Paketarchiv mit vielen Architekturen', 'Lange Sicherheitspflege durch Security-Team'], cons: ['Pakete sind oft älter als Upstream', 'Installer verlangt mehr manuelle Entscheidungen'] },
    { name: 'MX Linux', codebase: 'debian', countries: ['us'], isoSizeMb: 2200, tags: ['einsteigerfreundlich', 'lightweight', 'systemd-free'], docsUrl: 'https://mxlinux.org/wiki/', downloadUrl: 'https://mxlinux.org/downloads/', description: 'Debian Stable mit Xfce/Fluxbox, systemd-frei und sehr einsteigerfreundlich.', logo: 'assets/img/distros/MX Linux.png', videoUrl: 'https://youtu.be/zEkunNpiIuI?si=C3im3MkOfQzPL1U8' },
    { name: 'Devuan', codebase: 'debian', countries: ['us'], isoSizeMb: 1700, tags: ['systemd-free', 'server', 'privacy'], docsUrl: 'https://wiki.devuan.org/', downloadUrl: 'https://www.devuan.org/get-devuan', description: 'Systemd-freier Debian-Fork mit Fokus auf Init-Wahlfreiheit.', logo: 'assets/img/distros/Devuan.png', videoUrl: 'https://youtu.be/nRdNes7fsuU?si=qZP35UMpwyBBTl5o' },
-   { name: 'Arch Linux', codebase: 'arch', countries: ['international'], isoSizeMb: 1400, tags: ['rolling', 'fuer-experten', 'programmierer'], docsUrl: 'https://wiki.archlinux.org', downloadUrl: 'https://archlinux.org/download/', description: 'Minimal, rolling-release, mit hervorragender Dokumentation.', logo: 'assets/img/distros/Arch Linux.png', videoUrl: 'https://youtu.be/LiG2wMkcrFE?si=83Sk3QSxblFCYZMV' },
+   { name: 'Arch Linux', codebase: 'arch', countries: ['international'], isoSizeMb: 1400, tags: ['rolling', 'fuer-experten', 'programmierer'], docsUrl: 'https://wiki.archlinux.org', downloadUrl: 'https://archlinux.org/download/', description: 'Minimal, rolling-release, mit hervorragender Dokumentation.', logo: 'assets/img/distros/Arch Linux.png', videoUrl: 'https://youtu.be/LiG2wMkcrFE?si=83Sk3QSxblFCYZMV', pros: ['Rolling Release mit sehr aktuellen Paketen', 'Ausführliche Dokumentation im Arch Wiki', 'Pacman und AUR bieten große Softwareauswahl'], cons: ['Manuelle Installation erfordert Erfahrung', 'Rolling Release benötigt regelmäßige Wartung'] },
    { name: 'EndeavourOS', codebase: 'arch', countries: ['nl'], isoSizeMb: 2300, tags: ['rolling', 'einsteigerfreundlich', 'programmierer'], docsUrl: 'https://discovery.endeavouros.com', downloadUrl: 'https://endeavouros.com/latest-release/', description: 'Community-Arch-Spin mit schnellem Installer und Rolling-Updates.', logo: 'assets/img/distros/EndeavourOS.png', videoUrl: 'https://youtu.be/v-e9FheK5ZA?si=3lqrkKHPQWubt2TZ' },
-   { name: 'Manjaro', codebase: 'arch', countries: ['de'], isoSizeMb: 4000, tags: ['rolling', 'gaming', 'einsteigerfreundlich'], docsUrl: 'https://wiki.manjaro.org', downloadUrl: 'https://manjaro.org/download/', description: 'Arch-basiert mit vorgefertigten Desktops und grafischen Tools.', logo: 'assets/img/distros/Manjaro.png', videoUrl: 'https://youtu.be/lqRY8RGPsqg?si=JhMKvVfhzEycC8WZ' },
+   { name: 'Manjaro', codebase: 'arch', countries: ['de'], isoSizeMb: 4000, tags: ['rolling', 'gaming', 'einsteigerfreundlich'], docsUrl: 'https://wiki.manjaro.org', downloadUrl: 'https://manjaro.org/download/', description: 'Arch-basiert mit vorgefertigten Desktops und grafischen Tools.', logo: 'assets/img/distros/Manjaro.png', videoUrl: 'https://youtu.be/lqRY8RGPsqg?si=JhMKvVfhzEycC8WZ', pros: ['Einfache Installation mit vorkonfigurierten Desktops', 'Eigene Stable- und Testing-Branches für kontrollierte Updates', 'AUR optional via Pamac nutzbar'], cons: ['Upstream-Updates im Stable-Branch verzögert', 'Kleinere Community als Arch oder Ubuntu'] },
    { name: 'Garuda Linux', codebase: 'arch', countries: ['in'], isoSizeMb: 4600, tags: ['gaming', 'gutes-design', 'rolling'], docsUrl: 'https://garudalinux.org/docs', downloadUrl: 'https://garudalinux.org/downloads.html', description: 'Arch-basiert mit Btrfs-Snapshots, Gaming-Tuning und KDE-zentriertem Design.', logo: 'assets/img/distros/Garuda Linux.png', videoUrl: 'https://youtu.be/xVy7TBem_ZI?si=yfOtA890NA2bVLV-' },
    { name: 'AthenaOS', codebase: 'arch', countries: ['it'], isoSizeMb: 3400, tags: ['it-sicherheit', 'forensik', 'rolling'], docsUrl: 'https://athenaos.org/en/getting-started/athenaos/', downloadUrl: 'https://athenaos.org/en/getting-started/download/', description: 'Arch-basierte Security-Distribution mit forensischem Fokus.', logo: 'assets/img/distros/AthenaOS.png', videoUrl: 'https://youtu.be/j0xJ30WtsgA?si=4hqJ7QPPjOVv2W4M' },
-   { name: 'Fedora Workstation', codebase: 'redhat', countries: ['us'], isoSizeMb: 2000, tags: ['programmierer', 'gutes-design', 'bildung', 'ki'], docsUrl: 'https://docs.fedoraproject.org/en-US/quick-docs/', downloadUrl: 'https://fedoraproject.org/workstation/download', description: 'Upstream-nahes GNOME-Desktop-Erlebnis mit schnellen Releases.', logo: 'assets/img/distros/Fedora Workstation.png', videoUrl: 'https://youtu.be/Ivt5B5mgXTM?si=if9DGe81nabVA-4f' },
+   { name: 'Fedora Workstation', codebase: 'redhat', countries: ['us'], isoSizeMb: 2000, tags: ['programmierer', 'gutes-design', 'bildung', 'ki'], docsUrl: 'https://docs.fedoraproject.org/en-US/quick-docs/', downloadUrl: 'https://fedoraproject.org/workstation/download', description: 'Upstream-nahes GNOME-Desktop-Erlebnis mit schnellen Releases.', logo: 'assets/img/distros/Fedora Workstation.png', videoUrl: 'https://youtu.be/Ivt5B5mgXTM?si=if9DGe81nabVA-4f', pros: ['Sehr aktuelle GNOME-Versionen und Kernel', 'Gute Entwickler-Toolchain und Toolbox/Container-Setup', 'Flatpak-Integration ist first class'], cons: ['Halbjährliche Releases erfordern häufigere Upgrades', 'Für einige Codecs wird RPM Fusion benötigt'] },
    { name: 'Fedora Server', codebase: 'redhat', countries: ['us'], isoSizeMb: 2000, tags: ['server', 'cloud', 'verwaltung'], docsUrl: 'https://docs.fedoraproject.org/en-US/fedora-server/', downloadUrl: 'https://getfedora.org/en/server/download/', description: 'Server-Edition mit Cockpit-Admin-Tools und kurzem Release-Zyklus.', logo: 'assets/img/distros/Fedora Server.png', videoUrl: 'https://youtu.be/kOEcTGZWiUQ?si=aECGK3tpdXsySwPM' },
    { name: 'Fedora Silverblue', codebase: 'redhat', countries: ['us'], isoSizeMb: 2900, tags: ['immutable', 'programmierer', 'privacy'], docsUrl: 'https://docs.fedoraproject.org/en-US/fedora-silverblue/', downloadUrl: 'https://fedoraproject.org/silverblue/', description: 'Unveränderliches Fedora mit rpm-ostree und GNOME für stabile Desktops.', logo: 'assets/img/distros/Fedora Silverblue.png', videoUrl: 'https://youtu.be/q776zI6IKkc?si=NTklxHoIyL8MM0Hx' },
    { name: 'Nobara', codebase: 'redhat', countries: ['us'], isoSizeMb: 4400, tags: ['gaming', 'content-creation', 'einsteigerfreundlich'], docsUrl: 'https://nobara.org/docs', downloadUrl: 'https://nobara.org/download', description: 'Gaming-/Creator-orientierter Fedora-Spin mit vorinstallierten Tweaks.', logo: 'assets/img/distros/Nobara.png', videoUrl: 'https://youtu.be/wcMpmgKbZ8o?si=p4NRS6yBeey39rDv' },
@@ -682,6 +686,60 @@ function renderDistroTags(tags = []) {
    distroModalTags.style.display = 'flex'
 }
 
+function normalizeDistroPoints(points = []) {
+   if (Array.isArray(points)) {
+      return points.map((entry) => String(entry).trim()).filter(Boolean)
+   }
+
+   if (typeof points === 'string') {
+      return points
+         .split(/\r?\n|;/) // allow newline or semicolon separation when a single string is provided
+         .map((entry) => entry.trim())
+         .filter(Boolean)
+   }
+
+   return []
+}
+
+function renderDistroPointList(listEl, boxEl, points = [], { symbol = '•', emptyText = '' } = {}) {
+   if (!listEl || !boxEl) return
+
+   const items = normalizeDistroPoints(points)
+   listEl.innerHTML = ''
+
+   if (!items.length) {
+      if (emptyText) {
+         const fallback = document.createElement('li')
+         fallback.className = 'distro-modal__list-item distro-modal__list-item--empty'
+         fallback.textContent = emptyText
+         listEl.appendChild(fallback)
+         boxEl.style.display = 'block'
+      } else {
+         boxEl.style.display = 'none'
+      }
+      return
+   }
+
+   items.forEach((entry) => {
+      const item = document.createElement('li')
+      item.className = 'distro-modal__list-item'
+
+      const bullet = document.createElement('span')
+      bullet.className = 'distro-modal__list-bullet'
+      bullet.textContent = symbol
+
+      const text = document.createElement('span')
+      text.className = 'distro-modal__list-text'
+      text.textContent = entry
+
+      item.appendChild(bullet)
+      item.appendChild(text)
+      listEl.appendChild(item)
+   })
+
+   boxEl.style.display = 'block'
+}
+
 function setDistroRatingMessage(text = '', type = '') {
    if (!distroRatingMessage) return
    const normalizedType = type ? ` ${type}` : ''
@@ -948,6 +1006,16 @@ function openDistroModal(distro) {
       distroModalDescription.textContent = distro.description || ''
       distroModalDescriptionBox.style.display = hasText ? 'block' : 'none'
    }
+
+   renderDistroPointList(distroModalProsList, distroModalProsBox, distro.pros, {
+      symbol: '+',
+      emptyText: 'Noch keine Vorteile hinterlegt.'
+   })
+
+   renderDistroPointList(distroModalConsList, distroModalConsBox, distro.cons, {
+      symbol: '-',
+      emptyText: 'Noch keine Nachteile hinterlegt.'
+   })
 
    setDistroVideo(distro)
 

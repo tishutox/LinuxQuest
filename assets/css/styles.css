@@ -2233,6 +2233,74 @@ body.user-theme-active .profile-background__reset:disabled {
   margin: .25rem 0 .25rem;
 }
 
+#distro-modal .distro-modal__list {
+  width: 100%;
+  margin-top: .65rem;
+  padding: .65rem .8rem;
+  border: 1px solid var(--border-color);
+  border-radius: .65rem;
+  background: var(--container-color);
+}
+
+#distro-modal .distro-modal__list-title {
+  margin: 0 0 .35rem;
+  font-size: .92rem;
+  font-weight: var(--font-semi-bold);
+  letter-spacing: .01em;
+}
+
+#distro-modal .distro-modal__list-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+}
+
+#distro-modal .distro-modal__list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: .35rem;
+  color: var(--text-color);
+  font-size: .9rem;
+  line-height: 1.35;
+}
+
+#distro-modal .distro-modal__list-bullet {
+  font-weight: var(--font-semi-bold);
+  line-height: 1.2;
+  min-width: .9rem;
+}
+
+#distro-modal .distro-modal__list-text {
+  flex: 1;
+}
+
+#distro-modal .distro-modal__list-item--empty {
+  opacity: .78;
+}
+
+#distro-modal .distro-modal__list--pros {
+  border-color: #15803d;
+  background: rgba(21, 128, 61, .12);
+}
+
+#distro-modal .distro-modal__list--pros .distro-modal__list-title,
+#distro-modal .distro-modal__list--pros .distro-modal__list-bullet {
+  color: #22c55e;
+}
+
+#distro-modal .distro-modal__list--cons {
+  border-color: #b91c1c;
+  background: rgba(185, 28, 28, .12);
+}
+
+#distro-modal .distro-modal__list--cons .distro-modal__list-title,
+#distro-modal .distro-modal__list--cons .distro-modal__list-bullet {
+  color: #f87171;
+}
+
 #distro-modal .distro-modal__video {
   margin-top: .75rem;
 }
