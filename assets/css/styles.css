@@ -2256,6 +2256,7 @@ body.user-theme-active .profile-background__reset:disabled {
   display: flex;
   flex-direction: column;
   gap: .3rem;
+  text-align: left;
 }
 
 #distro-modal .distro-modal__list-item {
@@ -2265,6 +2266,7 @@ body.user-theme-active .profile-background__reset:disabled {
   color: var(--text-color);
   font-size: .9rem;
   line-height: 1.35;
+  text-align: left;
 }
 
 #distro-modal .distro-modal__list-bullet {
