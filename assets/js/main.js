@@ -463,6 +463,20 @@ const DISTRO_PROS_CONS = {
    }
 }
 
+// Fehlende pros/cons direkt in den Datensätzen ergänzen
+DISTRO_FINDER_DATA.forEach((distro) => {
+   const fallback = DISTRO_PROS_CONS[distro.name]
+
+   if (fallback) {
+      if (!distro.pros && fallback.pros) {
+         distro.pros = fallback.pros
+      }
+      if (!distro.cons && fallback.cons) {
+         distro.cons = fallback.cons
+      }
+   }
+})
+
 let searchDebounceTimer = null
 let isFinderMode = false
 let finderSelectedCountries = []
