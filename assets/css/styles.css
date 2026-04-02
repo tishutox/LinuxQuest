@@ -1226,7 +1226,8 @@ body.user-theme-active #birth-date-modal .login__button,
 body.user-theme-active #belief-modal .login__button,
 body.user-theme-active #accent-color-modal .login__button,
 body.user-theme-active #finder-country-modal .login__button,
-body.user-theme-active #bug-report-modal .login__button {
+body.user-theme-active #bug-report-modal .login__button,
+body.user-theme-active #distro-rating-modal .login__button {
   background-color: var(--user-accent-color);
   color: var(--user-accent-text-color);
 }
@@ -1238,6 +1239,12 @@ body.user-theme-active #profile-modal .profile__delete-button {
 }
 
 body.user-theme-active #bug-report-modal .profile__delete-button {
+  background-color: transparent;
+  color: var(--user-accent-color);
+  border-color: var(--user-accent-color);
+}
+
+body.user-theme-active #distro-rating-modal .profile__delete-button {
   background-color: transparent;
   color: var(--user-accent-color);
   border-color: var(--user-accent-color);
