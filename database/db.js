@@ -252,4 +252,19 @@ db.exec(`
 db.exec('CREATE INDEX IF NOT EXISTS idx_distro_reviews_distro_key ON distro_reviews(distro_key)');
 db.exec('CREATE INDEX IF NOT EXISTS idx_distro_reviews_user_id ON distro_reviews(user_id)');
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS saved_distros (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     INTEGER NOT NULL,
+    distro_key  TEXT    NOT NULL,
+    distro_name TEXT    NOT NULL,
+    created_at  TEXT    DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE (user_id, distro_key)
+  )
+`);
+
+db.exec('CREATE INDEX IF NOT EXISTS idx_saved_distros_user_id ON saved_distros(user_id)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_saved_distros_distro_key ON saved_distros(distro_key)');
+
 module.exports = db;

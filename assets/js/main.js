@@ -59,6 +59,7 @@ const search      = document.getElementById('search'),
 
 const searchResults = document.getElementById('search-results')
 const finderNavLink = document.getElementById('nav-finder-link')
+const savedNavLink = document.getElementById('nav-saved-link')
 const finderFilterOptions = document.getElementById('finder-filter-options')
 const finderDistroResults = document.getElementById('finder-distro-results')
 const finderFilterCodebase = document.getElementById('finder-filter-codebase')
@@ -96,6 +97,7 @@ const distroModalConsList = document.getElementById('distro-modal-cons')
 const distroModalVideo = document.getElementById('distro-modal-video')
 const distroModalVideoIframe = document.getElementById('distro-modal-video-iframe')
 const distroModalVideoPlay = document.getElementById('distro-modal-video-play')
+const distroModalBookmarkBtn = document.getElementById('distro-modal-bookmark-btn')
 const distroRatingAverage = document.getElementById('distro-rating-average')
 const distroRatingStars = document.getElementById('distro-rating-stars')
 const distroRatingReviews = document.getElementById('distro-rating-reviews')
@@ -118,9 +120,12 @@ const distroReviewsModalList = document.getElementById('distro-reviews-modal-lis
 let finderTagStates = {}
 let currentDistroKey = ''
 let currentDistroName = ''
+let currentDistroData = null
 let currentDistroUserReview = null
 let distroRatingSelection = 0
 let currentDistroReviews = []
+let savedDistroEntries = []
+let savedDistroKeySet = new Set()
 
 const FINDER_ISO_SIZE_MIN_MB = 700
 const FINDER_ISO_SIZE_MAX_MB = 5000
@@ -572,6 +577,21 @@ finderNavLink?.addEventListener('click', (event) => {
    navMenu.classList.remove('show-menu')
 })
 
+savedNavLink?.addEventListener('click', async (event) => {
+   event.preventDefault()
+
+   if (!currentUser) {
+      showLogin()
+      return
+   }
+
+   await loadSavedDistros()
+   searchInput.value = ''
+   search.classList.add('show-search')
+   renderSavedDistrosList()
+   navMenu.classList.remove('show-menu')
+})
+
 searchClose.addEventListener('click', () => {
    search.classList.remove('show-search')
    hideSearchResults()
@@ -829,6 +849,169 @@ function normalizeDistroKey(name = '') {
       .replace(/[^a-z0-9\s_-]/g, '')
       .replace(/\s+/g, '-')
       .slice(0, 80)
+}
+
+function findDistroByKey(distroKey = '') {
+   if (!distroKey) return null
+   return DISTRO_FINDER_DATA.find((distro) => normalizeDistroKey(distro.name) === distroKey) || null
+}
+
+function getFallbackDistroBySavedEntry(entry = {}) {
+   const distroName = typeof entry?.distro_name === 'string' ? entry.distro_name.trim() : ''
+   const distroKey = typeof entry?.distro_key === 'string' ? entry.distro_key.trim() : ''
+
+   return {
+      name: distroName || distroKey || 'Unbekannte Distro',
+      codebase: '',
+      tags: [],
+      description: 'Keine Detaildaten hinterlegt.',
+      pros: [],
+      cons: []
+   }
+}
+
+function updateDistroBookmarkButtonState() {
+   if (!distroModalBookmarkBtn) return
+
+   const canShow = Boolean(currentUser && currentDistroKey)
+   distroModalBookmarkBtn.style.display = canShow ? 'inline-flex' : 'none'
+   if (!canShow) return
+
+   const isSaved = savedDistroKeySet.has(currentDistroKey)
+   distroModalBookmarkBtn.title = isSaved ? 'Vergessen' : 'Speichern'
+   distroModalBookmarkBtn.setAttribute('aria-label', isSaved ? 'Vergessen' : 'Speichern')
+   distroModalBookmarkBtn.innerHTML = isSaved
+      ? '<i class="fi fi-sc-bookmark"></i>'
+      : '<i class="fi fi-rc-bookmark"></i>'
+}
+
+function applySavedDistrosPayload(payload = {}) {
+   const savedDistros = Array.isArray(payload.savedDistros) ? payload.savedDistros : []
+   savedDistroEntries = savedDistros
+      .map((entry) => ({
+         distro_key: typeof entry?.distro_key === 'string' ? entry.distro_key : '',
+         distro_name: typeof entry?.distro_name === 'string' ? entry.distro_name : '',
+         created_at: entry?.created_at || null
+      }))
+      .filter((entry) => Boolean(entry.distro_key))
+
+   savedDistroEntries.sort((first, second) => {
+      const firstName = first.distro_name || first.distro_key
+      const secondName = second.distro_name || second.distro_key
+      return firstName.localeCompare(secondName, 'de', { sensitivity: 'base' })
+   })
+
+   savedDistroKeySet = new Set(savedDistroEntries.map((entry) => entry.distro_key))
+   updateDistroBookmarkButtonState()
+}
+
+async function loadSavedDistros() {
+   if (!currentUser) {
+      applySavedDistrosPayload({ savedDistros: [] })
+      return []
+   }
+
+   try {
+      const response = await fetch('/api/auth/distros/saved', {
+         credentials: 'include'
+      })
+
+      if (!response.ok) {
+         applySavedDistrosPayload({ savedDistros: [] })
+         return []
+      }
+
+      const data = await response.json()
+      applySavedDistrosPayload(data)
+      return savedDistroEntries
+   } catch (_) {
+      applySavedDistrosPayload({ savedDistros: [] })
+      return []
+   }
+}
+
+async function saveCurrentDistroForUser() {
+   if (!currentUser || !currentDistroKey) return false
+
+   const response = await fetch(`/api/auth/distros/${encodeURIComponent(currentDistroKey)}/saved`, {
+      method: 'POST',
+      headers: {
+         'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+         distroName: currentDistroName || currentDistroData?.name || currentDistroKey
+      })
+   })
+
+   const data = await response.json().catch(() => ({}))
+   if (!response.ok) {
+      const errorText = data?.error || 'Distro konnte nicht gespeichert werden.'
+      showPublicProfileNotice(errorText, 'error', 2600)
+      return false
+   }
+
+   await loadSavedDistros()
+   return true
+}
+
+async function removeCurrentDistroForUser() {
+   if (!currentUser || !currentDistroKey) return false
+
+   const response = await fetch(`/api/auth/distros/${encodeURIComponent(currentDistroKey)}/saved`, {
+      method: 'DELETE',
+      credentials: 'include'
+   })
+
+   const data = await response.json().catch(() => ({}))
+   if (!response.ok) {
+      const errorText = data?.error || 'Distro konnte nicht entfernt werden.'
+      showPublicProfileNotice(errorText, 'error', 2600)
+      return false
+   }
+
+   await loadSavedDistros()
+   return true
+}
+
+function renderSavedDistrosList() {
+   setFinderMode(false)
+   hideFinderResults()
+   searchResults.innerHTML = ''
+
+   const group = document.createElement('section')
+   group.className = 'search-results__group'
+
+   const heading = document.createElement('h3')
+   heading.className = 'search-results__title'
+   heading.textContent = 'Gespeicherte Distros'
+   group.appendChild(heading)
+
+   const list = document.createElement('div')
+   list.className = 'search-results__list'
+
+   if (!savedDistroEntries.length) {
+      const empty = document.createElement('p')
+      empty.className = 'search-results__empty'
+      empty.textContent = 'Du hast noch keine Distros gespeichert.'
+      list.appendChild(empty)
+   } else {
+      savedDistroEntries.forEach((entry) => {
+         const item = document.createElement('button')
+         item.type = 'button'
+         item.className = 'search-results__item'
+         item.textContent = entry.distro_name || entry.distro_key
+         item.addEventListener('click', () => {
+            const distro = findDistroByKey(entry.distro_key) || getFallbackDistroBySavedEntry(entry)
+            openDistroModal(distro)
+         })
+         list.appendChild(item)
+      })
+   }
+
+   group.appendChild(list)
+   searchResults.appendChild(group)
+   searchResults.style.display = 'block'
 }
 
 function setDistroAvatar(distro) {
@@ -1250,6 +1433,7 @@ function openDistroModal(distro) {
    search.classList.remove('show-search')
 
    setDistroAvatar(distro)
+   currentDistroData = distro
 
    if (distroModalName) {
       distroModalName.textContent = distro.name || 'Unbekannte Distro'
@@ -1294,6 +1478,7 @@ function openDistroModal(distro) {
    setDistroVideo(distro)
 
    loadDistroRatings(distro)
+   updateDistroBookmarkButtonState()
 
    distroModal.classList.add('show-login')
 }
@@ -1512,6 +1697,32 @@ distroRatingModalClose?.addEventListener('click', closeDistroRatingModal)
 distroRatingModal?.addEventListener('click', (event) => {
    if (event.target === distroRatingModal) {
       closeDistroRatingModal()
+   }
+})
+
+distroModalBookmarkBtn?.addEventListener('click', async () => {
+   if (!currentUser) {
+      showLogin()
+      return
+   }
+
+   if (!currentDistroKey) {
+      showPublicProfileNotice('Keine Distro ausgewählt.', 'error', 2000)
+      return
+   }
+
+   distroModalBookmarkBtn.disabled = true
+
+   try {
+      const isSaved = savedDistroKeySet.has(currentDistroKey)
+      if (isSaved) {
+         await removeCurrentDistroForUser()
+      } else {
+         await saveCurrentDistroForUser()
+      }
+   } finally {
+      distroModalBookmarkBtn.disabled = false
+      updateDistroBookmarkButtonState()
    }
 })
 
@@ -4301,6 +4512,8 @@ function setLoggedIn(user) {
    if (distroRatingOpenBtn) {
       distroRatingOpenBtn.style.display = currentDistroKey ? 'inline-flex' : 'none'
    }
+   updateDistroBookmarkButtonState()
+   loadSavedDistros()
    updateProfileView(user)
    refreshProjectContacts()
    startRestrictionCheck()
@@ -4309,6 +4522,7 @@ function setLoggedIn(user) {
 function setLoggedOut() {
    stopRestrictionCheck()
    currentUser = null
+   applySavedDistrosPayload({ savedDistros: [] })
    applyUserAccentColor(null)
    applyMainBackground(null)
    applyUserCursor(null, null)
@@ -4319,6 +4533,7 @@ function setLoggedOut() {
     if (distroRatingOpenBtn) {
        distroRatingOpenBtn.style.display = 'none'
     }
+   updateDistroBookmarkButtonState()
    navAvatar.src           = ''
    profileAvatarImage.src  = ''
    profileFullNameInput.value = ''

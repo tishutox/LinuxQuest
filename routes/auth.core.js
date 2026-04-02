@@ -22,6 +22,7 @@ function createAuthCoreRouter({
   const router = express.Router();
 
   const MAX_DISTRO_REVIEW_LENGTH = 1000;
+  const MAX_SAVED_DISTROS = 3;
 
   function normalizeDistroKey(value) {
     if (typeof value !== 'string') return '';
@@ -611,6 +612,137 @@ function createAuthCoreRouter({
     } catch (err) {
       console.error('[CREATE DISTRO RATING ERROR]', err);
       return res.status(500).json({ error: 'Bewertung konnte nicht gespeichert werden.' });
+    }
+  });
+
+  router.get('/distros/saved', (req, res) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Du musst angemeldet sein, um gespeicherte Distros zu sehen.' });
+    }
+
+    try {
+      const userRecord = db.prepare('SELECT id FROM users WHERE id = ?').get(req.session.userId);
+      if (!userRecord) {
+        return res.status(401).json({ error: 'Ungültige Session.' });
+      }
+
+      const savedDistros = db.prepare(`
+        SELECT distro_key, distro_name, created_at
+        FROM saved_distros
+        WHERE user_id = ?
+        ORDER BY distro_name COLLATE NOCASE ASC, created_at DESC
+      `).all(userRecord.id);
+
+      return res.json({
+        maxSaved: MAX_SAVED_DISTROS,
+        count: Array.isArray(savedDistros) ? savedDistros.length : 0,
+        savedDistros: Array.isArray(savedDistros) ? savedDistros : []
+      });
+    } catch (err) {
+      console.error('[GET SAVED DISTROS ERROR]', err);
+      return res.status(500).json({ error: 'Gespeicherte Distros konnten nicht geladen werden.' });
+    }
+  });
+
+  router.post('/distros/:distroKey/saved', (req, res) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Du musst angemeldet sein, um Distros zu speichern.' });
+    }
+
+    const distroKey = normalizeDistroKey(req.params.distroKey);
+    const distroName = normalizeDistroName(req.body?.distroName, req.body?.fallbackName || req.params.distroKey);
+
+    if (!distroKey) {
+      return res.status(400).json({ error: 'Ungültige Distro.' });
+    }
+
+    try {
+      const userRecord = db.prepare('SELECT id, is_restricted FROM users WHERE id = ?').get(req.session.userId);
+      if (!userRecord) {
+        return res.status(401).json({ error: 'Ungültige Session.' });
+      }
+
+      if (userRecord.is_restricted === 1) {
+        return res.status(403).json({ error: 'Eingeschränkte Konten können keine Distros speichern.' });
+      }
+
+      const existing = db.prepare(`
+        SELECT id
+        FROM saved_distros
+        WHERE user_id = ? AND distro_key = ?
+      `).get(userRecord.id, distroKey);
+
+      if (existing) {
+        return res.json({
+          message: 'Distro ist bereits gespeichert.',
+          saved: true,
+          maxSaved: MAX_SAVED_DISTROS
+        });
+      }
+
+      const savedCountRow = db.prepare(`
+        SELECT COUNT(*) AS count
+        FROM saved_distros
+        WHERE user_id = ?
+      `).get(userRecord.id);
+
+      const savedCount = Number(savedCountRow?.count || 0);
+      if (savedCount >= MAX_SAVED_DISTROS) {
+        return res.status(400).json({
+          error: `Du kannst maximal ${MAX_SAVED_DISTROS} Distros gleichzeitig speichern.`,
+          maxSaved: MAX_SAVED_DISTROS
+        });
+      }
+
+      db.prepare(`
+        INSERT INTO saved_distros (user_id, distro_key, distro_name, created_at)
+        VALUES (?, ?, ?, datetime('now'))
+      `).run(userRecord.id, distroKey, distroName || distroKey);
+
+      touchUserActivity(userRecord.id);
+
+      return res.status(201).json({
+        message: 'Distro gespeichert.',
+        saved: true,
+        maxSaved: MAX_SAVED_DISTROS
+      });
+    } catch (err) {
+      console.error('[SAVE DISTRO ERROR]', err);
+      return res.status(500).json({ error: 'Distro konnte nicht gespeichert werden.' });
+    }
+  });
+
+  router.delete('/distros/:distroKey/saved', (req, res) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Du musst angemeldet sein, um Distros zu entfernen.' });
+    }
+
+    const distroKey = normalizeDistroKey(req.params.distroKey);
+    if (!distroKey) {
+      return res.status(400).json({ error: 'Ungültige Distro.' });
+    }
+
+    try {
+      const userRecord = db.prepare('SELECT id FROM users WHERE id = ?').get(req.session.userId);
+      if (!userRecord) {
+        return res.status(401).json({ error: 'Ungültige Session.' });
+      }
+
+      db.prepare(`
+        DELETE FROM saved_distros
+        WHERE user_id = ? AND distro_key = ?
+      `).run(userRecord.id, distroKey);
+
+      touchUserActivity(userRecord.id);
+
+      return res.json({
+        message: 'Distro entfernt.',
+        saved: false,
+        maxSaved: MAX_SAVED_DISTROS
+      });
+    } catch (err) {
+      console.error('[REMOVE SAVED DISTRO ERROR]', err);
+      return res.status(500).json({ error: 'Distro konnte nicht entfernt werden.' });
     }
   });
 
