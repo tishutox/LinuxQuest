@@ -2874,6 +2874,16 @@ body.user-theme-active .profile-background__reset:disabled {
   .login__form.login__form--wide {
     max-width: 760px;
   }
+
+  #distro-modal {
+    padding-bottom: 3rem;
+  }
+
+  #distro-modal .login__form {
+    max-height: min(80svh, calc(100svh - 9.5rem));
+    max-height: min(80dvh, calc(100dvh - 9.5rem));
+    max-height: min(80vh, calc(100vh - 9.5rem));
+  }
 }
 
 @media screen and (min-width: 1150px) {
