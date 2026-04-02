@@ -2271,7 +2271,7 @@ body.user-theme-active .profile-background__reset:disabled {
   background: transparent;
   font-size: var(--nav-icon-size) !important;
   line-height: 1;
-  color: var(--user-accent-color, var(--first-color));
+  color: var(--text-color);
   opacity: 1;
   visibility: visible;
 }
@@ -2289,7 +2289,7 @@ body.user-theme-active .profile-background__reset:disabled {
 #distro-modal .public-profile__action--bookmark-float:hover,
 #distro-modal .public-profile__action--bookmark-float:focus-visible {
   color: var(--user-accent-color, var(--first-color));
-  opacity: .85;
+  opacity: 1;
 }
 
 #distro-modal .public-profile__action--bookmark-float:disabled {
