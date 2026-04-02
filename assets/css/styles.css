@@ -2264,11 +2264,16 @@ body.user-theme-active .profile-background__reset:disabled {
 #distro-modal .public-profile__action--bookmark-float {
   width: auto;
   height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
   background: transparent;
   font-size: var(--nav-icon-size) !important;
   line-height: 1;
-  color: var(--text-color);
+  color: var(--user-accent-color, var(--first-color));
+  opacity: 1;
+  visibility: visible;
 }
 
 #distro-modal .public-profile__action--bookmark-float i,
@@ -2276,11 +2281,19 @@ body.user-theme-active .profile-background__reset:disabled {
   font-size: var(--nav-icon-size) !important;
   line-height: 1;
   transform: none;
+  color: inherit;
+  opacity: 1;
+  visibility: visible;
 }
 
 #distro-modal .public-profile__action--bookmark-float:hover,
 #distro-modal .public-profile__action--bookmark-float:focus-visible {
-  color: var(--first-color);
+  color: var(--user-accent-color, var(--first-color));
+  opacity: .85;
+}
+
+#distro-modal .public-profile__action--bookmark-float:disabled {
+  opacity: .55;
 }
 
 /* =============== DISTRO MODAL TAGS =============== */

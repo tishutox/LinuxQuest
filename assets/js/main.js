@@ -58,6 +58,7 @@ const search      = document.getElementById('search'),
       searchInput = document.getElementById('search-input')
 
 const searchResults = document.getElementById('search-results')
+const searchFormIcon = document.getElementById('search-form-icon')
 const finderNavLink = document.getElementById('nav-finder-link')
 const savedNavLink = document.getElementById('nav-saved-link')
 const finderFilterOptions = document.getElementById('finder-filter-options')
@@ -558,6 +559,11 @@ function openFinderCountryModal() {
    finderCountryModal?.classList.add('show-login')
 }
 
+function updateSearchFormIcon(iconClassName = 'fi fi-rc-search') {
+   if (!searchFormIcon) return
+   searchFormIcon.className = `${iconClassName} search__icon`
+}
+
 function applyFinderCountrySelection() {
    finderSelectedCountries = [...finderCountryPickerState]
    renderFinderCountrySummary()
@@ -566,6 +572,7 @@ function applyFinderCountrySelection() {
 
 searchBtn.addEventListener('click', () => {
    setFinderMode(false)
+   updateSearchFormIcon('fi fi-rc-search')
    finderCountryModal?.classList.remove('show-login')
    search.classList.add('show-search')
 })
@@ -573,6 +580,7 @@ searchBtn.addEventListener('click', () => {
 finderNavLink?.addEventListener('click', (event) => {
    event.preventDefault()
    setFinderMode(true)
+   updateSearchFormIcon('fi fi-rc-bookmark')
    search.classList.add('show-search')
    navMenu.classList.remove('show-menu')
 })
@@ -587,6 +595,7 @@ savedNavLink?.addEventListener('click', async (event) => {
 
    await loadSavedDistros()
    searchInput.value = ''
+   updateSearchFormIcon('fi fi-rc-bookmark')
    search.classList.add('show-search')
    renderSavedDistrosList()
    navMenu.classList.remove('show-menu')
@@ -594,6 +603,7 @@ savedNavLink?.addEventListener('click', async (event) => {
 
 searchClose.addEventListener('click', () => {
    search.classList.remove('show-search')
+   updateSearchFormIcon('fi fi-rc-search')
    hideSearchResults()
    hideFinderResults()
    setFinderMode(false)
