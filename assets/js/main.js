@@ -2297,11 +2297,20 @@ function createAdminBugReportItem(report, viewerIsAdministrator, targetUsername)
    const itemHeader = document.createElement('div')
    itemHeader.className = 'admin-reports__item-header'
 
-   const reporter = document.createElement('div')
-   reporter.className = 'admin-reports__reporter'
+   const reporter = document.createElement('button')
+   reporter.type = 'button'
+   reporter.className = 'admin-reports__reporter admin-reports__reporter-button'
    reporter.textContent = report.full_name
       ? `${report.full_name} (@${report.username || 'unbekannt'})`
       : `@${report.username || 'unbekannt'}`
+
+   if (report.username) {
+      reporter.addEventListener('click', async () => {
+         await openPublicProfileByUsername(report.username)
+      })
+   } else {
+      reporter.disabled = true
+   }
 
    if (isClosed) {
       const closedBadge = document.createElement('span')
