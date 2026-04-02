@@ -1140,6 +1140,14 @@ function closeDistroReviewsModal() {
    distroReviewsModal.classList.remove('show-login')
 }
 
+function updateDistroRatingActionLabel() {
+   if (!distroRatingOpenBtn) return
+
+   distroRatingOpenBtn.textContent = currentDistroUserReview
+      ? 'Bewertung überarbeiten'
+      : 'Bewertung abgeben'
+}
+
 function applyDistroRatingState(payload = {}) {
    if (!distroRatingAverage || !distroRatingStars) return
 
@@ -1151,6 +1159,7 @@ function applyDistroRatingState(payload = {}) {
    renderDistroReviews(currentDistroReviews)
 
    currentDistroUserReview = payload.userReview || null
+   updateDistroRatingActionLabel()
 
    if (distroRatingOpenBtn) {
       distroRatingOpenBtn.style.display = currentUser ? 'inline-flex' : 'none'
@@ -1162,6 +1171,8 @@ async function loadDistroRatings(distro) {
 
    currentDistroName = distro.name || ''
    currentDistroKey = normalizeDistroKey(distro.name)
+   currentDistroUserReview = null
+   updateDistroRatingActionLabel()
 
    if (!currentDistroKey) {
       applyDistroRatingState({ average: 0, count: 0, reviews: [], userReview: null })
