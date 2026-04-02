@@ -2262,8 +2262,9 @@ body.user-theme-active .profile-background__reset:disabled {
 }
 
 #distro-modal .public-profile__action--bookmark-float {
-  width: auto;
-  height: auto;
+  width: var(--nav-icon-size);
+  height: var(--nav-icon-size);
+  min-width: var(--nav-icon-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
