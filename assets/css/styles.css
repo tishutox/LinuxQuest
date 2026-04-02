@@ -2409,7 +2409,7 @@ body.user-theme-active .profile-background__reset:disabled {
 }
 
 .distro-rating__star.is-filled {
-  color: var(--first-color);
+  color: var(--user-accent-color, var(--first-color));
 }
 
 .distro-rating__star:not(.is-filled) {
@@ -2529,7 +2529,7 @@ body.user-theme-active .profile-background__reset:disabled {
 }
 
 .distro-rating-modal__star.is-active {
-  color: var(--first-color);
+  color: var(--user-accent-color, var(--first-color));
   opacity: 1;
 }
 
