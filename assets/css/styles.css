@@ -274,7 +274,7 @@ img {
 /* Fix: Modal-Close-Icon sichtbar machen */
 .search__close i,
 .login__close i {
-  color: var(--first-color) !important;
+  color: var(--user-accent-color, var(--first-color)) !important;
   text-shadow: 0 1px 4px rgba(0,0,0,0.12);
 }
 
@@ -595,8 +595,8 @@ img {
 }
 
 .search-results__item:hover {
-  color: var(--first-color);
-  border-color: var(--border-color);
+  color: var(--user-accent-color, var(--first-color));
+  border-color: var(--user-accent-color, var(--first-color));
 }
 
 .search-results__empty {
@@ -672,8 +672,8 @@ img {
 }
 
 .finder-filter__tag-option:hover {
-  border-color: var(--first-color);
-  color: var(--first-color);
+  border-color: var(--user-accent-color, var(--first-color));
+  color: var(--user-accent-color, var(--first-color));
 }
 
 .finder-filter__tag-option.is-selected {

@@ -3162,16 +3162,21 @@ function openAccentColorModal() {
 
 function applyUserAccentColor(accentColor) {
    const normalizedAccentColor = normalizeHexColor(accentColor)
+   const defaultColor = getDefaultAccentColor()
+   const themeColorTag = document.querySelector('meta[name="theme-color"]')
+   
    if (!normalizedAccentColor) {
       document.body.classList.remove(USER_THEME_CLASS)
-      document.documentElement.style.setProperty('--user-accent-color', getDefaultAccentColor())
+      document.documentElement.style.setProperty('--user-accent-color', defaultColor)
       document.documentElement.style.setProperty('--user-accent-text-color', '#FFF')
+      if (themeColorTag) themeColorTag.setAttribute('content', defaultColor)
       return
    }
 
    document.body.classList.add(USER_THEME_CLASS)
    document.documentElement.style.setProperty('--user-accent-color', normalizedAccentColor)
    document.documentElement.style.setProperty('--user-accent-text-color', getAccentTextColor(normalizedAccentColor))
+   if (themeColorTag) themeColorTag.setAttribute('content', normalizedAccentColor)
 }
 
 function applyPublicProfileAccentColor(accentColor) {
