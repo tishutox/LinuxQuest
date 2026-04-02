@@ -2419,8 +2419,18 @@ body.user-theme-active .profile-background__reset:disabled {
   color: var(--user-accent-color, var(--first-color));
 }
 
+.distro-rating__star.is-filled i,
+.distro-rating__star.is-filled i::before {
+  color: var(--user-accent-color, var(--first-color)) !important;
+}
+
 .distro-rating__star:not(.is-filled) {
   color: var(--text-color-light);
+}
+
+.distro-rating__star:not(.is-filled) i,
+.distro-rating__star:not(.is-filled) i::before {
+  color: var(--text-color-light) !important;
 }
 
 .distro-rating__action {
@@ -2538,6 +2548,11 @@ body.user-theme-active .profile-background__reset:disabled {
 .distro-rating-modal__star.is-active {
   color: var(--user-accent-color, var(--first-color));
   opacity: 1;
+}
+
+.distro-rating-modal__star.is-active i,
+.distro-rating-modal__star.is-active i::before {
+  color: var(--user-accent-color, var(--first-color)) !important;
 }
 
 .distro-rating-modal__star i {
