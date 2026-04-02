@@ -1571,14 +1571,58 @@ function createSearchGroup(title, users, formatter) {
    return group
 }
 
+function createDistroSearchGroup(title, distros) {
+   const group = document.createElement('section')
+   group.className = 'search-results__group'
+
+   const heading = document.createElement('h3')
+   heading.className = 'search-results__title'
+   heading.textContent = title
+   group.appendChild(heading)
+
+   const list = document.createElement('div')
+   list.className = 'search-results__list'
+
+   if (!distros.length) {
+      const empty = document.createElement('p')
+      empty.className = 'search-results__empty'
+      empty.textContent = 'Keine Treffer'
+      list.appendChild(empty)
+   } else {
+      distros.forEach((distro) => {
+         const item = document.createElement('button')
+         item.type = 'button'
+         item.className = 'search-results__item'
+         item.textContent = distro.name
+
+         item.addEventListener('click', () => {
+            hideSearchResults()
+            search.classList.remove('show-search')
+            openDistroModal(distro)
+         })
+
+         list.appendChild(item)
+      })
+   }
+
+   group.appendChild(list)
+   return group
+}
+
 function renderSearchResults(payload) {
    const results = payload?.results || {}
    const displayNames = Array.isArray(results.displayNames) ? results.displayNames : []
    const usernames = Array.isArray(results.usernames) ? results.usernames : []
 
+   const query = searchInput.value.trim().toLowerCase()
+   const matchedDistros = query
+      ? DISTRO_FINDER_DATA.filter((d) => d.name.toLowerCase().includes(query))
+      : []
+
    searchResults.innerHTML = ''
    searchResults.appendChild(createSearchGroup('Anzeigename', displayNames, (user) => user.profile_name || '(kein Anzeigename)'))
    searchResults.appendChild(createSearchGroup('Username', usernames, (user) => '@' + user.username))
+   searchResults.appendChild(createDistroSearchGroup('Distros', matchedDistros))
    searchResults.style.display = 'block'
 }
 
