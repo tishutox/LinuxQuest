@@ -1013,7 +1013,7 @@ img {
 }
 
 .admin-reports__reporter-button:hover {
-  color: var(--first-color);
+  color: var(--user-accent-color, var(--first-color));
 }
 
 .admin-reports__reporter-button:disabled {
