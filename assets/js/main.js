@@ -99,6 +99,7 @@ const distroModalVideo = document.getElementById('distro-modal-video')
 const distroModalVideoIframe = document.getElementById('distro-modal-video-iframe')
 const distroModalVideoPlay = document.getElementById('distro-modal-video-play')
 const distroModalBookmarkBtn = document.getElementById('distro-modal-bookmark-btn')
+const distroModalMessage = document.getElementById('distro-modal-message')
 const distroRatingAverage = document.getElementById('distro-rating-average')
 const distroRatingStars = document.getElementById('distro-rating-stars')
 const distroRatingReviews = document.getElementById('distro-rating-reviews')
@@ -957,7 +958,7 @@ async function saveCurrentDistroForUser() {
    const data = await response.json().catch(() => ({}))
    if (!response.ok) {
       const errorText = data?.error || 'Distro konnte nicht gespeichert werden.'
-      showPublicProfileNotice(errorText, 'error', 2600)
+      showDistroModalNotice(errorText, 'error', 3500)
       return false
    }
 
@@ -3823,6 +3824,26 @@ function showPublicProfileError(message) {
    publicProfileEmailLink.classList.remove('public-profile__action--badge')
    hideAll()
    publicProfileModal.classList.add('show-login')
+}
+
+function showDistroModalNotice(message, type = 'error', autoHideMs = 3500) {
+   if (!distroModalMessage) return
+
+   if (messageTimers.has('distro-modal-message')) {
+      clearTimeout(messageTimers.get('distro-modal-message'))
+      messageTimers.delete('distro-modal-message')
+   }
+
+   distroModalMessage.textContent = message
+   distroModalMessage.className = `login__message ${type}`
+
+   if (autoHideMs > 0) {
+      const timer = setTimeout(() => {
+         distroModalMessage.textContent = ''
+         distroModalMessage.className = 'login__message'
+      }, autoHideMs)
+      messageTimers.set('distro-modal-message', timer)
+   }
 }
 
 function showPublicProfileNotice(message, type = 'success', autoHideMs = 3000) {
