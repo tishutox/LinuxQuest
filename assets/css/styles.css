@@ -848,6 +848,10 @@ img {
 
 .admin-user-list__results {
   margin-top: .55rem;
+  max-height: clamp(24rem, calc(100vh - 12rem), 60rem);
+  max-height: clamp(24rem, calc(100dvh - 12rem), 60rem);
+  max-height: clamp(24rem, calc(100svh - 12rem), 60rem);
+  overflow-y: auto;
 }
 
 .admin-user-list__item {
@@ -975,6 +979,8 @@ img {
 
 .admin-reports__list {
   max-height: min(65vh, 34rem);
+  max-height: min(65dvh, 34rem);
+  max-height: min(65svh, 34rem);
   overflow-y: auto;
   border: 1px solid var(--border-color);
   border-radius: .5rem;
@@ -1141,8 +1147,9 @@ img {
   border-radius: .5rem;
   row-gap: 1.25rem;
   text-align: center;
-  max-height: 88vh;
-  max-height: 88dvh;
+  max-height: calc(100vh - 9rem);
+  max-height: calc(100dvh - 9rem);
+  max-height: calc(100svh - 9rem);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
@@ -1531,6 +1538,8 @@ body.user-theme-active .birth-date-picker__day.is-selected {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: .45rem;
   max-height: min(70vh, 36rem);
+  max-height: min(70dvh, 36rem);
+  max-height: min(70svh, 36rem);
   overflow-y: auto;
   align-content: start;
   padding-right: .2rem;
@@ -1539,6 +1548,8 @@ body.user-theme-active .birth-date-picker__day.is-selected {
 
 #finder-country-modal #finder-country-picker-countries {
   max-height: min(70vh, 36rem);
+  max-height: min(70dvh, 36rem);
+  max-height: min(70svh, 36rem);
   overflow-y: auto;
   align-content: start;
   padding-right: .2rem;
@@ -2603,6 +2614,8 @@ body.user-theme-active .profile-background__reset:disabled {
   display: grid;
   gap: .5rem;
   max-height: min(70vh, 36rem);
+  max-height: min(70dvh, 36rem);
+  max-height: min(70svh, 36rem);
   overflow-y: auto;
 }
 
@@ -2832,6 +2845,7 @@ body.user-theme-active .profile-background__reset:disabled {
     width: 100%;
     max-height: calc(100vh - 5.5rem);
     max-height: calc(100dvh - 5.5rem);
+    max-height: calc(100svh - 5.5rem);
   }
 
   #finder-country-modal #finder-country-picker-countries {
