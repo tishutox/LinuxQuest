@@ -2424,6 +2424,7 @@ function setImprintContactLink(nameLink, emailLink, contact, fallback) {
    if (nameLink) {
       nameLink.textContent = displayUser.full_name
       nameLink.dataset.publicProfile = displayUser.username || ''
+      nameLink.dataset.publicProfileEmail = displayUser.email || ''
       nameLink.dataset.modalTarget = 'public-profile-modal'
    }
 
@@ -3566,6 +3567,38 @@ async function openPublicProfileByUsername(username) {
 
    try {
       const response = await fetch(`/api/auth/public/${encodeURIComponent(username)}`, {
+         credentials: 'include'
+      })
+
+      if (!response.ok) {
+         if (response.status === 404) {
+            showPublicProfileError('Dieses Profil wurde nicht gefunden.')
+            return
+         }
+
+         showPublicProfileError('Das Profil konnte gerade nicht geladen werden.')
+         return
+      }
+
+      const data = await response.json()
+      if (!data.user) {
+         showPublicProfileError('Dieses Profil wurde nicht gefunden.')
+         return
+      }
+
+      updatePublicProfileView(data)
+      hideAll()
+      publicProfileModal.classList.add('show-login')
+   } catch (_) {
+      showPublicProfileError('Der Server ist nicht erreichbar. Bitte versuche es später erneut.')
+   }
+}
+
+async function openPublicProfileByEmail(email) {
+   if (!email) return
+
+   try {
+      const response = await fetch(`/api/auth/public-by-email/${encodeURIComponent(email)}`, {
          credentials: 'include'
       })
 
@@ -5208,8 +5241,16 @@ staticModalTriggers.forEach((trigger) => {
       event.preventDefault()
 
       const publicProfileKey = trigger.dataset.publicProfile
-      if (publicProfileKey) {
+      const publicProfileEmail = trigger.dataset.publicProfileEmail
+      
+      if (publicProfileKey || publicProfileEmail) {
          await refreshProjectContacts()
+         
+         if (publicProfileEmail) {
+            await openPublicProfileByEmail(publicProfileEmail)
+            return
+         }
+         
          const displayUser = projectContactsByKey[publicProfileKey]
 
          if (!displayUser?.username) {

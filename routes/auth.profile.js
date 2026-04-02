@@ -132,6 +132,45 @@ function createAuthProfileRouter({
     }
   });
 
+  router.get('/public-by-email/:email', (req, res) => {
+    try {
+      const email = req.params.email?.trim().toLowerCase();
+
+      if (!email) {
+        return res.status(400).json({ error: 'Ungültige E-Mail.' });
+      }
+
+      const user = db.prepare(`
+        SELECT id, username, profile_name, pronouns, bio, full_name, email, avatar, avatar_artist_url, birth_date, belief, confession, accent_color, role, early_supporter, is_developer, created_at, is_restricted
+        FROM users
+        WHERE LOWER(email) = ?
+      `).get(email);
+
+      if (!user) {
+        return res.status(404).json({ error: 'Benutzer nicht gefunden.' });
+      }
+
+      const { followersCount, followingCount } = getFollowCounts(user.id);
+      const viewerId = req.session.userId || null;
+      const isOwnProfile = Boolean(viewerId && viewerId === user.id);
+      const isFollowing = isOwnProfile ? false : isFollowingUser(viewerId, user.id);
+
+      return res.json({
+        user: withResolvedRole(user),
+        follow: {
+          followersCount,
+          followingCount,
+          isFollowing,
+          isOwnProfile,
+          canFollow: Boolean(viewerId) && !isOwnProfile
+        }
+      });
+    } catch (err) {
+      console.error('[PUBLIC PROFILE BY EMAIL ERROR]', err);
+      return res.status(500).json({ error: 'Öffentliches Profil konnte nicht geladen werden.' });
+    }
+  });
+
   router.get('/public/:username/followers', (req, res) => {
     try {
       const username = req.params.username?.trim();

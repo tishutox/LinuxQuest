@@ -1237,6 +1237,12 @@ body.user-theme-active #profile-modal .profile__delete-button {
   border-color: var(--user-accent-color);
 }
 
+body.user-theme-active #bug-report-modal .profile__delete-button {
+  background-color: transparent;
+  color: var(--user-accent-color);
+  border-color: var(--user-accent-color);
+}
+
 body.user-theme-active #profile-modal .profile-select-trigger,
 body.user-theme-active #profile-modal .profile-color-trigger {
   border-color: var(--border-color);
@@ -2669,7 +2675,8 @@ body.user-theme-active .profile-background__reset:disabled {
 }
 
 .profile__delete-button:hover {
-  border-color: var(--first-color);
+  border-color: var(--user-accent-color, var(--first-color));
+  color: var(--user-accent-color, var(--first-color));
   box-shadow: none;
 }
 
