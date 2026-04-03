@@ -9,6 +9,10 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 - Login mit E-Mail oder Benutzername
 - Passwort-Reset mit Verifizierungscode
 - Session-basierter Login (express-session)
+- Username-Validierung bei Registrierung/Profil-Update
+	- Nur erlaubte Zeichen (`a-z`, `A-Z`, `0-9`, `_`, `-`)
+	- Maximal 20 Zeichen
+	- Disallowed-Liste + Pattern-Filter für problematische Namen
 
 ### Profil
 - Profilbild hochladen/aktualisieren
@@ -87,6 +91,10 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 - Detail-Modal mit Beschreibung, Doku-Link, Download-Link und optionalem Video-Trailer (YouTube-nocookie, erst beim Klick geladen)
 - Bewertungen: 1–5 Sterne pro Nutzer*in und Distro, optionaler Review-Text
 - Aggregierte Anzeige (Durchschnitt, Sterne, Anzahl), Review-Liste, „Bewertung bearbeiten“-Flow
+- Gespeicherte Distros (Bookmarks)
+	- Distros im Detail-Modal speichern/entfernen
+	- Eigene „Gespeichert“-Ansicht für eingeloggte Nutzer
+	- Maximal 3 gespeicherte Distros pro Account
 
 ### Lokaler Custom-Background
 - Nur für eingeloggte Nutzer im Profil konfigurierbar
@@ -102,6 +110,9 @@ Diese Anwendung ist eine responsive Web-App mit Authentifizierung, Profilverwalt
 - Rollenbasiertes Zugriffssystem (User, Moderator, Administrator, Developer)
 - Early-Supporter-Status für Account (automatisch für Accounts vor 2026-06-18)
 - Benutzer-Einschränkungen und Sperrungen mit Freigabeanfragen
+- Persistente Sessions in SQLite (`sessions.db`)
+- Automatische DB-Schema-Migrationen beim Start (fehlende Spalten/Tabellen)
+- Zusätzliches IP-Limit für Verifizierungsanfragen (Registrierung/Passwort-Reset)
 
 ### Admin & Moderations-Funktionen
 - Benutzer-Verwaltung (Liste, Suche, Löschen)
@@ -247,6 +258,16 @@ Diese Checkliste prüft die wichtigsten Funktionen manuell im Browser.
 2. Nach Benutzernamen & Anzeigenamen suchen.
 	- Ergebnisse sollten in separaten Listen erscheinen.
 	- Klick auf Treffer sollte Profil öffnen.
+
+### Distro Finder & Bookmarks
+1. Distro Finder öffnen und Filter verwenden (Tags, Codebase, Land, ISO).
+	- Ergebnisliste sollte sich live aktualisieren.
+2. Distro-Detail öffnen und Bewertung abgeben (1–5 Sterne, optionaler Text).
+	- Aggregierte Anzeige sollte aktualisiert werden.
+3. Distro im Detail speichern und in „Gespeichert“ prüfen.
+	- Eintrag sollte sichtbar sein und sich wieder entfernen lassen.
+4. Mehr als 3 Distros speichern.
+	- Es sollte eine klare Limit-Meldung erscheinen.
 
 ### Bug-Report
 1. Logo klicken → Bug-Report-Modal öffnen.
