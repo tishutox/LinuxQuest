@@ -730,6 +730,7 @@ guideNavLink?.addEventListener('click', (event) => {
    updateSearchFormIcon('fi fi-rc-search')
    hideSearchResults()
    hideAll()
+   setActiveGuideArticle('', true)
    guideModal?.classList.add('show-login')
    navMenu.classList.remove('show-menu')
 })
@@ -5857,7 +5858,7 @@ guideAccordion?.addEventListener('click', (event) => {
 })
 
 renderGuideAccordion()
-setActiveGuideArticle(activeGuideArticleId, true)
+setActiveGuideArticle('', true)
 
 /*=============== CHECK SESSION ON LOAD ===============*/
 async function checkSession() {

@@ -1386,7 +1386,8 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
 }
 
 #guide-modal .login__form {
-  width: min(100%, 760px);
+  width: min(100%, 1120px);
+  max-width: min(100%, 1120px);
   text-align: left;
 }
 
@@ -1487,6 +1488,22 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
   gap: .9rem;
   padding: 0 1.1rem 1.1rem;
   border-top: 1px solid rgba(51, 121, 172, 0.12);
+}
+
+.guide-modal__panel[hidden] {
+  display: none;
+}
+
+@media screen and (min-width: 576px) {
+  #guide-modal .login__form {
+    max-width: min(92vw, 1120px);
+  }
+}
+
+@media screen and (min-width: 1023px) {
+  #guide-modal .login__form {
+    max-width: min(88vw, 1180px);
+  }
 }
 
 .guide-modal__section-title {
