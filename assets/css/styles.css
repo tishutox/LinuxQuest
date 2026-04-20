@@ -1578,9 +1578,13 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
   color: var(--text-color);
 }
 
-body.user-theme-active #guide-modal .guide-modal__eyebrow,
-body.user-theme-active #guide-modal .guide-modal__trigger-icon {
+body.user-theme-active #guide-modal .guide-modal__eyebrow {
   color: var(--user-accent-color);
+}
+
+body.user-theme-active #guide-modal .guide-modal__trigger-icon {
+  color: var(--user-accent-text-color);
+  background-color: var(--user-accent-color);
 }
 
 body.user-theme-active #guide-modal .guide-modal__hero {
@@ -1592,6 +1596,7 @@ body.user-theme-active #guide-modal .guide-modal__hero {
 
 body.user-theme-active #guide-modal .guide-modal__item.is-open .guide-modal__trigger-icon {
   background-color: var(--user-accent-color);
+  color: var(--user-accent-text-color);
 }
 
 body.user-theme-active #guide-modal .guide-modal__note {
