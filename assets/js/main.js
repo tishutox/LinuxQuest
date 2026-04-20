@@ -132,7 +132,6 @@ let distroRatingSelection = 0
 let currentDistroReviews = []
 let savedDistroEntries = []
 let savedDistroKeySet = new Set()
-let activeGuideArticleId = GUIDE_ARTICLES[0]?.id || ''
 
 const FINDER_ISO_SIZE_MIN_MB = 700
 const FINDER_ISO_SIZE_MAX_MB = 5000
@@ -280,6 +279,8 @@ const GUIDE_ARTICLES = [
       note: 'Gerade beim Dual Boot ist ein zusaetzliches Backup besonders wichtig, weil dort Bootloader, Partitionen und zwei Systeme zusammenkommen.'
    }
 ]
+
+let activeGuideArticleId = GUIDE_ARTICLES[0]?.id || ''
 
 const DISTRO_FINDER_DATA = [
    { name: 'Ubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 5900, tags: ['einsteigerfreundlich', 'long-term-support', 'office', 'Laptop'], docsUrl: 'https://help.ubuntu.com', downloadUrl: 'https://ubuntu.com/download', description: 'Bekannte Desktop-Distribution mit starkem LTS-Fokus.', logo: 'assets/img/distros/Ubuntu Server.png', pros: ['Große Community und sehr viel Dokumentation', 'LTS-Versionen mit langem Sicherheitssupport', 'Breite Hardware-Unterstützung out of the box'], cons: ['Snap-Standardpakete starten teils langsamer', 'Relativ umfangreiche Default-Installation'] },
