@@ -5762,11 +5762,7 @@ function renderGuideAccordion() {
       title.className = 'guide-modal__trigger-title'
       title.textContent = article.title
 
-      const description = document.createElement('span')
-      description.className = 'guide-modal__trigger-description'
-      description.textContent = article.description
-
-      triggerText.append(title, description)
+      triggerText.append(title)
 
       const icon = document.createElement('span')
       icon.className = 'guide-modal__trigger-icon'
