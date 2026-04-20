@@ -1574,9 +1574,9 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
 .guide-modal__note {
   padding: .9rem 1rem;
   border-radius: .85rem;
-  border-left: 4px solid var(--first-color);
-  background-color: rgba(255, 213, 79, 0.18);
-  color: var(--title-color);
+  border-left: 4px solid hsl(0, 75%, 56%);
+  background-color: rgba(51, 121, 172, 0.07);
+  color: var(--text-color);
 }
 
 body.user-theme-active #guide-modal .guide-modal__eyebrow,
@@ -1599,7 +1599,7 @@ body.user-theme-active #guide-modal .guide-modal__checklist-item::before {
 }
 
 body.user-theme-active #guide-modal .guide-modal__note {
-  border-left-color: var(--user-accent-color);
+  border-left-color: hsl(0, 75%, 56%);
 }
 
 .profile__delete-note {
