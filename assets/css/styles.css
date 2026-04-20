@@ -1557,31 +1557,29 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
 
 .guide-modal__checklist-item {
   display: flex;
-  align-items: flex-start;
-  gap: .65rem;
+  align-items: center;
+  gap: .55rem;
 }
 
 .guide-modal__checklist-item::before {
   content: '';
-  width: .6rem;
-  height: .6rem;
+  width: .42rem;
+  height: .42rem;
   flex-shrink: 0;
-  margin-top: .45rem;
   border-radius: 50%;
-  background-color: var(--first-color);
+  background-color: var(--text-color);
 }
 
 .guide-modal__note {
   padding: .9rem 1rem;
   border-radius: .85rem;
   border-left: 4px solid hsl(0, 75%, 56%);
-  background-color: rgba(51, 121, 172, 0.07);
+  background-color: hsl(0, 75%, 96%);
   color: var(--text-color);
 }
 
 body.user-theme-active #guide-modal .guide-modal__eyebrow,
 body.user-theme-active #guide-modal .guide-modal__trigger-icon,
-body.user-theme-active #guide-modal .guide-modal__checklist-item::before,
 body.user-theme-active #guide-modal .guide-modal__note {
   color: var(--user-accent-color);
 }
@@ -1593,8 +1591,7 @@ body.user-theme-active #guide-modal .guide-modal__hero {
     linear-gradient(145deg, rgba(51, 121, 172, 0.08), rgba(255, 255, 255, 0.96));
 }
 
-body.user-theme-active #guide-modal .guide-modal__item.is-open .guide-modal__trigger-icon,
-body.user-theme-active #guide-modal .guide-modal__checklist-item::before {
+body.user-theme-active #guide-modal .guide-modal__item.is-open .guide-modal__trigger-icon {
   background-color: var(--user-accent-color);
 }
 
