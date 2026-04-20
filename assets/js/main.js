@@ -168,115 +168,115 @@ const GUIDE_ARTICLES = [
    {
       id: 'dual-boot',
       title: 'Dual Boot vorbereiten',
-      description: 'Windows und Linux parallel auf demselben Rechner nutzen, ohne hektische Entscheidungen waehrend der Installation.',
+      description: 'Windows und Linux parallel auf demselben Rechner nutzen, ohne hektische Entscheidungen während der Installation.',
       steps: [
          'Sichere zuerst deine wichtigsten Dateien auf einer externen Festplatte oder in der Cloud. Eine saubere Sicherung ist der wichtigste Schutz, falls etwas schiefgeht.',
-         'Pruefe in Windows unter Datentraegerverwaltung, ob genug freier Speicher vorhanden ist. Fuer einen entspannten Start sind 60 bis 100 GB fuer Linux sinnvoll.',
-         'Deaktiviere in Windows den Schnellstart. Sonst kann Windows Partitionen in einem Zustand hinterlassen, den Linux spaeter nicht sauber lesen kann.',
-         'Verkleinere deine Windows-Partition nur in Windows selbst. Nutze dafuer die Datentraegerverwaltung und lasse den neu gewonnenen Bereich danach unzugeordnet.',
+         'Prüfe in Windows unter Datenträgerverwaltung, ob genug freier Speicher vorhanden ist. Für einen entspannten Start sind 60 bis 100 GB für Linux sinnvoll.',
+         'Deaktiviere in Windows den Schnellstart. Sonst kann Windows Partitionen in einem Zustand hinterlassen, den Linux später nicht sauber lesen kann.',
+         'Verkleinere deine Windows-Partition nur in Windows selbst. Nutze dafür die Datenträgerverwaltung und lasse den neu gewonnenen Bereich danach unzugeordnet.',
          'Lade die Linux-ISO nur von der offiziellen Projektseite herunter und notiere dir, welche Edition du wirklich willst, zum Beispiel Linux Mint Cinnamon oder Ubuntu LTS.',
-         'Wenn dein Geraet BitLocker oder Geraeteverschluesselung nutzt, notiere dir den Wiederherstellungsschluessel, bevor du Partitionen aenderst.'
+         'Wenn dein Gerät BitLocker oder Geräteverschlüsselung nutzt, notiere dir den Wiederherstellungsschlüssel, bevor du Partitionen änderst.'
       ],
       checklist: [
          'Backup vorhanden',
          'Genug freier Speicher eingeplant',
          'Schnellstart deaktiviert',
-         'BitLocker-Schluessel gesichert'
+         'BitLocker-Schlüssel gesichert'
       ],
-      note: 'Bei sehr alten Rechnern mit Legacy-BIOS oder mehreren Festplatten lohnt es sich, vorab im BIOS oder UEFI zu pruefen, von welcher Platte spaeter zuerst gebootet wird.'
+      note: 'Bei sehr alten Rechnern mit Legacy-BIOS oder mehreren Festplatten lohnt es sich, vorab im BIOS oder UEFI zu prüfen, von welcher Platte später zuerst gebootet wird.'
    },
    {
       id: 'usb-stick',
       title: 'Linux-USB-Stick erstellen und testen',
-      description: 'Ein bootfaehiger USB-Stick ist der sicherste Weg, Linux erst einmal unverbindlich auszuprobieren.',
+      description: 'Ein bootfähiger USB-Stick ist der sicherste Weg, Linux erst einmal unverbindlich auszuprobieren.',
       steps: [
-         'Nimm einen USB-Stick mit mindestens 8 GB, auf dem nichts Wichtiges mehr liegt. Beim Erstellen wird er in der Regel komplett geloescht.',
-         'Nutze ein einfaches Tool wie Rufus oder balenaEtcher und waehle dort die heruntergeladene ISO-Datei aus.',
-         'Lass die vorgeschlagenen Standardwerte meist unveraendert, sofern das Tool nichts anderes empfiehlt. Fuer moderne Rechner ist UEFI fast immer richtig.',
-         'Starte den Rechner neu und oeffne das Boot-Menue. Je nach Hersteller ist das oft F12, Esc oder F9.',
-         'Waehle den USB-Stick aus und starte zuerst den Live-Modus, also "Ausprobieren" statt sofort "Installieren".',
-         'Teste im Live-System kurz WLAN, Touchpad, Ton, Bildschirmhelligkeit und Tastatur. Wenn diese Dinge funktionieren, ist das ein gutes Zeichen fuer eine problemlose Installation.'
+         'Nimm einen USB-Stick mit mindestens 8 GB, auf dem nichts Wichtiges mehr liegt. Beim Erstellen wird er in der Regel komplett gelöscht.',
+         'Nutze ein einfaches Tool wie Rufus oder balenaEtcher und wähle dort die heruntergeladene ISO-Datei aus.',
+         'Lass die vorgeschlagenen Standardwerte meist unverändert, sofern das Tool nichts anderes empfiehlt. Für moderne Rechner ist UEFI fast immer richtig.',
+         'Starte den Rechner neu und öffne das Boot-Menü. Je nach Hersteller ist das oft F12, Esc oder F9.',
+         'Wähle den USB-Stick aus und starte zuerst den Live-Modus, also "Ausprobieren" statt sofort "Installieren".',
+         'Teste im Live-System kurz WLAN, Touchpad, Ton, Bildschirmhelligkeit und Tastatur. Wenn diese Dinge funktionieren, ist das ein gutes Zeichen für eine problemlose Installation.'
       ],
       checklist: [
          'USB-Stick erfolgreich erstellt',
          'Live-Modus gestartet',
          'WLAN, Audio und Eingabe getestet'
       ],
-      note: 'Wenn der Stick nicht erscheint, deaktiviere Secure Boot nicht sofort. Erst pruefen, ob die Distribution Secure Boot bereits sauber unterstuetzt.'
+      note: 'Wenn der Stick nicht erscheint, deaktiviere Secure Boot nicht sofort. Erst prüfen, ob die Distribution Secure Boot bereits sauber unterstützt.'
    },
    {
       id: 'installation',
       title: 'Linux installieren',
-      description: 'Die eigentliche Installation ist meist einfacher als erwartet, wenn du dich vorher fuer eine klare Variante entschieden hast.',
+      description: 'Die eigentliche Installation ist meist einfacher als erwartet, wenn du dich vorher für eine klare Variante entschieden hast.',
       steps: [
-         'Starte wieder vom USB-Stick und waehle diesmal die Installation. Sprache, Tastatur und WLAN kannst du meist direkt am Anfang festlegen.',
-         'Wenn du Dual Boot willst, suche nach einer Option wie "Neben Windows installieren". Diese Automatik ist fuer Einsteiger oft die sicherste Wahl.',
-         'Wenn du eine manuelle Partitionierung siehst und dir unsicher bist, brich lieber ab und starte neu, statt auf Verdacht etwas zu loeschen.',
-         'Lege Benutzername und Passwort so fest, dass du sie dir leicht merken kannst. Unter Linux brauchst du das Passwort spaeter regelmaessig fuer Systemaenderungen.',
-         'Nach dem Kopieren der Daten verlangt der Installer meist einen Neustart. Ziehe den USB-Stick erst dann ab, wenn du dazu aufgefordert wirst oder der Rechner bereits herunterfaehrt.',
-         'Nach dem Neustart solltest du ein Boot-Menue sehen, in dem du zwischen Linux und Windows waehlen kannst.'
+         'Starte wieder vom USB-Stick und wähle diesmal die Installation. Sprache, Tastatur und WLAN kannst du meist direkt am Anfang festlegen.',
+         'Wenn du Dual Boot willst, suche nach einer Option wie "Neben Windows installieren". Diese Automatik ist für Einsteiger oft die sicherste Wahl.',
+         'Wenn du eine manuelle Partitionierung siehst und dir unsicher bist, brich lieber ab und starte neu, statt auf Verdacht etwas zu löschen.',
+         'Lege Benutzername und Passwort so fest, dass du sie dir leicht merken kannst. Unter Linux brauchst du das Passwort später regelmäßig für Systemänderungen.',
+         'Nach dem Kopieren der Daten verlangt der Installer meist einen Neustart. Ziehe den USB-Stick erst dann ab, wenn du dazu aufgefordert wirst oder der Rechner bereits herunterfährt.',
+         'Nach dem Neustart solltest du ein Boot-Menü sehen, in dem du zwischen Linux und Windows wählen kannst.'
       ],
       checklist: [
-         'Richtige Installationsoption gewaehlt',
-         'Keine Windows-Partition versehentlich geloescht',
+         'Richtige Installationsoption gewählt',
+         'Keine Windows-Partition versehentlich gelöscht',
          'Benutzerkonto erstellt',
-         'Beide Systeme im Boot-Menue sichtbar'
+         'Beide Systeme im Boot-Menü sichtbar'
       ],
-      note: 'Falls nur noch Windows startet, ist das nicht automatisch ein Datenverlust. Oft laesst sich der Linux-Bootloader spaeter mit einem Live-Stick reparieren.'
+      note: 'Falls nur noch Windows startet, ist das nicht automatisch ein Datenverlust. Oft lässt sich der Linux-Bootloader später mit einem Live-Stick reparieren.'
    },
    {
       id: 'programme',
       title: 'Programme installieren',
-      description: 'Unter Linux kommt Software oft aus einer zentralen Paketquelle. Das ist ungewohnt, aber fuer Einsteiger meist angenehmer als einzelne Downloads aus dem Web.',
+      description: 'Unter Linux kommt Software oft aus einer zentralen Paketquelle. Das ist ungewohnt, aber für Einsteiger meist angenehmer als einzelne Downloads aus dem Web.',
       steps: [
          'Suche zuerst im Software-Center deiner Distribution. Dort findest du Browser, Messenger, Office-Tools und viele weitere Programme mit wenigen Klicks.',
          'Achte auf die Quelle eines Programms. Bevorzuge offizielle Paketquellen oder bekannte Formate wie Flatpak, statt beliebige Dateien aus Foren herunterzuladen.',
          'Wenn du ein Programm nicht findest, suche auf der offiziellen Projektseite nach einer Linux-Anleitung statt nach inoffiziellen Tutorials.',
-         'Merke dir: Unter Debian, Ubuntu oder Mint trifft man oft auf APT, bei Fedora auf DNF und bei Arch auf Pacman. Du musst das nicht sofort auswendig koennen, aber die Namen helfen bei Anleitungen.',
-         'Installiere anfangs nur das, was du wirklich brauchst. So bleibt das System uebersichtlich und du erkennst schneller, wenn ein neues Programm ein Problem verursacht.'
+         'Merke dir: Unter Debian, Ubuntu oder Mint trifft man oft auf APT, bei Fedora auf DNF und bei Arch auf Pacman. Du musst das nicht sofort auswendig können, aber die Namen helfen bei Anleitungen.',
+         'Installiere anfangs nur das, was du wirklich brauchst. So bleibt das System übersichtlich und du erkennst schneller, wenn ein neues Programm ein Problem verursacht.'
       ],
       checklist: [
          'Software-Center zuerst genutzt',
-         'Nur vertrauenswuerdige Quellen verwendet',
+         'Nur vertrauenswürdige Quellen verwendet',
          'Paketmanager der eigenen Distribution grob erkannt'
       ],
-      note: 'Wenn eine Webseite nur eine EXE-Datei anbietet, ist das fast immer ein Hinweis darauf, dass diese Version fuer Windows gedacht ist und nicht direkt unter Linux laeuft.'
+      note: 'Wenn eine Webseite nur eine EXE-Datei anbietet, ist das fast immer ein Hinweis darauf, dass diese Version für Windows gedacht ist und nicht direkt unter Linux läuft.'
    },
    {
       id: 'updates',
       title: 'Updates, Treiber und Sicherheit',
-      description: 'Regelmaessige Updates sind unter Linux genauso wichtig wie unter Windows, oft sogar einfacher.',
+      description: 'Regelmäßige Updates sind unter Linux genauso wichtig wie unter Windows, oft sogar einfacher.',
       steps: [
-         'Oeffne direkt nach der Installation den Update-Manager und installiere alle angebotenen Aktualisierungen.',
-         'Falls deine Distribution proprietaere Grafik- oder WLAN-Treiber empfiehlt, lies die Beschreibung in Ruhe. Gerade bei NVIDIA kann das sinnvoll sein.',
-         'Starte den Rechner nach einem groesseren Kernel- oder Treiber-Update einmal neu, auch wenn Linux nicht immer aktiv dazu auffordert.',
+         'Öffne direkt nach der Installation den Update-Manager und installiere alle angebotenen Aktualisierungen.',
+         'Falls deine Distribution proprietäre Grafik- oder WLAN-Treiber empfiehlt, lies die Beschreibung in Ruhe. Gerade bei NVIDIA kann das sinnvoll sein.',
+         'Starte den Rechner nach einem größeren Kernel- oder Treiber-Update einmal neu, auch wenn Linux nicht immer aktiv dazu auffordert.',
          'Installiere Sicherheitsupdates zeitnah und vermeide es, Warnmeldungen dauerhaft zu ignorieren.',
-         'Nutze fuer dein Benutzerkonto ein starkes Passwort und arbeite nicht staendig als Administrator. Genau dafuer fragt Linux gezielt nach dem Passwort, wenn wirklich etwas Wichtiges geaendert wird.'
+         'Nutze für dein Benutzerkonto ein starkes Passwort und arbeite nicht ständig als Administrator. Genau dafür fragt Linux gezielt nach dem Passwort, wenn wirklich etwas Wichtiges geändert wird.'
       ],
       checklist: [
          'Erste Systemupdates erledigt',
-         'Empfohlene Treiber geprueft',
-         'Rechner nach grossen Updates neu gestartet'
+         'Empfohlene Treiber geprüft',
+         'Rechner nach großen Updates neu gestartet'
       ],
-      note: 'Wenn nach einem Treiberwechsel ploetzlich etwas schlechter funktioniert, kannst du meist auf den vorherigen Treiber zurueckgehen. Deshalb lohnt es sich, immer nur eine groessere Aenderung auf einmal zu machen.'
+      note: 'Wenn nach einem Treiberwechsel plötzlich etwas schlechter funktioniert, kannst du meist auf den vorherigen Treiber zurückgehen. Deshalb lohnt es sich, immer nur eine größere Änderung auf einmal zu machen.'
    },
    {
       id: 'dateien-backup',
       title: 'Dateien, Rechte und Backup',
-      description: 'Ein paar Grundideen zu Ordnern, Rechten und Sicherungen ersparen spaeter viel Frust.',
+      description: 'Ein paar Grundideen zu Ordnern, Rechten und Sicherungen ersparen später viel Frust.',
       steps: [
-         'Deine persoenlichen Dateien liegen normalerweise im Home-Ordner. Dort arbeitest du im Alltag, nicht in Systemordnern wie /etc oder /usr.',
-         'Wenn eine Aktion nach dem Passwort fragt, bedeutet das meist: Du aenderst gerade etwas am System und nicht nur an deinen eigenen Dateien.',
-         'Speichere wichtige Dokumente regelmaessig auf einem zweiten Medium. Ein Backup ist nur dann hilfreich, wenn es nicht auf derselben SSD liegt wie das Original.',
-         'Nutze fuer grosse Aenderungen an Partitionen oder Boot-Einstellungen lieber vorher einen Wiederherstellungspunkt, ein Image oder zumindest ein frisches Dateibackup.',
-         'Wenn du unsicher bist, was ein Befehl macht, fuehre ihn nicht blind aus. Suche zuerst nach einer Erklaerung in der offiziellen Doku deiner Distribution.'
+         'Deine persönlichen Dateien liegen normalerweise im Home-Ordner. Dort arbeitest du im Alltag, nicht in Systemordnern wie /etc oder /usr.',
+         'Wenn eine Aktion nach dem Passwort fragt, bedeutet das meist: Du änderst gerade etwas am System und nicht nur an deinen eigenen Dateien.',
+         'Speichere wichtige Dokumente regelmäßig auf einem zweiten Medium. Ein Backup ist nur dann hilfreich, wenn es nicht auf derselben SSD liegt wie das Original.',
+         'Nutze für große Änderungen an Partitionen oder Boot-Einstellungen lieber vorher einen Wiederherstellungspunkt, ein Image oder zumindest ein frisches Dateibackup.',
+         'Wenn du unsicher bist, was ein Befehl macht, führe ihn nicht blind aus. Suche zuerst nach einer Erklärung in der offiziellen Doku deiner Distribution.'
       ],
       checklist: [
          'Home-Ordner als Hauptarbeitsort verstanden',
          'Backup-Routine eingerichtet',
-         'Unbekannte Befehle nicht blind ausgefuehrt'
+         'Unbekannte Befehle nicht blind ausgeführt'
       ],
-      note: 'Gerade beim Dual Boot ist ein zusaetzliches Backup besonders wichtig, weil dort Bootloader, Partitionen und zwei Systeme zusammenkommen.'
+      note: 'Gerade beim Dual Boot ist ein zusätzliches Backup besonders wichtig, weil dort Bootloader, Partitionen und zwei Systeme zusammenkommen.'
    }
 ]
 
