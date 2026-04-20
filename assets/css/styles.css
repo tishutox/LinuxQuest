@@ -1584,7 +1584,7 @@ body.user-theme-active #guide-modal .guide-modal__eyebrow {
 
 body.user-theme-active #guide-modal .guide-modal__trigger-icon {
   color: var(--user-accent-text-color);
-  background-color: var(--user-accent-color);
+  background-color: color-mix(in srgb, var(--user-accent-color) 32%, transparent);
 }
 
 body.user-theme-active #guide-modal .guide-modal__hero {
