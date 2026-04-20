@@ -1430,7 +1430,7 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
 .guide-modal__item {
   border: 1px solid var(--border-color);
   border-radius: 1rem;
-  background-color: rgba(255, 255, 255, 0.88);
+  background-color: var(--container-color);
   box-shadow: 0 10px 30px rgba(30, 56, 84, 0.08);
   overflow: hidden;
 }
@@ -1442,7 +1442,7 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.1rem;
-  background: transparent;
+  background-color: var(--container-color);
   color: var(--title-color);
   text-align: left;
 }
@@ -1507,6 +1507,7 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
   display: grid;
   gap: .9rem;
   padding: 0 1.1rem 1.1rem;
+  background-color: var(--container-color);
   border-top: 1px solid rgba(51, 121, 172, 0.12);
 }
 
