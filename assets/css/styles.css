@@ -1563,12 +1563,11 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
 
 .guide-modal__checklist-item::before {
   content: '';
-  width: .42rem;
-  height: .42rem;
+  width: .32rem;
+  height: .32rem;
   flex-shrink: 0;
   border-radius: 50%;
   background-color: var(--text-color);
-  margin-top: .15em;
 }
 
 .guide-modal__note {
@@ -1580,8 +1579,7 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
 }
 
 body.user-theme-active #guide-modal .guide-modal__eyebrow,
-body.user-theme-active #guide-modal .guide-modal__trigger-icon,
-body.user-theme-active #guide-modal .guide-modal__note {
+body.user-theme-active #guide-modal .guide-modal__trigger-icon {
   color: var(--user-accent-color);
 }
 
