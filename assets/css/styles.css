@@ -1385,6 +1385,185 @@ body.user-theme-active #finder-country-modal .belief-picker__religion {
   background-color: var(--container-color);
 }
 
+#guide-modal .login__form {
+  width: min(100%, 760px);
+  text-align: left;
+}
+
+.guide-modal__form {
+  gap: 1rem;
+}
+
+.guide-modal__hero {
+  display: grid;
+  gap: .55rem;
+  padding: 1.1rem 1rem;
+  border: 1px solid rgba(51, 121, 172, 0.18);
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at top right, rgba(51, 121, 172, 0.18), transparent 38%),
+    linear-gradient(145deg, rgba(51, 121, 172, 0.08), rgba(255, 255, 255, 0.96));
+}
+
+.guide-modal__eyebrow {
+  font-size: .78rem;
+  font-weight: var(--font-semi-bold);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--first-color);
+}
+
+.guide-modal__intro,
+.guide-modal__panel-intro,
+.guide-modal__step,
+.guide-modal__checklist-item,
+.guide-modal__note {
+  line-height: 1.65;
+}
+
+.guide-modal__accordion {
+  display: grid;
+  gap: .85rem;
+}
+
+.guide-modal__item {
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  background-color: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 10px 30px rgba(30, 56, 84, 0.08);
+  overflow: hidden;
+}
+
+.guide-modal__trigger {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  background: transparent;
+  color: var(--title-color);
+  text-align: left;
+}
+
+.guide-modal__trigger-text {
+  display: grid;
+  gap: .3rem;
+}
+
+.guide-modal__trigger-title {
+  font-size: 1rem;
+  font-weight: var(--font-semi-bold);
+}
+
+.guide-modal__trigger-description {
+  font-size: .92rem;
+  color: var(--text-color);
+}
+
+.guide-modal__trigger-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background-color: rgba(51, 121, 172, 0.12);
+  color: var(--first-color);
+  font-size: 1.2rem;
+  font-weight: var(--font-semi-bold);
+  transition: transform .25s ease, background-color .25s ease, color .25s ease;
+}
+
+.guide-modal__item.is-open .guide-modal__trigger-icon {
+  transform: rotate(45deg);
+  background-color: var(--first-color);
+  color: #fff;
+}
+
+.guide-modal__panel {
+  display: grid;
+  gap: .9rem;
+  padding: 0 1.1rem 1.1rem;
+  border-top: 1px solid rgba(51, 121, 172, 0.12);
+}
+
+.guide-modal__section-title {
+  font-size: .82rem;
+  font-weight: var(--font-semi-bold);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--title-color);
+}
+
+.guide-modal__steps {
+  display: grid;
+  gap: .75rem;
+  margin-left: 1.2rem;
+  color: var(--text-color);
+}
+
+.guide-modal__checklist {
+  display: grid;
+  gap: .65rem;
+  padding: .9rem 1rem;
+  border-radius: .85rem;
+  background-color: rgba(51, 121, 172, 0.07);
+}
+
+.guide-modal__checklist-list {
+  display: grid;
+  gap: .55rem;
+}
+
+.guide-modal__checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+}
+
+.guide-modal__checklist-item::before {
+  content: '';
+  width: .6rem;
+  height: .6rem;
+  flex-shrink: 0;
+  margin-top: .45rem;
+  border-radius: 50%;
+  background-color: var(--first-color);
+}
+
+.guide-modal__note {
+  padding: .9rem 1rem;
+  border-radius: .85rem;
+  border-left: 4px solid var(--first-color);
+  background-color: rgba(255, 213, 79, 0.18);
+  color: var(--title-color);
+}
+
+body.user-theme-active #guide-modal .guide-modal__eyebrow,
+body.user-theme-active #guide-modal .guide-modal__trigger-icon,
+body.user-theme-active #guide-modal .guide-modal__checklist-item::before,
+body.user-theme-active #guide-modal .guide-modal__note {
+  color: var(--user-accent-color);
+}
+
+body.user-theme-active #guide-modal .guide-modal__hero {
+  border-color: var(--user-accent-color);
+  background:
+    radial-gradient(circle at top right, rgba(51, 121, 172, 0.18), transparent 38%),
+    linear-gradient(145deg, rgba(51, 121, 172, 0.08), rgba(255, 255, 255, 0.96));
+}
+
+body.user-theme-active #guide-modal .guide-modal__item.is-open .guide-modal__trigger-icon,
+body.user-theme-active #guide-modal .guide-modal__checklist-item::before {
+  background-color: var(--user-accent-color);
+}
+
+body.user-theme-active #guide-modal .guide-modal__note {
+  border-left-color: var(--user-accent-color);
+}
+
 .profile__delete-note {
   color: var(--text-color);
   font-size: .8rem;

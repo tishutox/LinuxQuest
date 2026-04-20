@@ -52,7 +52,7 @@
                   </li>
 
                   <li class="nav__item">
-                     <a href="#" class="nav__link">Leitfaden</a>
+                     <a href="#" class="nav__link" id="nav-guide-link" aria-haspopup="dialog" aria-controls="guide-modal">Leitfaden</a>
                   </li>
                </ul>
 
@@ -818,6 +818,20 @@
          <i class="fi fi-rr-cross-small login__close" id="finder-country-close"></i>
       </div>
 
+      <div class="login" id="guide-modal">
+         <div class="login__form profile__form guide-modal__form">
+            <div class="guide-modal__hero">
+               <p class="guide-modal__eyebrow">Leitfaden</p>
+               <h2 class="login__title">Linux Schritt für Schritt verstehen</h2>
+               <p class="guide-modal__intro">Hier findest du kurze, verständliche Anleitungen zu typischen Linux-Themen. Klappe ein Thema auf und arbeite die Schritte nacheinander ab. Wenn du einen neuen Punkt öffnest, schließt sich der vorherige automatisch.</p>
+            </div>
+
+            <div class="guide-modal__accordion" id="guide-accordion" aria-label="Linux Leitfäden"></div>
+         </div>
+
+         <i class="fi fi-rr-cross-small login__close" id="guide-modal-close"></i>
+      </div>
+
       <div class="login" id="follow-list-modal">
          <div class="login__form profile__form">
             <h2 class="login__title" id="follow-list-title">Liste</h2>
@@ -946,6 +960,6 @@
       </div>
 
       <!--=============== MAIN JS ===============-->
-      <script src="assets/js/main.js"></script>
+      <script src="assets/js/main.js?v=20260420-1"></script>
    </body>
 </html>

@@ -61,6 +61,7 @@ const searchResults = document.getElementById('search-results')
 const searchFormIcon = document.getElementById('search-form-icon')
 const finderNavLink = document.getElementById('nav-finder-link')
 const savedNavLink = document.getElementById('nav-saved-link')
+const guideNavLink = document.getElementById('nav-guide-link')
 const finderFilterOptions = document.getElementById('finder-filter-options')
 const finderDistroResults = document.getElementById('finder-distro-results')
 const finderFilterCodebase = document.getElementById('finder-filter-codebase')
@@ -118,6 +119,9 @@ const distroReviewsModal = document.getElementById('distro-reviews-modal')
 const distroReviewsModalClose = document.getElementById('distro-reviews-modal-close')
 const distroReviewsModalCloseBtn = document.getElementById('distro-reviews-close-btn')
 const distroReviewsModalList = document.getElementById('distro-reviews-modal-list')
+const guideModal = document.getElementById('guide-modal')
+const guideModalClose = document.getElementById('guide-modal-close')
+const guideAccordion = document.getElementById('guide-accordion')
 
 let finderTagStates = {}
 let currentDistroKey = ''
@@ -128,6 +132,7 @@ let distroRatingSelection = 0
 let currentDistroReviews = []
 let savedDistroEntries = []
 let savedDistroKeySet = new Set()
+let activeGuideArticleId = GUIDE_ARTICLES[0]?.id || ''
 
 const FINDER_ISO_SIZE_MIN_MB = 700
 const FINDER_ISO_SIZE_MAX_MB = 5000
@@ -159,6 +164,122 @@ const FINDER_COUNTRY_OPTIONS = [
 const FINDER_COUNTRY_LABEL_BY_VALUE = Object.fromEntries(
    FINDER_COUNTRY_OPTIONS.map((country) => [country.value, country.label])
 )
+
+const GUIDE_ARTICLES = [
+   {
+      id: 'dual-boot',
+      title: 'Dual Boot vorbereiten',
+      description: 'Windows und Linux parallel auf demselben Rechner nutzen, ohne hektische Entscheidungen waehrend der Installation.',
+      steps: [
+         'Sichere zuerst deine wichtigsten Dateien auf einer externen Festplatte oder in der Cloud. Eine saubere Sicherung ist der wichtigste Schutz, falls etwas schiefgeht.',
+         'Pruefe in Windows unter Datentraegerverwaltung, ob genug freier Speicher vorhanden ist. Fuer einen entspannten Start sind 60 bis 100 GB fuer Linux sinnvoll.',
+         'Deaktiviere in Windows den Schnellstart. Sonst kann Windows Partitionen in einem Zustand hinterlassen, den Linux spaeter nicht sauber lesen kann.',
+         'Verkleinere deine Windows-Partition nur in Windows selbst. Nutze dafuer die Datentraegerverwaltung und lasse den neu gewonnenen Bereich danach unzugeordnet.',
+         'Lade die Linux-ISO nur von der offiziellen Projektseite herunter und notiere dir, welche Edition du wirklich willst, zum Beispiel Linux Mint Cinnamon oder Ubuntu LTS.',
+         'Wenn dein Geraet BitLocker oder Geraeteverschluesselung nutzt, notiere dir den Wiederherstellungsschluessel, bevor du Partitionen aenderst.'
+      ],
+      checklist: [
+         'Backup vorhanden',
+         'Genug freier Speicher eingeplant',
+         'Schnellstart deaktiviert',
+         'BitLocker-Schluessel gesichert'
+      ],
+      note: 'Bei sehr alten Rechnern mit Legacy-BIOS oder mehreren Festplatten lohnt es sich, vorab im BIOS oder UEFI zu pruefen, von welcher Platte spaeter zuerst gebootet wird.'
+   },
+   {
+      id: 'usb-stick',
+      title: 'Linux-USB-Stick erstellen und testen',
+      description: 'Ein bootfaehiger USB-Stick ist der sicherste Weg, Linux erst einmal unverbindlich auszuprobieren.',
+      steps: [
+         'Nimm einen USB-Stick mit mindestens 8 GB, auf dem nichts Wichtiges mehr liegt. Beim Erstellen wird er in der Regel komplett geloescht.',
+         'Nutze ein einfaches Tool wie Rufus oder balenaEtcher und waehle dort die heruntergeladene ISO-Datei aus.',
+         'Lass die vorgeschlagenen Standardwerte meist unveraendert, sofern das Tool nichts anderes empfiehlt. Fuer moderne Rechner ist UEFI fast immer richtig.',
+         'Starte den Rechner neu und oeffne das Boot-Menue. Je nach Hersteller ist das oft F12, Esc oder F9.',
+         'Waehle den USB-Stick aus und starte zuerst den Live-Modus, also "Ausprobieren" statt sofort "Installieren".',
+         'Teste im Live-System kurz WLAN, Touchpad, Ton, Bildschirmhelligkeit und Tastatur. Wenn diese Dinge funktionieren, ist das ein gutes Zeichen fuer eine problemlose Installation.'
+      ],
+      checklist: [
+         'USB-Stick erfolgreich erstellt',
+         'Live-Modus gestartet',
+         'WLAN, Audio und Eingabe getestet'
+      ],
+      note: 'Wenn der Stick nicht erscheint, deaktiviere Secure Boot nicht sofort. Erst pruefen, ob die Distribution Secure Boot bereits sauber unterstuetzt.'
+   },
+   {
+      id: 'installation',
+      title: 'Linux installieren',
+      description: 'Die eigentliche Installation ist meist einfacher als erwartet, wenn du dich vorher fuer eine klare Variante entschieden hast.',
+      steps: [
+         'Starte wieder vom USB-Stick und waehle diesmal die Installation. Sprache, Tastatur und WLAN kannst du meist direkt am Anfang festlegen.',
+         'Wenn du Dual Boot willst, suche nach einer Option wie "Neben Windows installieren". Diese Automatik ist fuer Einsteiger oft die sicherste Wahl.',
+         'Wenn du eine manuelle Partitionierung siehst und dir unsicher bist, brich lieber ab und starte neu, statt auf Verdacht etwas zu loeschen.',
+         'Lege Benutzername und Passwort so fest, dass du sie dir leicht merken kannst. Unter Linux brauchst du das Passwort spaeter regelmaessig fuer Systemaenderungen.',
+         'Nach dem Kopieren der Daten verlangt der Installer meist einen Neustart. Ziehe den USB-Stick erst dann ab, wenn du dazu aufgefordert wirst oder der Rechner bereits herunterfaehrt.',
+         'Nach dem Neustart solltest du ein Boot-Menue sehen, in dem du zwischen Linux und Windows waehlen kannst.'
+      ],
+      checklist: [
+         'Richtige Installationsoption gewaehlt',
+         'Keine Windows-Partition versehentlich geloescht',
+         'Benutzerkonto erstellt',
+         'Beide Systeme im Boot-Menue sichtbar'
+      ],
+      note: 'Falls nur noch Windows startet, ist das nicht automatisch ein Datenverlust. Oft laesst sich der Linux-Bootloader spaeter mit einem Live-Stick reparieren.'
+   },
+   {
+      id: 'programme',
+      title: 'Programme installieren',
+      description: 'Unter Linux kommt Software oft aus einer zentralen Paketquelle. Das ist ungewohnt, aber fuer Einsteiger meist angenehmer als einzelne Downloads aus dem Web.',
+      steps: [
+         'Suche zuerst im Software-Center deiner Distribution. Dort findest du Browser, Messenger, Office-Tools und viele weitere Programme mit wenigen Klicks.',
+         'Achte auf die Quelle eines Programms. Bevorzuge offizielle Paketquellen oder bekannte Formate wie Flatpak, statt beliebige Dateien aus Foren herunterzuladen.',
+         'Wenn du ein Programm nicht findest, suche auf der offiziellen Projektseite nach einer Linux-Anleitung statt nach inoffiziellen Tutorials.',
+         'Merke dir: Unter Debian, Ubuntu oder Mint trifft man oft auf APT, bei Fedora auf DNF und bei Arch auf Pacman. Du musst das nicht sofort auswendig koennen, aber die Namen helfen bei Anleitungen.',
+         'Installiere anfangs nur das, was du wirklich brauchst. So bleibt das System uebersichtlich und du erkennst schneller, wenn ein neues Programm ein Problem verursacht.'
+      ],
+      checklist: [
+         'Software-Center zuerst genutzt',
+         'Nur vertrauenswuerdige Quellen verwendet',
+         'Paketmanager der eigenen Distribution grob erkannt'
+      ],
+      note: 'Wenn eine Webseite nur eine EXE-Datei anbietet, ist das fast immer ein Hinweis darauf, dass diese Version fuer Windows gedacht ist und nicht direkt unter Linux laeuft.'
+   },
+   {
+      id: 'updates',
+      title: 'Updates, Treiber und Sicherheit',
+      description: 'Regelmaessige Updates sind unter Linux genauso wichtig wie unter Windows, oft sogar einfacher.',
+      steps: [
+         'Oeffne direkt nach der Installation den Update-Manager und installiere alle angebotenen Aktualisierungen.',
+         'Falls deine Distribution proprietaere Grafik- oder WLAN-Treiber empfiehlt, lies die Beschreibung in Ruhe. Gerade bei NVIDIA kann das sinnvoll sein.',
+         'Starte den Rechner nach einem groesseren Kernel- oder Treiber-Update einmal neu, auch wenn Linux nicht immer aktiv dazu auffordert.',
+         'Installiere Sicherheitsupdates zeitnah und vermeide es, Warnmeldungen dauerhaft zu ignorieren.',
+         'Nutze fuer dein Benutzerkonto ein starkes Passwort und arbeite nicht staendig als Administrator. Genau dafuer fragt Linux gezielt nach dem Passwort, wenn wirklich etwas Wichtiges geaendert wird.'
+      ],
+      checklist: [
+         'Erste Systemupdates erledigt',
+         'Empfohlene Treiber geprueft',
+         'Rechner nach grossen Updates neu gestartet'
+      ],
+      note: 'Wenn nach einem Treiberwechsel ploetzlich etwas schlechter funktioniert, kannst du meist auf den vorherigen Treiber zurueckgehen. Deshalb lohnt es sich, immer nur eine groessere Aenderung auf einmal zu machen.'
+   },
+   {
+      id: 'dateien-backup',
+      title: 'Dateien, Rechte und Backup',
+      description: 'Ein paar Grundideen zu Ordnern, Rechten und Sicherungen ersparen spaeter viel Frust.',
+      steps: [
+         'Deine persoenlichen Dateien liegen normalerweise im Home-Ordner. Dort arbeitest du im Alltag, nicht in Systemordnern wie /etc oder /usr.',
+         'Wenn eine Aktion nach dem Passwort fragt, bedeutet das meist: Du aenderst gerade etwas am System und nicht nur an deinen eigenen Dateien.',
+         'Speichere wichtige Dokumente regelmaessig auf einem zweiten Medium. Ein Backup ist nur dann hilfreich, wenn es nicht auf derselben SSD liegt wie das Original.',
+         'Nutze fuer grosse Aenderungen an Partitionen oder Boot-Einstellungen lieber vorher einen Wiederherstellungspunkt, ein Image oder zumindest ein frisches Dateibackup.',
+         'Wenn du unsicher bist, was ein Befehl macht, fuehre ihn nicht blind aus. Suche zuerst nach einer Erklaerung in der offiziellen Doku deiner Distribution.'
+      ],
+      checklist: [
+         'Home-Ordner als Hauptarbeitsort verstanden',
+         'Backup-Routine eingerichtet',
+         'Unbekannte Befehle nicht blind ausgefuehrt'
+      ],
+      note: 'Gerade beim Dual Boot ist ein zusaetzliches Backup besonders wichtig, weil dort Bootloader, Partitionen und zwei Systeme zusammenkommen.'
+   }
+]
 
 const DISTRO_FINDER_DATA = [
    { name: 'Ubuntu', codebase: 'ubuntu', countries: ['uk'], isoSizeMb: 5900, tags: ['einsteigerfreundlich', 'long-term-support', 'office', 'Laptop'], docsUrl: 'https://help.ubuntu.com', downloadUrl: 'https://ubuntu.com/download', description: 'Bekannte Desktop-Distribution mit starkem LTS-Fokus.', logo: 'assets/img/distros/Ubuntu Server.png', pros: ['Große Community und sehr viel Dokumentation', 'LTS-Versionen mit langem Sicherheitssupport', 'Breite Hardware-Unterstützung out of the box'], cons: ['Snap-Standardpakete starten teils langsamer', 'Relativ umfangreiche Default-Installation'] },
@@ -599,6 +720,16 @@ savedNavLink?.addEventListener('click', async (event) => {
    updateSearchFormIcon('fi fi-rc-bookmark')
    search.classList.add('show-search')
    renderSavedDistrosList()
+   navMenu.classList.remove('show-menu')
+})
+
+guideNavLink?.addEventListener('click', (event) => {
+   event.preventDefault()
+   search.classList.remove('show-search')
+   updateSearchFormIcon('fi fi-rc-search')
+   hideSearchResults()
+   hideAll()
+   guideModal?.classList.add('show-login')
    navMenu.classList.remove('show-menu')
 })
 
@@ -1699,6 +1830,16 @@ finderCountryModal?.addEventListener('click', (event) => {
    }
 })
 
+guideModalClose?.addEventListener('click', () => {
+   guideModal?.classList.remove('show-login')
+})
+
+guideModal?.addEventListener('click', (event) => {
+   if (event.target === guideModal) {
+      guideModal.classList.remove('show-login')
+   }
+})
+
 distroModalClose?.addEventListener('click', () => {
    resetDistroVideo()
    distroModal?.classList.remove('show-login')
@@ -1932,10 +2073,10 @@ function hideStaticModals() {
    staticModalPanels.forEach((panel) => panel.classList.remove('show-login'))
 }
 
-const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
-const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
-const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
-const hideAll      = () => { resetDistroVideo(); loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search'); hideStaticModals() }
+const showLogin    = () => { hideStaticModals(); loginPanel.classList.add('show-login');       registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); guideModal?.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const showRegister = () => { hideStaticModals(); registerPanel.classList.add('show-register'); loginPanel.classList.remove('show-login');    changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); guideModal?.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const showResetPassword = () => { hideStaticModals(); resetPasswordPanel.classList.add('show-login'); loginPanel.classList.remove('show-login'); registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); guideModal?.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search') }
+const hideAll      = () => { resetDistroVideo(); loginPanel.classList.remove('show-login');    registerPanel.classList.remove('show-register'); changeUsernamePanel.classList.remove('show-login'); resetPasswordPanel.classList.remove('show-login'); profileModal.classList.remove('show-login'); accentColorModal.classList.remove('show-login'); birthDateModal.classList.remove('show-login'); beliefModal.classList.remove('show-login'); guideModal?.classList.remove('show-login'); publicProfileModal.classList.remove('show-login'); distroModal.classList.remove('show-login'); distroRatingModal.classList.remove('show-login'); reportModal.classList.remove('show-login'); bugReportModal.classList.remove('show-login'); adminReportsModal.classList.remove('show-login'); followListModal.classList.remove('show-login'); adminUserListModal.classList.remove('show-search'); developerUserListModal.classList.remove('show-search'); hideStaticModals() }
 
 function showStaticModal(modalId) {
    const modal = document.getElementById(modalId)
@@ -5593,6 +5734,129 @@ staticModalPanels.forEach((panel) => {
       }
    })
 })
+
+function renderGuideAccordion() {
+   if (!guideAccordion) return
+
+   guideAccordion.replaceChildren()
+
+   GUIDE_ARTICLES.forEach((article) => {
+      const isExpanded = article.id === activeGuideArticleId
+      const item = document.createElement('section')
+      item.className = 'guide-modal__item'
+      item.dataset.guideId = article.id
+
+      const trigger = document.createElement('button')
+      trigger.type = 'button'
+      trigger.className = 'guide-modal__trigger'
+      trigger.dataset.guideId = article.id
+      trigger.setAttribute('aria-expanded', String(isExpanded))
+      trigger.setAttribute('aria-controls', `guide-panel-${article.id}`)
+
+      const triggerText = document.createElement('span')
+      triggerText.className = 'guide-modal__trigger-text'
+
+      const title = document.createElement('span')
+      title.className = 'guide-modal__trigger-title'
+      title.textContent = article.title
+
+      const description = document.createElement('span')
+      description.className = 'guide-modal__trigger-description'
+      description.textContent = article.description
+
+      triggerText.append(title, description)
+
+      const icon = document.createElement('span')
+      icon.className = 'guide-modal__trigger-icon'
+      icon.setAttribute('aria-hidden', 'true')
+      icon.textContent = '+'
+
+      trigger.append(triggerText, icon)
+
+      const panel = document.createElement('div')
+      panel.className = 'guide-modal__panel'
+      panel.id = `guide-panel-${article.id}`
+      panel.hidden = !isExpanded
+
+      const panelIntro = document.createElement('p')
+      panelIntro.className = 'guide-modal__panel-intro'
+      panelIntro.textContent = article.description
+
+      const stepsTitle = document.createElement('p')
+      stepsTitle.className = 'guide-modal__section-title'
+      stepsTitle.textContent = 'So gehst du vor'
+
+      const stepsList = document.createElement('ol')
+      stepsList.className = 'guide-modal__steps'
+
+      article.steps.forEach((stepText) => {
+         const stepItem = document.createElement('li')
+         stepItem.className = 'guide-modal__step'
+         stepItem.textContent = stepText
+         stepsList.append(stepItem)
+      })
+
+      const checklistBox = document.createElement('div')
+      checklistBox.className = 'guide-modal__checklist'
+
+      const checklistTitle = document.createElement('p')
+      checklistTitle.className = 'guide-modal__section-title'
+      checklistTitle.textContent = 'Kurz-Check'
+
+      const checklistList = document.createElement('ul')
+      checklistList.className = 'guide-modal__checklist-list'
+
+      article.checklist.forEach((point) => {
+         const checklistItem = document.createElement('li')
+         checklistItem.className = 'guide-modal__checklist-item'
+         checklistItem.textContent = point
+         checklistList.append(checklistItem)
+      })
+
+      checklistBox.append(checklistTitle, checklistList)
+
+      const note = document.createElement('p')
+      note.className = 'guide-modal__note'
+      note.textContent = `Wichtig: ${article.note}`
+
+      panel.append(panelIntro, stepsTitle, stepsList, checklistBox, note)
+      item.append(trigger, panel)
+      guideAccordion.append(item)
+   })
+}
+
+function setActiveGuideArticle(articleId, forceOpen = false) {
+   activeGuideArticleId = !forceOpen && activeGuideArticleId === articleId ? '' : articleId
+
+   if (!guideAccordion) return
+
+   const items = Array.from(guideAccordion.querySelectorAll('.guide-modal__item'))
+   items.forEach((item) => {
+      const isExpanded = item.dataset.guideId === activeGuideArticleId
+      item.classList.toggle('is-open', isExpanded)
+
+      const trigger = item.querySelector('.guide-modal__trigger')
+      const panel = item.querySelector('.guide-modal__panel')
+
+      if (trigger) {
+         trigger.setAttribute('aria-expanded', String(isExpanded))
+      }
+
+      if (panel) {
+         panel.hidden = !isExpanded
+      }
+   })
+}
+
+guideAccordion?.addEventListener('click', (event) => {
+   const trigger = event.target.closest('.guide-modal__trigger')
+   if (!trigger) return
+
+   setActiveGuideArticle(trigger.dataset.guideId)
+})
+
+renderGuideAccordion()
+setActiveGuideArticle(activeGuideArticleId, true)
 
 /*=============== CHECK SESSION ON LOAD ===============*/
 async function checkSession() {
