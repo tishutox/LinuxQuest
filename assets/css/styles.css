@@ -401,12 +401,12 @@ img {
   }
 
   .nav__brand-actions > * + * {
-    margin-left: -.35rem !important;
+    margin-left: -.2rem !important;
   }
 
   .nav__brand-actions .nav__developer-tools,
   .nav__brand-actions .nav__admin-tools {
-    margin-left: -.35rem !important;
+    margin-left: -.2rem !important;
   }
 
   .nav__actions {
@@ -414,7 +414,7 @@ img {
   }
 
   .nav__actions .nav__search {
-    margin-right: .35rem !important;
+    margin-right: .45rem !important;
   }
 
   .nav__actions .nav__login,
@@ -424,7 +424,7 @@ img {
   }
 
   .nav__actions > * + * {
-    margin-left: 0 !important;
+    margin-left: .1rem !important;
   }
 
   .nav__menu {
