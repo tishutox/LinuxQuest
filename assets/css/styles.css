@@ -3152,6 +3152,12 @@ body.user-theme-active .profile-background__reset:disabled {
 
 /* For large devices */
 @media screen and (min-width: 1023px) {
+  .search__form {
+    width: min(100%, 1180px);
+    max-width: min(88vw, 1180px);
+    margin-inline: auto;
+  }
+
   .nav {
     height: calc(var(--header-height) + 2rem);
     column-gap: 3rem;
