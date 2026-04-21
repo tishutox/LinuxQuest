@@ -1,8 +1,8 @@
-const CACHE_NAME = 'tuxoraquest-v25'
+const CACHE_NAME = 'tuxoraquest-v26'
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/assets/css/styles.css?v=20260327-5',
+  '/assets/css/styles.css?v=20260421-7',
   '/assets/js/main.js?v=20260420-1',
   '/assets/img/Logo.png',
   '/assets/img/bg-image.png',
