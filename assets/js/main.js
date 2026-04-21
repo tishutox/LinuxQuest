@@ -3861,6 +3861,17 @@ function updateFollowButton() {
    publicProfileFollowIconBtn.setAttribute('aria-label', isFollowing ? 'Entfolgen' : 'Folgen')
 }
 
+function updatePublicProfileReportButton() {
+   if (!publicProfileReportBtn) return
+
+   const isOwnProfile = Boolean(currentPublicProfileFollowState?.isOwnProfile)
+   const hasTargetUser = Boolean(currentPublicProfileUser?.username)
+   const canShowReportButton = hasTargetUser && !isOwnProfile
+
+   publicProfileReportBtn.style.display = canShowReportButton ? 'inline-flex' : 'none'
+   publicProfileReportBtn.disabled = !canShowReportButton
+}
+
 function updatePublicFollowStats() {
    publicProfileFollowersCount.textContent = String(currentPublicProfileFollowState.followersCount || 0)
    publicProfileFollowingCount.textContent = String(currentPublicProfileFollowState.followingCount || 0)
@@ -3907,6 +3918,7 @@ function updatePublicProfileView(payload) {
    publicProfileBioBox.style.display = hasBio ? 'block' : 'none'
    updatePublicFollowStats()
    updateFollowButton()
+   updatePublicProfileReportButton()
 
    // Show unban modal if current user is restricted (regardless of which profile they're viewing)
    if (currentUser?.is_restricted === 1 && !unbanRequestModal.classList.contains('show-login')) {
@@ -3958,6 +3970,7 @@ function showPublicProfileError(message) {
    publicProfileBioBox.style.display = 'none'
     updatePublicFollowStats()
     updateFollowButton()
+   updatePublicProfileReportButton()
    publicProfileEmailLink.style.display = 'none'
    publicProfileEmailLink.href = '#'
    publicProfileEmailLink.innerHTML = '<i class="fi fi-rc-envelope"></i>'
@@ -4831,6 +4844,7 @@ publicProfileCopyBtn.addEventListener('click', async () => {
 })
 
 publicProfileReportBtn.addEventListener('click', () => {
+   if (currentPublicProfileFollowState?.isOwnProfile) return
    if (!currentPublicProfileUser?.username) return
    hideAll()
    if (reportReasonInput) reportReasonInput.value = ''
