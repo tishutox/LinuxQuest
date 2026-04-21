@@ -397,11 +397,16 @@ img {
 /* Navigation for mobile devices */
 @media screen and (max-width: 1023px) {
   .nav__brand-actions {
-    column-gap: .75rem !important;
+    column-gap: 0 !important;
   }
 
   .nav__brand-actions > * + * {
-    margin-left: 0 !important;
+    margin-left: -.35rem !important;
+  }
+
+  .nav__brand-actions .nav__developer-tools,
+  .nav__brand-actions .nav__admin-tools {
+    margin-left: -.35rem !important;
   }
 
   .nav__actions {
@@ -409,7 +414,7 @@ img {
   }
 
   .nav__actions .nav__search {
-    margin-right: .75rem !important;
+    margin-right: .35rem !important;
   }
 
   .nav__actions .nav__login,
