@@ -397,11 +397,18 @@ img {
 /* Navigation for mobile devices */
 @media screen and (max-width: 1023px) {
   .nav__brand-actions {
-    column-gap: .3rem;
+    column-gap: .08rem;
   }
 
   .nav__actions {
-    column-gap: .3rem;
+    column-gap: .16rem;
+  }
+
+  .nav__actions .nav__search,
+  .nav__actions .nav__login,
+  .nav__actions .nav__user,
+  .nav__actions .nav__toggle {
+    margin: 0;
   }
 
   .nav__menu {
