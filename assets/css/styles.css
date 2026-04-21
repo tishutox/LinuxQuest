@@ -401,7 +401,7 @@ img {
   }
 
   .nav__brand-actions > * + * {
-    margin-left: -.55rem;
+    margin-left: .22rem;
   }
 
   .nav__actions {
@@ -410,6 +410,11 @@ img {
 
   .nav__actions > * + * {
     margin-left: -.32rem;
+  }
+
+  .nav__actions .nav__search + .nav__login,
+  .nav__actions .nav__search + .nav__user {
+    margin-left: .22rem;
   }
 
   .nav__actions .nav__search,
