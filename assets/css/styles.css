@@ -396,6 +396,14 @@ img {
 
 /* Navigation for mobile devices */
 @media screen and (max-width: 1023px) {
+  .nav__brand-actions {
+    column-gap: .3rem;
+  }
+
+  .nav__actions {
+    column-gap: .3rem;
+  }
+
   .nav__menu {
     position: fixed;
     top: -100%;
