@@ -6275,6 +6275,16 @@ const DISTRO_DATABASE = {
    "Manjaro": { description: "Beginner-friendly Arch-based distro", tags: ["arch", "einsteigerfreundlich"] }
 }
 
+const QUIZ_DISTRO_ALIAS_MAP = {
+   "Fedora": "Fedora Workstation",
+   "Arch": "Arch Linux",
+   "openSUSE": "openSUSE Leap",
+   "Alpine": "Alpine Linux",
+   "Raspberry Pi OS": "endeavouros-arm",
+   "CentOS Stream": "RHEL",
+   "Privacy-focused Distros": "Tails"
+}
+
 let currentQuizQuestion = 1
 let quizAnswers = {}
 
@@ -6326,6 +6336,41 @@ function showQuizQuestion(questionNum) {
 function getCheckedValues(name) {
    const checked = document.querySelectorAll(`input[name="${name}"]:checked`)
    return Array.from(checked).map(c => c.value)
+}
+
+function resolveQuizDistroToModalData(distroName) {
+   if (!distroName) return null
+
+   const aliasName = QUIZ_DISTRO_ALIAS_MAP[distroName] || distroName
+   const aliasKey = normalizeDistroKey(aliasName)
+   const directKey = normalizeDistroKey(distroName)
+
+   const exactMatch = DISTRO_FINDER_DATA.find((distro) => normalizeDistroKey(distro.name) === aliasKey)
+   if (exactMatch) return exactMatch
+
+   const directMatch = DISTRO_FINDER_DATA.find((distro) => normalizeDistroKey(distro.name) === directKey)
+   if (directMatch) return directMatch
+
+   const looseMatch = DISTRO_FINDER_DATA.find((distro) => {
+      const distroKey = normalizeDistroKey(distro.name)
+      return distroKey.includes(aliasKey) || aliasKey.includes(distroKey)
+   })
+   if (looseMatch) return looseMatch
+
+   const fallback = DISTRO_DATABASE[distroName] || {}
+   return {
+      name: distroName,
+      codebase: '',
+      countries: [],
+      isoSizeMb: null,
+      tags: Array.isArray(fallback.tags) ? fallback.tags : [],
+      docsUrl: '',
+      downloadUrl: '',
+      description: fallback.description || 'Keine Detaildaten hinterlegt.',
+      logo: '',
+      pros: [],
+      cons: []
+   }
 }
 
 function calculateResults() {
@@ -6400,7 +6445,7 @@ function displayResults(results) {
    resultsList.querySelectorAll('.quiz-result-item').forEach(item => {
       item.addEventListener('click', () => {
          const distroName = item.dataset.distro
-         const distroData = DISTRO_FINDER_DATA.find(d => d.name === distroName)
+         const distroData = resolveQuizDistroToModalData(distroName)
          if (distroData) {
             openDistroFromQuiz(distroData)
          }
@@ -6409,78 +6454,8 @@ function displayResults(results) {
 }
 
 function openDistroFromQuiz(distroData) {
-   // Fill distro modal with data
-   currentDistroKey = distroData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-   currentDistroName = distroData.name
-   currentDistroData = distroData
-   
-   // Set basic info
-   if (distroModalName) distroModalName.textContent = distroData.name
-   if (distroModalAvatar) distroModalAvatar.src = distroData.logo || ''
-   if (distroModalAvatar) distroModalAvatar.alt = distroData.name
-   
-   // Set codebase
-   if (distroModalCodebase) {
-      if (distroData.codebase) {
-         distroModalCodebase.textContent = distroData.codebase.charAt(0).toUpperCase() + distroData.codebase.slice(1) + '-basiert'
-         distroModalCodebase.style.display = 'inline'
-      } else {
-         distroModalCodebase.style.display = 'none'
-      }
-   }
-   
-   // Set ISO info
-   if (distroModalIso) {
-      if (distroData.isoSizeMb) {
-         distroModalIso.textContent = `ISO Größe: ${distroData.isoSizeMb} MB`
-      } else {
-         distroModalIso.textContent = ''
-      }
-   }
-   
-   // Set description
-   if (distroModalDescription) {
-      distroModalDescription.textContent = distroData.description || ''
-   }
-   if (distroModalDescriptionBox) {
-      distroModalDescriptionBox.style.display = distroData.description ? 'block' : 'none'
-   }
-   
-   // Set links
-   setDistroLink(distroModalDocs, distroData.docsUrl)
-   setDistroLink(distroModalDownload, distroData.downloadUrl)
-   
-   // Set tags
-   renderDistroTags(distroData.tags)
-   
-   // Set pros/cons
-   const prosConsData = DISTRO_PROS_CONS[distroData.name] || {}
-   renderDistroPointList(
-      distroModalProsList,
-      distroModalProsBox,
-      distroData.pros || prosConsData.pros || [],
-      { symbol: '✓', emptyText: 'Keine Vorteile angegeben' }
-   )
-   renderDistroPointList(
-      distroModalConsList,
-      distroModalConsBox,
-      distroData.cons || prosConsData.cons || [],
-      { symbol: '✗', emptyText: 'Keine Nachteile angegeben' }
-   )
-   
-   // Set video
-   setDistroVideo(distroData)
-   
-   // Clear message
-   if (distroModalMessage) distroModalMessage.textContent = ''
-   
-   // Show modal
-   if (distroModal) {
-      distroModal.style.display = 'flex'
-   }
-   
-   // Hide quiz
-   document.getElementById('quiz-container').style.display = 'none'
+   if (!distroData) return
+   openDistroModal(distroData)
 }
 
 document.getElementById('quiz-next-btn')?.addEventListener('click', (e) => {
