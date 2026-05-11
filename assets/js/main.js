@@ -6278,12 +6278,31 @@ const DISTRO_DATABASE = {
 let currentQuizQuestion = 1
 let quizAnswers = {}
 
+function resetQuizState() {
+   currentQuizQuestion = 1
+   quizAnswers = {}
+
+   const quizForm = document.getElementById('quiz-form')
+   if (quizForm) {
+      quizForm.reset()
+   }
+
+   showQuizQuestion(1)
+   document.getElementById('quiz-results').style.display = 'none'
+   document.getElementById('quiz-next-btn').style.display = 'block'
+   document.getElementById('quiz-prev-btn').style.display = 'none'
+   document.getElementById('quiz-submit-btn').style.display = 'none'
+   document.getElementById('quiz-restart-btn').style.display = 'none'
+}
+
 function initQuiz() {
    const quizContainer = document.getElementById('quiz-container')
-   if (quizContainer && !sessionStorage.getItem('quiz_shown')) {
-      quizContainer.style.display = 'flex'
-      sessionStorage.setItem('quiz_shown', 'true')
-   }
+   if (!quizContainer) return
+
+   // Always restart the quiz from question 1 after a page reload.
+   sessionStorage.removeItem('quiz_shown')
+   quizContainer.style.display = 'flex'
+   resetQuizState()
 }
 
 function updateQuizProgress() {
@@ -6517,13 +6536,7 @@ document.getElementById('quiz-submit-btn')?.addEventListener('click', (e) => {
 
 document.getElementById('quiz-restart-btn')?.addEventListener('click', (e) => {
    e.preventDefault()
-   currentQuizQuestion = 1
-   quizAnswers = {}
-   document.getElementById('quiz-form').reset()
-   showQuizQuestion(1)
-   document.getElementById('quiz-results').style.display = 'none'
-   document.getElementById('quiz-next-btn').style.display = 'block'
-   document.getElementById('quiz-restart-btn').style.display = 'none'
+   resetQuizState()
    
    // Scroll to top
    document.querySelector('.quiz-wrapper').scrollIntoView({ behavior: 'smooth' })
